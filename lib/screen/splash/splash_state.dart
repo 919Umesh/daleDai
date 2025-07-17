@@ -1,0 +1,45 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:omspos/services/sharePrefGeneric/preference_keys.dart';
+import 'package:omspos/services/sharePrefGeneric/sharedPref_service.dart';
+import '../../services/router/router_name.dart';
+
+class SplashState with ChangeNotifier {
+  SplashState();
+
+  late final BuildContext _context;
+
+  set getContext(BuildContext context) {
+    _context = context;
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _startTimer();
+  }
+
+  Future<void> _startTimer() async {
+    await Future.delayed(const Duration(seconds: 3));
+    await _navigateUser();
+  }
+
+  Future<void> _navigateUser() async {
+    try {
+      await SharedPrefService.setValue<bool>(PrefKey.loginSuccess, true);
+      final isLoggedIn = await SharedPrefService.getValue<bool>(
+            PrefKey.loginSuccess,
+            defaultValue: false,
+          ) ??
+          false;
+
+      debugPrint('------------------IsLogin-----------');
+      debugPrint(isLoggedIn.toString());
+
+      _context.go(isLoggedIn ? loginPath : homeScreenPath);
+    } catch (e) {
+      debugPrint('Error during navigation: $e');
+      _context.go(loginPath);
+    }
+  }
+}
