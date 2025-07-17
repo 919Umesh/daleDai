@@ -6,7 +6,7 @@ import 'package:omspos/services/api/customCache_manager.dart';
 import 'package:omspos/utils/custom_log.dart';
 import 'package:omspos/utils/network_util.dart';
 
-import '../sharepref/get_all_pref.dart';
+
 
 
 class APIProvider {
@@ -18,7 +18,7 @@ class APIProvider {
 
   /// ========== GET API ==========
   static Future<dynamic> getAPI({required String endPoint}) async {
-    final String url = "${await GetAllPref.apiUrl()}$endPoint";
+    final String url = "dummyUrl";
 
     CustomLog.warningLog(value: "GET API => $url");
 
@@ -48,7 +48,7 @@ class APIProvider {
 
   /// ========== POST API ==========
   static Future<dynamic> postAPI({required String endPoint, required dynamic body}) async {
-    final String url = "${await GetAllPref.apiUrl()}$endPoint";
+    final String url = "dummyap";
 
     CustomLog.actionLog(value: "POST API => $url \nBody => $body");
 

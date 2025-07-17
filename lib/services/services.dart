@@ -3,8 +3,4 @@ export 'database/create_table.dart';
 export 'database/database.dart';
 export 'database/database_const.dart';
 export 'database/database_provider.dart';
-export 'sharepref/get_all_pref.dart';
-export 'sharepref/pref_text.dart';
-export 'sharepref/set_all_pref.dart';
-export 'sharepref/share_preference.dart';
-export 'sharepref/sharepref.dart';
+

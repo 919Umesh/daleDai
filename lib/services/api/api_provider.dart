@@ -1,16 +1,14 @@
 import 'dart:io';
 
-
 import 'package:dio/dio.dart';
 
 import '../../constants/api_const.dart';
 import '../../utils/custom_log.dart';
-import '../sharepref/get_all_pref.dart';
 
 class APIProvider {
   static getAPI({required String endPoint}) async {
     try {
-      String api = await GetAllPref.apiUrl() + endPoint;
+      String api = "dummyurl";
       CustomLog.warningLog(value: " API =>  $api");
 
       Response response = await Dio().get(api);
@@ -33,13 +31,13 @@ class APIProvider {
 
   static postAPI({required String endPoint, required String body}) async {
     try {
-      String api = await GetAllPref.apiUrl() + endPoint.trim();
+      String api = "dummyurl";
 
       CustomLog.actionLog(value: "API DETAILS => $api $body ");
 
       var headers = {'Content-Type': 'application/json'};
       Response response =
-      await Dio().post(api, data: body, queryParameters: headers);
+          await Dio().post(api, data: body, queryParameters: headers);
 
       ///
       ///

@@ -1,4 +1,4 @@
-import 'package:omspos/services/sharePrefGeneric/preference_keys.dart';
+import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefService {
