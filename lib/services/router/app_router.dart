@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/home/home_screen.dart';
-import 'package:omspos/screen/login/login_screen.dart';
+import 'package:omspos/screen/login/ui/login_screen.dart';
 import 'package:omspos/screen/splash/splash_screen.dart';
 import 'package:omspos/services/router/router_name.dart';
 

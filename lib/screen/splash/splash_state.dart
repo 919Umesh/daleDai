@@ -27,15 +27,9 @@ class SplashState with ChangeNotifier {
   Future<void> _navigateUser() async {
     try {
       await SharedPrefService.setValue<bool>(PrefKey.loginSuccess, true);
-      final isLoggedIn = await SharedPrefService.getValue<bool>(
-            PrefKey.loginSuccess,
-            defaultValue: false,
-          ) ??
-          false;
-
+      final isLoggedIn = await SharedPrefService.getValue<bool>( PrefKey.loginSuccess, defaultValue: false,) ?? false;
       debugPrint('------------------IsLogin-----------');
       debugPrint(isLoggedIn.toString());
-
       _context.go(isLoggedIn ? loginPath : homeScreenPath);
     } catch (e) {
       debugPrint('Error during navigation: $e');
