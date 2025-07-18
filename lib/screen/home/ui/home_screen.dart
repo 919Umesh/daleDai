@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
+import 'package:omspos/services/router/router_name.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 
@@ -51,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Add your action here
+          context.go(profileScreenPath);
         },
         icon: const Icon(Icons.add),
         label: const Text('Press me'),
