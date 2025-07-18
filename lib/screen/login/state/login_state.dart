@@ -3,6 +3,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/login/api/login_api.dart';
 import 'package:omspos/services/router/router_name.dart';
+import 'package:omspos/services/sharedPreference/preference_keys.dart';
+import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class LoginState extends ChangeNotifier {
@@ -63,6 +65,7 @@ class LoginState extends ChangeNotifier {
           gravity: ToastGravity.BOTTOM,
         );
         CustomLog.successLog(value: 'Login successful for ${authModel.email}');
+        await SharedPrefService.setValue<bool>(PrefKey.loginSuccess, true);
         _context.go(homeScreenPath);
       }
     } catch (e) {
