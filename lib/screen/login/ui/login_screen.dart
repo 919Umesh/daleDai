@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:omspos/screen/login/state/login_state.dart';
 import 'package:provider/provider.dart';
 
@@ -11,26 +10,20 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
-    Provider.of<LoginState>(context, listen: false).getContext = context;
-  }
-
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<LoginState>(context, listen: false).getContext = context;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = Provider.of<LoginState>(context);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -60,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     TextFormField(
-                      controller: _emailController,
+                      controller: state.emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
                         prefixIcon: const Icon(Icons.email_outlined),
@@ -83,20 +76,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
-                      controller: _passwordController,
+                      controller: state.passwordController,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword
+                            state.obscurePassword
                                 ? Icons.visibility_off
                                 : Icons.visibility,
                           ),
                           onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
+                            state.togglePasswordVisibility();
                           },
                         ),
                         border: OutlineInputBorder(
@@ -105,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         filled: true,
                         fillColor: Colors.grey.shade50,
                       ),
-                      obscureText: _obscurePassword,
+                      obscureText: state.obscurePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
@@ -130,43 +121,39 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    Consumer<LoginState>(
-                      builder: (context, state, _) {
-                        return SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade600,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: state.isLoading
-                                ? null
-                                : () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      await state.signIn(
-                                        _emailController.text.trim(),
-                                        _passwordController.text.trim(),
-                                      );
-                                    }
-                                  },
-                            child: state.isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : const Text(
-                                    'Sign In',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade600,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      },
+                        ),
+                        onPressed: state.isLoading
+                            ? null
+                            : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  await state.signIn(
+                                    state.emailController.text.trim(),
+                                    state.passwordController.text.trim(),
+                                  );
+                                }
+                              },
+                        child: state.isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Row(
