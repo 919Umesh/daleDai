@@ -18,7 +18,6 @@ enum BillPrintEnum {
   purchases,
   salesReturn,
   purchasesReturn,
-  // pdc,
 }
 
 // enum LinkReportEnum {

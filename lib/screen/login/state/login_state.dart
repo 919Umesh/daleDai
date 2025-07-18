@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:omspos/utils/custom_log.dart';
 
 class LoginState extends ChangeNotifier {
   LoginState();
@@ -10,6 +11,7 @@ class LoginState extends ChangeNotifier {
   }
 
   _initialize() {
-    debugPrint('Login Has been initalized');
+    CustomLog.successLog(value: '------------LoginState--------------');
+    CustomLog.successLog(value: 'Login State has been initalize');
   }
 }
