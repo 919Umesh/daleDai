@@ -1,3 +1,4 @@
 enum PrefKey {
-  loginSuccess,
+  isLogin,
+  userId,
 }

@@ -46,10 +46,8 @@ class LoginState extends ChangeNotifier {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
-
     try {
       final authModel = await AuthAPI.signIn(email: email, password: password);
-
       if (authModel.error) {
         _errorMessage = authModel.message ?? 'Login failed';
         Fluttertoast.showToast(
@@ -65,7 +63,12 @@ class LoginState extends ChangeNotifier {
           gravity: ToastGravity.BOTTOM,
         );
         CustomLog.successLog(value: 'Login successful for ${authModel.email}');
-        await SharedPrefService.setValue<bool>(PrefKey.loginSuccess, true);
+        CustomLog.successLog(
+            value: '-----------------UserId-------------------');
+        CustomLog.successLog(value: authModel.userId);
+        await SharedPrefService.setValue<String>(
+            PrefKey.userId, authModel.userId);
+        await SharedPrefService.setValue<bool>(PrefKey.isLogin, true);
         _context.go(homeScreenPath);
       }
     } catch (e) {

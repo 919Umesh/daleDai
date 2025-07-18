@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
-import 'package:omspos/utils/custom_log.dart';
 import '../../services/router/router_name.dart';
 
 class SplashState with ChangeNotifier {
@@ -27,7 +26,7 @@ class SplashState with ChangeNotifier {
   Future<void> _navigateUser() async {
     try {
       final isLoggedIn = await SharedPrefService.getValue<bool>(
-            PrefKey.loginSuccess,
+            PrefKey.isLogin,
             defaultValue: false,
           ) ??
           false;
