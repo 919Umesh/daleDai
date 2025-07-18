@@ -62,7 +62,7 @@ class SupabaseProvider {
       try {
         final cachedData = await _getFromCache(cacheKey);
         if (cachedData != null) {
-          CustomLog.warningLog(value: "⚠️ Loaded from cache: $tableName");
+          CustomLog.warningLog(value: "Loaded from cache: $tableName");
           return cachedData;
         }
       } catch (e) {
@@ -79,7 +79,8 @@ class SupabaseProvider {
 
     try {
       // Create a base query builder
-      var queryBuilder = _client.from(tableName).select(columns?.join(',') ?? '*');
+      var queryBuilder =
+          _client.from(tableName).select(columns?.join(',') ?? '*');
 
       // Apply filters if needed
       if (filterColumn != null && filterValue != null) {
@@ -87,9 +88,8 @@ class SupabaseProvider {
       }
 
       // Execute the query with limit if specified
-      final response = limit != null 
-          ? await queryBuilder.limit(limit)
-          : await queryBuilder;
+      final response =
+          limit != null ? await queryBuilder.limit(limit) : await queryBuilder;
 
       await _cacheResponse(cacheKey, response);
 
@@ -120,10 +120,7 @@ class SupabaseProvider {
     try {
       CustomLog.actionLog(value: "Supabase INSERT => $tableName \nData: $data");
 
-      final response = await _client
-          .from(tableName)
-          .insert(data)
-          .select();
+      final response = await _client.from(tableName).insert(data).select();
 
       await _invalidateTableCache(tableName);
 
@@ -172,10 +169,8 @@ class SupabaseProvider {
     try {
       CustomLog.actionLog(value: "Supabase DELETE => $tableName");
 
-      final response = await _client
-          .from(tableName)
-          .delete()
-          .eq(columnName, columnValue);
+      final response =
+          await _client.from(tableName).delete().eq(columnName, columnValue);
 
       await _invalidateTableCache(tableName);
 
@@ -278,7 +273,8 @@ class SupabaseProvider {
 
     return {
       "error": true,
-      "message": e is PostgrestException ? e.message : "Unexpected error occurred",
+      "message":
+          e is PostgrestException ? e.message : "Unexpected error occurred",
       "code": e is PostgrestException ? e.code : null,
     };
   }
