@@ -11,7 +11,6 @@ class IndexState extends ChangeNotifier {
     Icons.person,
   ];
 
-  // Getters
   int get currentIndex => _currentIndex;
   IconData get fabIcon => _fabIcon;
   List<IconData> get icons => _icons;
