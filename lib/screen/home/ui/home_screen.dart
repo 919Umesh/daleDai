@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
+import 'package:omspos/screen/properties/ui/properties_screen.dart';
 import 'package:omspos/screen/room/ui/room_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -393,82 +394,93 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: state.areas.length,
                             itemBuilder: (context, index) {
                               final area = state.areas[index];
-                              return Container(
-                                width: 110,
-                                margin: const EdgeInsets.only(right: 16),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.08),
-                                      spreadRadius: 0,
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 70,
-                                        height: 70,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Theme.of(context)
-                                                  .primaryColor
-                                                  .withOpacity(0.1),
-                                              Theme.of(context)
-                                                  .primaryColor
-                                                  .withOpacity(0.05),
-                                            ],
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Theme.of(context)
-                                                  .primaryColor
-                                                  .withOpacity(0.2),
-                                              spreadRadius: 0,
-                                              blurRadius: 8,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: CircleAvatar(
-                                          radius: 35,
-                                          backgroundColor: Colors.transparent,
-                                          backgroundImage: area.areaImage !=
-                                                  null
-                                              ? NetworkImage(area.areaImage!)
-                                              : null,
-                                          child: area.areaImage == null
-                                              ? Icon(
-                                                  Icons.location_on,
-                                                  size: 32,
-                                                  color: Theme.of(context)
-                                                      .primaryColor,
-                                                )
-                                              : null,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        area.name,
-                                        textAlign: TextAlign.center,
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.black87,
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => PropertiesScreen(
+                                              areaId: area.areaId,
+                                            )),
+                                  );
+                                },
+                                child: Container(
+                                  width: 110,
+                                  margin: const EdgeInsets.only(right: 16),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.08),
+                                        spreadRadius: 0,
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 2),
                                       ),
                                     ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 70,
+                                          height: 70,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Theme.of(context)
+                                                    .primaryColor
+                                                    .withOpacity(0.1),
+                                                Theme.of(context)
+                                                    .primaryColor
+                                                    .withOpacity(0.05),
+                                              ],
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Theme.of(context)
+                                                    .primaryColor
+                                                    .withOpacity(0.2),
+                                                spreadRadius: 0,
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: CircleAvatar(
+                                            radius: 35,
+                                            backgroundColor: Colors.transparent,
+                                            backgroundImage: area.areaImage !=
+                                                    null
+                                                ? NetworkImage(area.areaImage!)
+                                                : null,
+                                            child: area.areaImage == null
+                                                ? Icon(
+                                                    Icons.location_on,
+                                                    size: 32,
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                  )
+                                                : null,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          area.name,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black87,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
@@ -515,7 +527,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              // Navigate to see all properties
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) => PropertiesScreen()),
+                              );
                             },
                             style: TextButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
