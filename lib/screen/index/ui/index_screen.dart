@@ -33,42 +33,9 @@ class IndexScreen extends StatelessWidget {
               child: _screens[state.currentIndex],
             ),
           ),
-          floatingActionButton: _buildFloatingActionButton(context, state),
           bottomNavigationBar: _buildBottomNavigationBar(context, state),
         );
       },
-    );
-  }
-
-  Widget _buildFloatingActionButton(BuildContext context, IndexState state) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: FloatingActionButton(
-        onPressed: () => _handleFabPress(context, state.currentIndex),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: Icon(
-            state.fabIcon,
-            key: ValueKey(state.fabIcon),
-            size: 26,
-          ),
-        ),
-      ),
     );
   }
 
@@ -100,19 +67,23 @@ class IndexScreen extends StatelessWidget {
             iconSize: 24,
             items: [
               BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.home_outlined, Icons.home, 0, state.currentIndex),
+                icon: _buildNavIcon(context, Icons.home_outlined, Icons.home, 0,
+                    state.currentIndex),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.list_alt_outlined, Icons.list_alt, 1, state.currentIndex),
+                icon: _buildNavIcon(context, Icons.list_alt_outlined,
+                    Icons.list_alt, 1, state.currentIndex),
                 label: 'Bookings',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.favorite_outline, Icons.favorite, 2, state.currentIndex),
+                icon: _buildNavIcon(context, Icons.favorite_outline,
+                    Icons.favorite, 2, state.currentIndex),
                 label: 'Wishlist',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(Icons.person_outline, Icons.person, 3, state.currentIndex),
+                icon: _buildNavIcon(context, Icons.person_outline, Icons.person,
+                    3, state.currentIndex),
                 label: 'Profile',
               ),
             ],
@@ -122,13 +93,16 @@ class IndexScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNavIcon(IconData outlineIcon, IconData filledIcon, int index, int currentIndex) {
+  Widget _buildNavIcon(BuildContext context, IconData outlineIcon,
+      IconData filledIcon, int index, int currentIndex) {
     final isSelected = index == currentIndex;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: isSelected ? Theme.of(GlobalKey<NavigatorState>().currentContext!).primaryColor.withOpacity(0.1) : Colors.transparent,
+        color: isSelected
+            ? Theme.of(context).primaryColor.withOpacity(0.1)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(
