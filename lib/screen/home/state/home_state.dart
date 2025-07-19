@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:omspos/screen/home/api/home_api.dart';
 import 'package:omspos/screen/home/model/home_model.dart';
+import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class HomeState extends ChangeNotifier {
@@ -8,7 +9,7 @@ class HomeState extends ChangeNotifier {
 
   BuildContext? _context;
   BuildContext? get context => _context;
-  
+
   set getContext(BuildContext value) {
     _context = value;
     initialize();
@@ -16,28 +17,33 @@ class HomeState extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-  
+
   List<AreaModel> _areas = [];
   List<AreaModel> get areas => _areas;
-  
+
+  List<PropertyModel> _properties = [];
+  List<PropertyModel> get properties => _properties;
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
   Future<void> initialize() async {
     await clean();
     await loadAllAreas();
+    await loadProperties(); // Load properties on initialization
   }
 
   Future<void> clean() async {
     _isLoading = false;
     _errorMessage = null;
     _areas = [];
+    _properties = [];
     notifyListeners();
   }
 
   Future<void> loadAllAreas() async {
     if (_isLoading) return;
-    
+
     _isLoading = true;
     notifyListeners();
 
@@ -55,7 +61,31 @@ class HomeState extends ChangeNotifier {
     }
   }
 
+  Future<void> loadProperties() async {
+    if (_isLoading) return;
+    
+    _isLoading = true;
+    notifyListeners();
+    
+    try {
+      _properties = await HomeApi.getAllProperties();
+      _errorMessage = null;
+      CustomLog.successLog(value: 'Loaded ${_properties.length} properties');
+    } catch (e) {
+      _errorMessage = e.toString();
+      _properties = [];
+      CustomLog.errorLog(value: 'Properties load error: $_errorMessage');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> refreshAreas() async {
     await loadAllAreas();
+  }
+
+  Future<void> refreshProperties() async {
+    await loadProperties();
   }
 }
