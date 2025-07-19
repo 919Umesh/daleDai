@@ -56,8 +56,6 @@ class SupabaseProvider {
     CustomLog.warningLog(value: "Supabase GET => $tableName");
 
     final isOnline = await NetworkUtil.hasInternetConnection();
-
-    // Try cache first if enabled or offline
     if (!isOnline || cacheFirst) {
       try {
         final cachedData = await _getFromCache(cacheKey);

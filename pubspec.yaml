@@ -58,6 +58,7 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   supabase_flutter: ^2.9.1
   flutter_dotenv: ^5.2.1
+  animated_bottom_navigation_bar: ^1.4.0
 
 dev_dependencies:
   flutter_test:

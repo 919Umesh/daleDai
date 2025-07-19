@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/home/ui/home_screen.dart';
+import 'package:omspos/screen/index/ui/index_screen.dart';
 import 'package:omspos/screen/login/ui/login_screen.dart';
 import 'package:omspos/screen/profile/ui/profile_screen.dart';
 import 'package:omspos/screen/splash/splash_screen.dart';
 import 'package:omspos/services/router/router_name.dart';
-
 
 final GoRouter appRouter = GoRouter(
   initialLocation: splashPath,
@@ -18,7 +18,12 @@ final GoRouter appRouter = GoRouter(
       path: loginPath,
       builder: (context, state) => const LoginScreen(),
     ),
-      GoRoute(
+    GoRoute(
+      path: indexScreenPath,
+      builder: (context, state) => const IndexScreen(),
+    ),
+
+    GoRoute(
       path: homeScreenPath,
       builder: (context, state) => const HomeScreen(),
     ),
@@ -26,16 +31,14 @@ final GoRouter appRouter = GoRouter(
       path: profileScreenPath,
       builder: (context, state) => const ProfileScreen(),
     ),
-    
-   // HomeScreen
+
+    // HomeScreen
   ],
   errorBuilder: (context, state) => Scaffold(
     appBar: AppBar(title: const Text('Error')),
     body: const Center(child: Text('Page not found')),
   ),
 );
-
-
 
 // import 'package:flutter/material.dart';
 // import 'package:omspos/services/router/app_router.dart';

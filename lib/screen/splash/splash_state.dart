@@ -30,7 +30,7 @@ class SplashState with ChangeNotifier {
             defaultValue: false,
           ) ??
           false;
-      _context.go(isLoggedIn ? homeScreenPath : loginPath);
+      _context.go(isLoggedIn ? indexScreenPath : loginPath);
     } catch (e) {
       debugPrint('Error during navigation: $e');
       _context.go(loginPath);
