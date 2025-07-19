@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
 import 'package:omspos/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:omspos/utils/loading_indicator.dart';
 
 class RoomScreen extends StatefulWidget {
   final String propertyId;

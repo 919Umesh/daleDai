@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
+import 'package:omspos/screen/room/ui/room_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -741,7 +743,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                               const SizedBox(),
                                             ElevatedButton(
                                               onPressed: () {
-                                                // Navigate to property details
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          RoomScreen(
+                                                            propertyId: property
+                                                                .propertyId,
+                                                          )),
+                                                );
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 backgroundColor:
