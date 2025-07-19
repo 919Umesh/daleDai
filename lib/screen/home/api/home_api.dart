@@ -27,7 +27,7 @@ class HomeApi {
       tableName: 'properties',
       filterColumn: 'area_id',
       filterValue: areaId,
-      limit: 10, // Consistent limit for filtered queries
+      limit: 10,
     );
 
     if (response['error'] == true) {
@@ -47,6 +47,7 @@ class HomeApi {
   static Future<List<AreaModel>> getAllAreas() async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'area',
+      limit: 10,
     );
 
     if (response['error'] == true) {

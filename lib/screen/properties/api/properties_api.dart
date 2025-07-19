@@ -1,6 +1,6 @@
 import 'package:omspos/screen/home/model/property_model.dart';
+import 'package:omspos/screen/room/model/images_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
-import 'package:omspos/utils/custom_log.dart';
 
 class PropertiesApi {
   static Future<List<PropertyModel>> getAllProperties({int limit = 10}) async {
@@ -61,4 +61,6 @@ class PropertiesApi {
 
     return PropertyModel.fromJson(response['data'][0]);
   }
+
+
 }

@@ -1,3 +1,4 @@
+import 'package:omspos/screen/room/model/images_model.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
 
@@ -81,5 +82,24 @@ class RoomApi {
     if (response['error'] == true) {
       throw Exception(response['message'] ?? 'Failed to delete room');
     }
+  }
+    static Future<List<ImageModel>> getPropertyImages(String propertyId) async {
+    final response = await SupabaseProvider.fetchData(
+      tableName: 'images',
+      filterColumn: 'property_id',
+      filterValue: propertyId,
+    );
+
+    if (response['error'] == true) {
+      throw Exception(response['message'] ?? 'Failed to fetch property images');
+    }
+
+    if (response['data'].isEmpty) {
+      return [];
+    }
+
+    return (response['data'] as List)
+        .map((imageJson) => ImageModel.fromJson(imageJson))
+        .toList();
   }
 }

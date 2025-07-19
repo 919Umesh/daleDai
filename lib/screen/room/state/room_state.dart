@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/room/api/room_api.dart';
+import 'package:omspos/screen/room/model/images_model.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/utils/custom_log.dart';
 
@@ -14,6 +15,9 @@ class RoomState extends ChangeNotifier {
 
   List<RoomModel> _rooms = [];
   List<RoomModel> get rooms => _rooms;
+
+  List<ImageModel> _images = [];
+  List<ImageModel> get images => _images;
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
@@ -34,8 +38,29 @@ class RoomState extends ChangeNotifier {
     _isLoading = false;
     _errorMessage = null;
     _rooms = [];
+    _images = [];
     _currentPropertyId = null;
     notifyListeners();
+  }
+
+  Future<void> getAllImages(String propertyId) async {
+    if (_isLoading) return;
+    
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _images = await RoomApi.getPropertyImages(propertyId);
+      _errorMessage = null;
+      CustomLog.successLog(value: 'Loaded ${_images.length} images');
+    } catch (e) {
+      _errorMessage = e.toString();
+      _images = [];
+      CustomLog.errorLog(value: 'Images load error: $_errorMessage');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> loadRoomsByProperty(String propertyId) async {
@@ -62,6 +87,12 @@ class RoomState extends ChangeNotifier {
   Future<void> refreshRooms() async {
     if (_currentPropertyId != null) {
       await loadRoomsByProperty(_currentPropertyId!);
+    }
+  }
+
+  Future<void> refreshImages() async {
+    if (_currentPropertyId != null) {
+      await getAllImages(_currentPropertyId!);
     }
   }
 }

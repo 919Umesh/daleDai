@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/properties/state/properties_state.dart';
+import 'package:omspos/screen/room/ui/room_screen.dart';
 import 'package:omspos/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
-import 'package:omspos/utils/loading_indicator.dart';
 
 class PropertiesScreen extends StatefulWidget {
   final String? areaId;
@@ -32,19 +32,23 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.areaId != null ? 'Properties in Area' : 'All Properties'),
+        title: Text(
+            widget.areaId != null ? 'Properties in Area' : 'All Properties'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => Provider.of<PropertiesState>(context, listen: false)
-                .refreshProperties(),
+            onPressed: () =>
+                Provider.of<PropertiesState>(context, listen: false)
+                    .refreshProperties(),
           ),
         ],
       ),
       body: Consumer<PropertiesState>(
         builder: (context, state, child) {
           if (state.isLoading && state.properties.isEmpty) {
-            return Center(child: CircularProgressIndicator(),);
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
           if (state.errorMessage != null) {
@@ -72,7 +76,17 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
             itemCount: state.properties.length,
             itemBuilder: (context, index) {
               final property = state.properties[index];
-              return _PropertyCard(property: property);
+              return InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => RoomScreen(
+                          propertyId: property.propertyId,
+                        ),
+                      ),
+                    );
+                  },
+                  child: _PropertyCard(property: property));
             },
           );
         },

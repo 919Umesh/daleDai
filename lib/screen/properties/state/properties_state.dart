@@ -18,10 +18,10 @@ class PropertiesState extends ChangeNotifier {
 
   Future<void> loadAllProperties() async {
     if (_isLoading) return;
-    
+
     _isLoading = true;
     notifyListeners();
-    
+
     try {
       _properties = await PropertiesApi.getAllProperties();
       _errorMessage = null;
@@ -36,7 +36,6 @@ class PropertiesState extends ChangeNotifier {
       notifyListeners();
     }
   }
-
   Future<void> loadPropertiesByArea(String areaId) async {
     if (_isLoading) return;
 
@@ -47,7 +46,8 @@ class PropertiesState extends ChangeNotifier {
     try {
       _properties = await PropertiesApi.getPropertiesByArea(areaId);
       _errorMessage = null;
-      CustomLog.successLog(value: 'Loaded ${_properties.length} properties for area $areaId');
+      CustomLog.successLog(
+          value: 'Loaded ${_properties.length} properties for area $areaId');
     } catch (e) {
       _errorMessage = e.toString();
       _properties = [];
