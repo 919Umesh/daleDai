@@ -83,7 +83,8 @@ class RoomApi {
       throw Exception(response['message'] ?? 'Failed to delete room');
     }
   }
-    static Future<List<ImageModel>> getPropertyImages(String propertyId) async {
+
+  static Future<List<ImageModel>> getPropertyImages(String propertyId) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'images',
       filterColumn: 'property_id',
