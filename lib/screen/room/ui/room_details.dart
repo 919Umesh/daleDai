@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
+import 'package:omspos/screen/room/ui/booking_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class RoomDetailScreen extends StatefulWidget {
   final String roomID;
+
   const RoomDetailScreen({super.key, required this.roomID});
 
   @override
@@ -21,174 +22,14 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
     });
   }
 
-  void _showBookingBottomSheet(BuildContext context, RoomModel room) {
-    final formKey = GlobalKey<FormState>();
-    DateTime? bookingDate;
-    DateTime? moveInDate;
-    DateTime? moveOutDate;
-    double? monthlyRent = room.rentAmount;
-    double? securityDeposit = room.securityDeposit;
-
+  void _openBookingSheet(RoomModel room) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Form(
-            key: formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Book This Room',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDateField(
-                    context,
-                    'Booking Date',
-                    (date) => bookingDate = date,
-                    isRequired: true,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDateField(
-                    context,
-                    'Move In Date',
-                    (date) => moveInDate = date,
-                    isRequired: true,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDateField(
-                    context,
-                    'Move Out Date',
-                    (date) => moveOutDate = date,
-                    isRequired: false,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: monthlyRent?.toStringAsFixed(2),
-                    decoration: const InputDecoration(
-                      labelText: 'Monthly Rent',
-                      border: OutlineInputBorder(),
-                      prefixText: '\$ ',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter monthly rent';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid amount';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      monthlyRent = double.tryParse(value ?? '0');
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    initialValue: securityDeposit?.toStringAsFixed(2),
-                    decoration: const InputDecoration(
-                      labelText: 'Security Deposit',
-                      border: OutlineInputBorder(),
-                      prefixText: '\$ ',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter security deposit';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid amount';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      securityDeposit = double.tryParse(value ?? '0');
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          formKey.currentState!.save();
-                          // Here you would typically call an API to save the booking
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Room booked successfully!'),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text('Confirm Booking'),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDateField(
-    BuildContext context,
-    String label,
-    Function(DateTime) onDateSelected, {
-    required bool isRequired,
-  }) {
-    DateTime? selectedDate;
-    final controller = TextEditingController();
-
-    return GestureDetector(
-      onTap: () async {
-        final date = await showDatePicker(
-          context: context,
-          initialDate: DateTime.now(),
-          firstDate: DateTime.now(),
-          lastDate: DateTime(DateTime.now().year + 2),
-        );
-        if (date != null) {
-          selectedDate = date;
-          controller.text = DateFormat('yyyy-MM-dd').format(date);
-          onDateSelected(date);
-        }
-      },
-      child: AbsorbPointer(
-        child: TextFormField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: label,
-            border: const OutlineInputBorder(),
-            suffixIcon: const Icon(Icons.calendar_today),
-          ),
-          validator: isRequired
-              ? (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select $label';
-                  }
-                  return null;
-                }
-              : null,
-        ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (context) => BookingBottomSheet(room: room),
     );
   }
 
@@ -218,7 +59,6 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-
     if (state.errorMessage != null) {
       return Center(
         child: Column(
@@ -226,9 +66,9 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
-            Text(
-              'Error loading room details',
-              style: Theme.of(context).textTheme.titleMedium,
+            const Text(
+              'Error Loading Room',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Padding(
@@ -241,30 +81,16 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
               onPressed: () => state.getRoomDetails(widget.roomID),
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Retry'),
             ),
           ],
         ),
       );
     }
-
     if (room == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.meeting_room_outlined,
-                size: 48, color: Colors.grey),
-            const SizedBox(height: 16),
-            Text(
-              'No room data available',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ],
-        ),
-      );
+      return const Center(child: Text('No room data available'));
     }
 
     return SingleChildScrollView(
@@ -273,79 +99,77 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
         children: [
           // Header Card
           Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            elevation: 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        width: 56,
+                        height: 56,
                         decoration: BoxDecoration(
                           color: Colors.blue.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child:
-                            const Icon(Icons.meeting_room, color: Colors.blue),
+                        child: const Icon(Icons.meeting_room,
+                            color: Colors.blue, size: 32),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Room ${room.roomNumber}',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Room ${room.roomNumber}',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                room.roomType,
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ]),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              room.roomType,
+                              style: TextStyle(
+                                  color: Colors.grey[600], fontSize: 14),
+                            ),
+                          ],
+                        ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          if (!room.isOccupied) {
-                            _showBookingBottomSheet(context, room);
-                          }
-                        },
+                        onTap: !room.isOccupied
+                            ? () => _openBookingSheet(room)
+                            : null,
                         child: Chip(
                           label: Text(
                             room.isOccupied ? 'Occupied' : 'Available',
-                            style: const TextStyle(color: Colors.white),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 13),
                           ),
                           backgroundColor:
                               room.isOccupied ? Colors.orange : Colors.green,
+                          visualDensity: VisualDensity.compact,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   const Divider(height: 1),
                   const SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _buildStatItem(
-                        'Rent',
-                        '\$${room.rentAmount.toStringAsFixed(2)}',
-                        Icons.attach_money,
-                      ),
+                          'Rent',
+                          '\$${room.rentAmount.toStringAsFixed(2)}',
+                          Icons.attach_money),
                       _buildStatItem(
-                        'Deposit',
-                        '\$${room.securityDeposit.toStringAsFixed(2)}',
-                        Icons.security,
-                      ),
+                          'Deposit',
+                          '\$${room.securityDeposit.toStringAsFixed(2)}',
+                          Icons.security),
                     ],
                   ),
                 ],
@@ -356,45 +180,33 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
 
           // Details Section
           Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            elevation: 3,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'Room Information',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   _buildDetailItem(
-                    context,
-                    'Room ID',
-                    room.roomNumber,
-                    Icons.code,
-                  ),
-                  _buildDetailItem(
-                    context,
-                    'Property ID',
-                    room.roomNumber,
-                    Icons.apartment,
-                  ),
+                      context, 'Room ID', room.roomNumber, Icons.qr_code),
+                  _buildDetailItem(context, 'Property ID',
+                      room.propertyId ?? 'N/A', Icons.apartment),
                   _buildDetailItem(
                     context,
                     'Created',
-                    DateFormat('MMM dd, yyyy').format(room.createdAt),
+                    _formatDate(room.createdAt),
                     Icons.calendar_today,
                   ),
                   _buildDetailItem(
                     context,
-                    'Last Updated',
-                    DateFormat('MMM dd, yyyy').format(room.updatedAt),
+                    'Updated',
+                    _formatDate(room.updatedAt),
                     Icons.update,
                   ),
                 ],
@@ -406,24 +218,24 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
     );
   }
 
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
   Widget _buildStatItem(String label, String value, IconData icon) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 28, color: Colors.blue),
-        const SizedBox(height: 8),
+        Icon(icon, size: 26, color: Colors.blue),
+        const SizedBox(height: 6),
         Text(
           value,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
         ),
       ],
     );
@@ -432,28 +244,23 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
   Widget _buildDetailItem(
       BuildContext context, String label, String value, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Icon(icon, size: 24, color: Colors.grey),
+          Icon(icon, size: 20, color: Colors.grey),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
+                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
+                style:
+                    const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
               ),
             ],
           ),
