@@ -58,6 +58,8 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   supabase_flutter: ^2.9.1
   flutter_dotenv: ^5.2.1
+  flutter_form_builder: ^10.1.0
+  form_builder_validators: ^11.2.0
 
 dev_dependencies:
   flutter_test:

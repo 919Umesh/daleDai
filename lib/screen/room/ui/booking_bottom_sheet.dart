@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
+import 'package:omspos/utils/custom_log.dart';
 
 class BookingBottomSheet extends StatefulWidget {
   final RoomModel room;
@@ -12,67 +15,15 @@ class BookingBottomSheet extends StatefulWidget {
 }
 
 class _BookingBottomSheetState extends State<BookingBottomSheet> {
-  late final TextEditingController _rentController;
-  late final TextEditingController _depositController;
-  late final TextEditingController _bookingDateController;
-  late final TextEditingController _moveInDateController;
-  late final TextEditingController _moveOutDateController;
-
-  DateTime? _bookingDate;
-  DateTime? _moveInDate;
-  DateTime? _moveOutDate;
-
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormBuilderState>();
+  late final double initialRent;
+  late final double initialDeposit;
 
   @override
   void initState() {
     super.initState();
-    final room = widget.room;
-    _rentController =
-        TextEditingController(text: room.rentAmount.toStringAsFixed(2));
-    _depositController =
-        TextEditingController(text: room.securityDeposit.toStringAsFixed(2));
-    _bookingDateController = TextEditingController();
-    _moveInDateController = TextEditingController();
-    _moveOutDateController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _rentController.dispose();
-    _depositController.dispose();
-    _bookingDateController.dispose();
-    _moveInDateController.dispose();
-    _moveOutDateController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _selectDate(
-      BuildContext context,
-      TextEditingController controller,
-      DateTime? selected,
-      ValueSetter<DateTime> onSelected) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selected ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(Duration()),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            datePickerTheme: DatePickerThemeData(
-              headerBackgroundColor: Colors.blue,
-              rangeSelectionBackgroundColor: Colors.blue.withOpacity(0.2),
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null && picked != selected) {
-      controller.text = DateFormat('yyyy-MM-dd').format(picked);
-      onSelected(picked);
-    }
+    initialRent = widget.room.rentAmount;
+    initialDeposit = widget.room.securityDeposit;
   }
 
   @override
@@ -84,13 +35,15 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
         right: 16,
         top: 20,
       ),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
+      child: SingleChildScrollView(
+        child: FormBuilder(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Drag Handle
               const Align(
                 alignment: Alignment.center,
                 child: SizedBox(
@@ -105,6 +58,8 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                 ),
               ),
               const SizedBox(height: 12),
+
+              // Title
               const Text(
                 'Book This Room',
                 style: TextStyle(
@@ -116,106 +71,123 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
               const SizedBox(height: 24),
 
               // Booking Date
-              TextFormField(
-                controller: _bookingDateController,
-                decoration: const InputDecoration(
+              FormBuilderDateTimePicker(
+                name: 'booking_date',
+                initialValue: null,
+                inputType: InputType.date,
+                format: DateFormat('yyyy-MM-dd'),
+                decoration: InputDecoration(
                   labelText: 'Booking Date',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
+                  prefixIcon: const Icon(Icons.calendar_today),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
-                readOnly: true,
-                onTap: () => _selectDate(
-                    context, _bookingDateController, _bookingDate, (date) {
-                  setState(() => _bookingDate = date);
-                }),
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                    return 'Please select booking date';
-                  return null;
-                },
+                validator: FormBuilderValidators.required(
+                  errorText: 'Please select booking date',
+                ),
               ),
               const SizedBox(height: 16),
 
-              // Move In Date
-              TextFormField(
-                controller: _moveInDateController,
-                decoration: const InputDecoration(
+              // Move-In Date
+              FormBuilderDateTimePicker(
+                name: 'move_in_date',
+                initialValue: null,
+                inputType: InputType.date,
+                format: DateFormat('yyyy-MM-dd'),
+                decoration: InputDecoration(
                   labelText: 'Move-In Date',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
+                  prefixIcon: const Icon(Icons.calendar_today),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
-                readOnly: true,
-                onTap: () => _selectDate(
-                    context, _moveInDateController, _moveInDate, (date) {
-                  setState(() => _moveInDate = date);
-                }),
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                    return 'Please select move-in date';
-                  return null;
-                },
+                validator: FormBuilderValidators.required(
+                  errorText: 'Please select move-in date',
+                ),
               ),
               const SizedBox(height: 16),
 
-              // Move Out Date (Optional)
-              TextFormField(
-                controller: _moveOutDateController,
-                decoration: const InputDecoration(
+              // Move-Out Date (Optional)
+              FormBuilderDateTimePicker(
+                name: 'move_out_date',
+                initialValue: null,
+                inputType: InputType.date,
+                format: DateFormat('yyyy-MM-dd'),
+                decoration: InputDecoration(
                   labelText: 'Move-Out Date (Optional)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
+                  prefixIcon: const Icon(Icons.calendar_today),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
-                readOnly: true,
-                onTap: () => _selectDate(
-                    context, _moveOutDateController, _moveOutDate, (date) {
-                  setState(() => _moveOutDate = date);
-                }),
               ),
               const SizedBox(height: 16),
 
               // Monthly Rent
-              TextFormField(
-                controller: _rentController,
-                decoration: const InputDecoration(
+              FormBuilderTextField(
+                name: 'monthly_rent',
+                initialValue: initialRent.toStringAsFixed(2),
+                decoration: InputDecoration(
                   labelText: 'Monthly Rent',
-                  border: OutlineInputBorder(),
                   prefixText: '\$ ',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                    return 'Enter monthly rent';
-                  if (double.tryParse(value) == null) return 'Invalid amount';
-                  return null;
-                },
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(
+                      errorText: 'Enter monthly rent'),
+                  FormBuilderValidators.numeric(
+                      errorText: 'Must be a valid number'),
+                ]),
               ),
               const SizedBox(height: 16),
 
               // Security Deposit
-              TextFormField(
-                controller: _depositController,
-                decoration: const InputDecoration(
+              FormBuilderTextField(
+                name: 'security_deposit',
+                initialValue: initialDeposit.toStringAsFixed(2),
+                decoration: InputDecoration(
                   labelText: 'Security Deposit',
-                  border: OutlineInputBorder(),
                   prefixText: '\$ ',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
                 keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty)
-                    return 'Enter security deposit';
-                  if (double.tryParse(value) == null) return 'Invalid amount';
-                  return null;
-                },
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(
+                      errorText: 'Enter security deposit'),
+                  FormBuilderValidators.numeric(
+                      errorText: 'Must be a valid number'),
+                ]),
               ),
 
               const SizedBox(height: 32),
+
+              // Confirm Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Perform booking logic here
-                      Navigator.pop(context);
+                    if (_formKey.currentState!.saveAndValidate()) {
+                      final Map<String, dynamic> formData =
+                          _formKey.currentState!.value;
+                      CustomLog.successLog(value: "Booking Data: $formData");
+
+                      Navigator.pop(context); // Close bottom sheet
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Room booked successfully!')),
