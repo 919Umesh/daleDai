@@ -1,8 +1,8 @@
-// room_screen.dart
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/room/model/images_model.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
+import 'package:omspos/screen/room/ui/room_details.dart';
 import 'package:omspos/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -484,99 +484,110 @@ class _RoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.08),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Row
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => RoomDetailScreen(
+                    roomID: room.roomId,
+                  )),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Room ${room.roomNumber}',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.grey[800],
+                                  ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          room.roomType.toUpperCase(),
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _StatusBadge(isOccupied: room.isOccupied),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Price Information
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.1),
+                  ),
+                ),
+                child: IntrinsicHeight(
+                  child: Row(
                     children: [
-                      Text(
-                        'Room ${room.roomNumber}',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: Colors.grey[800],
-                            ),
+                      Expanded(
+                        child: _PriceInfo(
+                          icon: Icons.payments_rounded,
+                          label: 'Monthly Rent',
+                          amount: room.rentAmount,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        room.roomType.toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.5,
+                      Container(
+                        width: 1,
+                        color: Colors.grey.withOpacity(0.2),
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      Expanded(
+                        child: _PriceInfo(
+                          icon: Icons.security_rounded,
+                          label: 'Security Deposit',
+                          amount: room.securityDeposit,
+                          color: Colors.orange,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
-                _StatusBadge(isOccupied: room.isOccupied),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Price Information
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.1),
-                ),
               ),
-              child: IntrinsicHeight(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _PriceInfo(
-                        icon: Icons.payments_rounded,
-                        label: 'Monthly Rent',
-                        amount: room.rentAmount,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    Container(
-                      width: 1,
-                      color: Colors.grey.withOpacity(0.2),
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                    Expanded(
-                      child: _PriceInfo(
-                        icon: Icons.security_rounded,
-                        label: 'Security Deposit',
-                        amount: room.securityDeposit,
-                        color: Colors.orange,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
