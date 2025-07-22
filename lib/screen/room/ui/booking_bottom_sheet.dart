@@ -32,8 +32,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final state =
-        Provider.of<RoomState>(context, listen: false).getContext = context;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -191,16 +189,43 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     if (_formKey.currentState!.saveAndValidate()) {
                       try {
                         final userId = await SharedPrefService.getValue<String>(
-                            PrefKey.userId,
-                            defaultValue: "-");
+                          PrefKey.userId,
+                          defaultValue: "-",
+                        );
                         final landlordId =
                             await SharedPrefService.getValue<String>(
-                                PrefKey.landLordId,
-                                defaultValue: "-");
+                          PrefKey.landLordId,
+                          defaultValue: "-",
+                        );
+
+                        final formValues = _formKey.currentState!.value;
+
+                        // Parse numeric values safely - first to double, then to int
+                        final monthlyRent = (double.tryParse(
+                                    formValues['monthly_rent'].toString()) ??
+                                0)
+                            .toInt();
+                        final securityDeposit = (double.tryParse(
+                                    formValues['security_deposit']
+                                        .toString()) ??
+                                0)
+                            .toInt();
+
+                        // Format dates to match the 'date' type in your table (not timestamp)
+                        final formatDate = (DateTime date) =>
+                            date.toIso8601String().split('T')[0];
 
                         final Map<String, dynamic> formData = {
-                          ..._formKey.currentState!.value,
-                          'room_id': widget.room.roomId.toString(),
+                          ...formValues,
+                          'booking_date': formatDate(
+                              formValues['booking_date'] as DateTime),
+                          'move_in_date': formatDate(
+                              formValues['move_in_date'] as DateTime),
+                          'move_out_date': formatDate(
+                              formValues['move_out_date'] as DateTime),
+                          'monthly_rent': monthlyRent,
+                          'security_deposit': securityDeposit,
+                          'room_id': widget.room.roomId,
                           'tenant_id': userId,
                           'landlord_id': landlordId,
                           'status': 'pending',
@@ -213,8 +238,10 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                           const SnackBar(content: Text('Booking successful!')),
                         );
                       } catch (e) {
+                        CustomLog.successLog(value: 'Error: ${e.toString()}');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error: ${e.toString()}')),
+                          SnackBar(
+                              content: Text('Booking failed: ${e.toString()}')),
                         );
                       }
                     }

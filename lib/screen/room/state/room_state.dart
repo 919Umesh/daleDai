@@ -98,7 +98,7 @@ Future<void> createBooking(Map<String, dynamic> formData) async {
     await RoomApi.createBooking(formData);
     _handleSuccess('Booking created successfully!');
     
-    // Optional: Refresh rooms to reflect booking status changes
+  
     if (_currentPropertyId != null) {
       await loadRoomsByProperty(_currentPropertyId!);
     }

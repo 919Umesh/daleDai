@@ -26,7 +26,7 @@ class RoomApi {
   static Future<Map<String, dynamic>> createBooking(
       Map<String, dynamic> bookingData) async {
     final response = await SupabaseProvider.insertData(
-      tableName: 'bookings', // Replace with your bookings table name
+      tableName: 'bookings',
       data: bookingData,
     );
 
