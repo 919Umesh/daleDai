@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:omspos/screen/booking/ui/bookig_screen.dart';
 import 'package:omspos/screen/home/ui/home_screen.dart';
 import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:omspos/screen/profile/ui/profile_screen.dart';
@@ -159,74 +160,6 @@ class IndexScreen extends StatelessWidget {
   }
 }
 
-class BookingListScreen extends StatelessWidget {
-  const BookingListScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text(
-          'Bookings',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.list_alt,
-                size: 40,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Your Bookings',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'All your bookings will appear here',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});

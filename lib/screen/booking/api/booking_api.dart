@@ -2,22 +2,19 @@ import 'package:omspos/screen/booking/model/booking_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
 
 class BookingAPI {
-  // Get a single booking by ID
-  static Future<BookingModel> getBookingById(String bookingId) async {
+  static Future<List<BookingModel>> getBookingsByUserId(String userId) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'bookings',
-      filterColumn: 'booking_id',
-      filterValue: bookingId,
+      filterColumn: 'tenant_id',
+      filterValue: userId,
     );
 
     if (response['error'] == true) {
-      throw Exception(response['message'] ?? 'Failed to fetch booking');
+      throw Exception(response['message'] ?? 'Failed to fetch bookings');
     }
 
-    if (response['data'].isEmpty) {
-      throw Exception('Booking not found');
-    }
-
-    return BookingModel.fromJson(response['data'][0]);
+    return (response['data'] as List)
+        .map((json) => BookingModel.fromJson(json))
+        .toList();
   }
 }

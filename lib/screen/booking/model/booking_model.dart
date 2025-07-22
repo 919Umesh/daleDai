@@ -1,3 +1,18 @@
+enum BookingStatus { pending, confirmed, completed }
+
+extension BookingStatusExtension on BookingStatus {
+  String get value {
+    switch (this) {
+      case BookingStatus.pending:
+        return 'pending';
+      case BookingStatus.confirmed:
+        return 'confirmed';
+      case BookingStatus.completed:
+        return 'completed';
+    }
+  }
+}
+
 class BookingModel {
   final String bookingId;
   final String roomId;
@@ -8,7 +23,7 @@ class BookingModel {
   final DateTime? moveOutDate;
   final int monthlyRent;
   final int securityDeposit;
-  final String status;
+  final BookingStatus status;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -35,15 +50,28 @@ class BookingModel {
       landlordId: json['landlord_id'] as String,
       bookingDate: DateTime.parse(json['booking_date'] as String),
       moveInDate: DateTime.parse(json['move_in_date'] as String),
-      moveOutDate: json['move_out_date'] != null 
+      moveOutDate: json['move_out_date'] != null
           ? DateTime.parse(json['move_out_date'] as String)
           : null,
       monthlyRent: json['monthly_rent'] as int,
       securityDeposit: json['security_deposit'] as int,
-      status: json['status'] as String,
+      status: _parseStatus(json['status'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
+  }
+
+  static BookingStatus _parseStatus(String status) {
+    switch (status) {
+      case 'pending':
+        return BookingStatus.pending;
+      case 'confirmed':
+        return BookingStatus.confirmed;
+      case 'completed':
+        return BookingStatus.completed;
+      default:
+        return BookingStatus.pending;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -57,7 +85,7 @@ class BookingModel {
       'move_out_date': moveOutDate?.toIso8601String(),
       'monthly_rent': monthlyRent,
       'security_deposit': securityDeposit,
-      'status': status,
+      'status': status.value,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
