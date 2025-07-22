@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
 import 'package:omspos/screen/properties/ui/properties_screen.dart';
 import 'package:omspos/screen/room/ui/room_screen.dart';
+import 'package:omspos/services/sharedPreference/preference_keys.dart';
+import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -757,7 +759,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             else
                                               const SizedBox(),
                                             ElevatedButton(
-                                              onPressed: () {
+                                              onPressed: () async {
+                                                await SharedPrefService
+                                                    .setValue<String>(
+                                                        PrefKey.landLordId,
+                                                        property.landlordId);
                                                 Navigator.of(context).push(
                                                   MaterialPageRoute(
                                                       builder: (context) =>
