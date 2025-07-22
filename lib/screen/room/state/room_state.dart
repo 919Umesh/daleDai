@@ -91,6 +91,24 @@ class RoomState extends ChangeNotifier {
     }
   }
 
+Future<void> createBooking(Map<String, dynamic> formData) async {
+  try {
+    _setLoading(true);
+    
+    await RoomApi.createBooking(formData);
+    _handleSuccess('Booking created successfully!');
+    
+    // Optional: Refresh rooms to reflect booking status changes
+    if (_currentPropertyId != null) {
+      await loadRoomsByProperty(_currentPropertyId!);
+    }
+  } catch (e) {
+    _handleError('Booking failed: ${e.toString()}');
+    rethrow;
+  } finally {
+    _setLoading(false);
+  }
+}
   Future<void> refreshData() async {
     if (_currentPropertyId == null || _isRefreshing) return;
 

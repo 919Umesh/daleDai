@@ -3,7 +3,11 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
+import 'package:omspos/screen/room/state/room_state.dart';
+import 'package:omspos/services/sharedPreference/preference_keys.dart';
+import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
+import 'package:provider/provider.dart';
 
 class BookingBottomSheet extends StatefulWidget {
   final RoomModel room;
@@ -28,6 +32,8 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final state =
+        Provider.of<RoomState>(context, listen: false).getContext = context;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -181,17 +187,36 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.saveAndValidate()) {
-                      final Map<String, dynamic> formData =
-                          _formKey.currentState!.value;
-                      CustomLog.successLog(value: "Booking Data: $formData");
+                      try {
+                        final userId = await SharedPrefService.getValue<String>(
+                            PrefKey.userId,
+                            defaultValue: "-");
+                        final landlordId =
+                            await SharedPrefService.getValue<String>(
+                                PrefKey.landLordId,
+                                defaultValue: "-");
 
-                      Navigator.pop(context); // Close bottom sheet
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Room booked successfully!')),
-                      );
+                        final Map<String, dynamic> formData = {
+                          ..._formKey.currentState!.value,
+                          'room_id': widget.room.roomId.toString(),
+                          'tenant_id': userId,
+                          'landlord_id': landlordId,
+                          'status': 'pending',
+                        };
+
+                        await context.read<RoomState>().createBooking(formData);
+
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Booking successful!')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}')),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(

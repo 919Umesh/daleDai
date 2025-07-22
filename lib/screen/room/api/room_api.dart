@@ -23,6 +23,20 @@ class RoomApi {
         .toList();
   }
 
+  static Future<Map<String, dynamic>> createBooking(
+      Map<String, dynamic> bookingData) async {
+    final response = await SupabaseProvider.insertData(
+      tableName: 'bookings', // Replace with your bookings table name
+      data: bookingData,
+    );
+
+    if (response['error'] == true) {
+      throw Exception(response['message'] ?? 'Failed to create booking');
+    }
+
+    return response['data']; // Return the created booking record
+  }
+
   static Future<RoomModel> getRoomById(String roomId) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'rooms',
