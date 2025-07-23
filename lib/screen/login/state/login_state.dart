@@ -69,7 +69,7 @@ class LoginState extends ChangeNotifier {
         await SharedPrefService.setValue<String>(
             PrefKey.userId, authModel.userId);
         await SharedPrefService.setValue<bool>(PrefKey.isLogin, true);
-        _context.go(homeScreenPath);
+        _context.go(indexScreenPath);
       }
     } catch (e) {
       _errorMessage = 'An unexpected error occurred';
