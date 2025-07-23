@@ -1,5 +1,4 @@
-
-
+import 'package:geolocator/geolocator.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class LocationService {
