@@ -91,3 +91,23 @@ class LocationService {
     }
   }
 }
+
+
+// // To get current location anywhere in your app:
+// Position? position = await LocationService.getCurrentLocation();
+// if (position != null) {
+//   print('Latitude: ${position.latitude}');
+//   print('Longitude: ${position.longitude}');
+// } else {
+//   // Handle case where location isn't available
+// }
+
+// // Or use the convenience methods:
+// String? lat = await LocationService.getLatitude();
+// String? lng = await LocationService.getLongitude();
+
+
+// bool hasPermission = await LocationService._handleLocationPermission();
+// if (!hasPermission) {
+//   // Show explanation or redirect to settings
+// }
