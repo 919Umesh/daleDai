@@ -5,6 +5,7 @@ class LocationService {
   static Position? _currentPosition;
 
   static Future<void> initialize() async {
+    //Execute the function serially
     await _checkLocationService();
     await _handleLocationPermission();
     await getCurrentLocation();
