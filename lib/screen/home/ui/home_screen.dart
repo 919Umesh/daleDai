@@ -17,12 +17,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  List<String> carouselImages = [
-    'https://xuodtwztsrbqtfiisxrq.supabase.co/storage/v1/object/public/area//basantpur.PNG',
-    'https://xuodtwztsrbqtfiisxrq.supabase.co/storage/v1/object/public/area//patan.PNG',
-    'https://xuodtwztsrbqtfiisxrq.supabase.co/storage/v1/object/public/area//swaymbu.PNG',
-  ];
-
   @override
   void initState() {
     super.initState();
