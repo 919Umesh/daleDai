@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
 import 'package:omspos/screen/properties/ui/properties_screen.dart';
@@ -186,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Consumer<HomeState>(
         builder: (context, state, child) {
           return Container(
-            height: 280,
+            height: 320,
             margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
@@ -401,146 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Map Header
-  Widget _buildMapHeader(HomeState state, BuildContext context) {
-    return Positioned(
-      top: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.black.withOpacity(0.5),
-              Colors.transparent,
-            ],
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Properties Map',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  '${state.properties.length} properties nearby',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                _buildMapButton(
-                  Icons.my_location,
-                  () => state.centerMapOnUserLocation(),
-                  context,
-                ),
-                const SizedBox(width: 8),
-                _buildMapButton(
-                  Icons.refresh,
-                  () => state.refreshProperties(),
-                  context,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // Map Button Helper
-  Widget _buildMapButton(
-      IconData icon, VoidCallback onTap, BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          color: Theme.of(context).primaryColor,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
   // User Location Marker
-  Marker _buildUserLocationMarker(LatLng position) {
-    return Marker(
-      point: position,
-      width: 40,
-      height: 40,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 3),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 3,
-            ),
-          ],
-        ),
-        child: const Icon(
-          Icons.my_location,
-          color: Colors.white,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  // Property Marker
-  Marker _buildPropertyMarker(property, BuildContext context) {
-    return Marker(
-      point: LatLng(property.latitude, property.longitude),
-      width: 44,
-      height: 44,
-      child: GestureDetector(
-        onTap: () => _navigateToProperty(property, context),
-        child: Container(
-          decoration: BoxDecoration(
-            color: property.isActive ? Colors.green : Colors.orange,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 1,
-                blurRadius: 3,
-              ),
-            ],
-          ),
-          child: Icon(
-            _getPropertyIcon(property.propertyType),
-            color: Colors.white,
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }
 
   // Areas Section
   Widget _buildAreasSection(HomeState state) {
@@ -960,39 +820,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  // Location Loading Indicator
-  Widget _buildLocationLoadingIndicator(BuildContext context) {
-    return Positioned(
-      bottom: 16,
-      right: 16,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 14,
-              height: 14,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'Getting location...',
-              style: TextStyle(fontSize: 11),
-            ),
-          ],
         ),
       ),
     );
