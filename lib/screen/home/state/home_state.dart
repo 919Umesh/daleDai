@@ -63,13 +63,16 @@ class HomeState extends ChangeNotifier {
 
   Future<void> loadProperties() async {
     if (_isLoading) return;
-    
+
     _isLoading = true;
     notifyListeners();
-    
+
     try {
       _properties = await HomeApi.getAllProperties();
       _errorMessage = null;
+      CustomLog.successLog(
+          value: '-----------------PropertiesList----------------------');
+      CustomLog.errorLog(value: properties);
       CustomLog.successLog(value: 'Loaded ${_properties.length} properties');
     } catch (e) {
       _errorMessage = e.toString();
