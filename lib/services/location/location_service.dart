@@ -5,7 +5,6 @@ class LocationService {
   static Position? _currentPosition;
 
   static Future<void> initialize() async {
-    //Execute the function serially
     await _checkLocationService();
     await _handleLocationPermission();
     await getCurrentLocation();
@@ -70,13 +69,13 @@ class LocationService {
     }
   }
 
-  // Get latitude
+  // Get current latitude
   static Future<String?> getLatitude() async {
     Position? position = await getCurrentLocation();
     return position?.latitude.toString();
   }
 
-  // Get longitude
+  // Get current longitude
   static Future<String?> getLongitude() async {
     Position? position = await getCurrentLocation();
     return position?.longitude.toString();
