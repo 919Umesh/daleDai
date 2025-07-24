@@ -1,11 +1,16 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:omspos/screen/home/api/home_api.dart';
 import 'package:omspos/screen/home/model/home_model.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
+import 'package:omspos/services/location/location_service.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class HomeState extends ChangeNotifier {
-  HomeState();
+  HomeState() {
+    _getCurrentLocation();
+  }
 
   BuildContext? _context;
   BuildContext? get context => _context;
@@ -27,10 +32,20 @@ class HomeState extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  // Map and location related variables
+  final MapController _mapController = MapController();
+  MapController get mapController => _mapController;
+
+  LatLng? _currentPosition;
+  LatLng? get currentPosition => _currentPosition;
+
+  bool _isLoadingLocation = true;
+  bool get isLoadingLocation => _isLoadingLocation;
+
   Future<void> initialize() async {
     await clean();
     await loadAllAreas();
-    await loadProperties(); // Load properties on initialization
+    await loadProperties();
   }
 
   Future<void> clean() async {
@@ -41,9 +56,34 @@ class HomeState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _getCurrentLocation() async {
+    try {
+      _isLoadingLocation = true;
+      notifyListeners();
+
+      final lat = await LocationService.getLatitude();
+      final lng = await LocationService.getLongitude();
+
+      if (lat != null && lng != null) {
+        _currentPosition = LatLng(double.parse(lat), double.parse(lng));
+        // Center map on current location
+        _mapController.move(_currentPosition!, 14.0);
+      } else {
+        // Default to Kathmandu if location not available
+        _currentPosition = const LatLng(27.7172, 85.3240);
+      }
+    } catch (e) {
+      CustomLog.errorLog(value: 'Location error: $e');
+      // Fallback to default location
+      _currentPosition = const LatLng(27.7172, 85.3240);
+    } finally {
+      _isLoadingLocation = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> loadAllAreas() async {
     if (_isLoading) return;
-
     _isLoading = true;
     notifyListeners();
 
@@ -63,16 +103,12 @@ class HomeState extends ChangeNotifier {
 
   Future<void> loadProperties() async {
     if (_isLoading) return;
-
     _isLoading = true;
     notifyListeners();
 
     try {
       _properties = await HomeApi.getAllProperties();
       _errorMessage = null;
-      CustomLog.successLog(
-          value: '-----------------PropertiesList----------------------');
-      CustomLog.errorLog(value: properties);
       CustomLog.successLog(value: 'Loaded ${_properties.length} properties');
     } catch (e) {
       _errorMessage = e.toString();
@@ -90,5 +126,17 @@ class HomeState extends ChangeNotifier {
 
   Future<void> refreshProperties() async {
     await loadProperties();
+    await _getCurrentLocation();
+  }
+
+  Future<void> centerMapOnUserLocation() async {
+    if (_currentPosition != null) {
+      _mapController.move(_currentPosition!, 14.0);
+    } else {
+      await _getCurrentLocation();
+      if (_currentPosition != null) {
+        _mapController.move(_currentPosition!, 14.0);
+      }
+    }
   }
 }
