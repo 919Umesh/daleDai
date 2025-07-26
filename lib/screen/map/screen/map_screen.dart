@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:omspos/screen/home/model/property_model.dart';
+import 'package:omspos/screen/map/state/map_state.dart';
 import 'package:provider/provider.dart';
-import 'package:omspos/screen/map/state/map_state.dart'; // Adjust import path
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -13,56 +14,47 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<MapState>()..getContext = context;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MapState(),
-      child: Consumer<MapState>(
-        builder: (context, mapState, child) {
-          return Scaffold(
-            body: Stack(
+    return Scaffold(
+      body: ChangeNotifierProvider(
+        create: (context) => MapState()..getContext = context,
+        child: Consumer<MapState>(
+          builder: (context, state, child) {
+            return Stack(
               children: [
-                // Map Widget
                 FlutterMap(
-                  mapController: mapState.mapController,
+                  mapController: state.mapController,
                   options: MapOptions(
-                    initialCenter: mapState.currentPosition ??
-                        const LatLng(27.7172, 85.3240), // Default Kathmandu
+                    initialCenter:
+                        state.currentPosition ?? const LatLng(27.7172, 85.3240),
                     initialZoom: 13.0,
                     maxZoom: 18.0,
-                    minZoom: 5.0,
+                    minZoom: 10.0,
+                    onMapReady: () {
+                      if (state.currentPosition != null) {
+                        state.mapController.move(state.currentPosition!, 14.0);
+                      }
+                    },
                   ),
                   children: [
-                    // Tile Layer (OpenStreetMap)
                     TileLayer(
                       urlTemplate:
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.omspos', // Replace with your package name
+                      userAgentPackageName: 'com.example.omspos',
                     ),
-                    // Marker Layer for Properties
                     MarkerLayer(
-                      markers: mapState.markers, // Use markers from state
-                    ),
-                    // Marker Layer for User Location (if available)
-                    if (mapState.currentPosition != null)
-                      MarkerLayer(
-                        markers: [
+                      markers: [
+                        if (state.currentPosition != null)
                           Marker(
-                            point: mapState.currentPosition!,
+                            point: state.currentPosition!,
                             width: 40,
                             height: 40,
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.blue,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 3),
+                                border:
+                                    Border.all(color: Colors.white, width: 3),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withOpacity(0.3),
@@ -78,27 +70,60 @@ class _MapScreenState extends State<MapScreen> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ...state.properties.map(
+                          (property) => Marker(
+                            point:
+                                LatLng(property.latitude, property.longitude),
+                            width: 44,
+                            height: 44,
+                            child: GestureDetector(
+                              onTap: () =>
+                                  _navigateToProperty(property, context),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: property.isActive
+                                      ? Colors.green
+                                      : Colors.orange,
+                                  shape: BoxShape.circle,
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 3,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  _getPropertyIcon(property.propertyType),
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-
-                // Top Overlay (Title, Count, Controls)
                 Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
+                  top: MediaQuery.of(context).padding.top + 16,
+                  left: 16,
+                  right: 16,
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.5),
-                          Colors.transparent,
-                        ],
-                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -109,56 +134,36 @@ class _MapScreenState extends State<MapScreen> {
                             const Text(
                               'Properties Map',
                               style: TextStyle(
-                                color: Colors.white,
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              '${mapState.properties.length} properties',
-                              style: const TextStyle(
-                                color: Colors.white70,
+                              '${state.properties.length} properties',
+                              style: TextStyle(
                                 fontSize: 12,
+                                color: Colors.grey[600],
                               ),
                             ),
                           ],
                         ),
                         Row(
                           children: [
-                            GestureDetector(
-                              onTap: mapState.isLoadingLocation
-                                  ? null
-                                  : () => mapState.centerMapOnUserLocation(),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.my_location,
-                                  color: Theme.of(context).primaryColor,
-                                  size: 18,
-                                ),
+                            IconButton(
+                              onPressed: () => state.centerMapOnUserLocation(),
+                              icon: Icon(
+                                Icons.my_location,
+                                color: Theme.of(context).primaryColor,
                               ),
+                              tooltip: 'Center on my location',
                             ),
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: mapState.isLoading
-                                  ? null
-                                  : () => mapState.refreshMap(),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.refresh,
-                                  color: Theme.of(context).primaryColor,
-                                  size: 18,
-                                ),
+                            IconButton(
+                              onPressed: () => state.refreshProperties(),
+                              icon: Icon(
+                                Icons.refresh,
+                                color: Theme.of(context).primaryColor,
                               ),
+                              tooltip: 'Refresh properties',
                             ),
                           ],
                         ),
@@ -166,67 +171,60 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                 ),
-
-                // Loading Indicator for Location
-                if (mapState.isLoadingLocation)
-                  Positioned(
-                    bottom: 16,
-                    right: 16,
-                    child: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              // color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Getting location...',
-                            style: TextStyle(fontSize: 11),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                // Loading Indicator for Properties
-                 if (mapState.isLoading && !mapState.isLoadingLocation)
+                if (state.isLoadingLocation)
                   const Center(
                     child: CircularProgressIndicator(),
                   ),
-
-                // Error Message Display
-                if (mapState.errorMessage != null)
-                  Positioned(
-                    top: kToolbarHeight + 20, // Below AppBar
-                    left: 20,
-                    right: 20,
-                    child: Card(
-                      color: Colors.red.shade100,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'Error: ${mapState.errorMessage}',
-                          style: const TextStyle(color: Colors.red, fontSize: 12),
-                        ),
-                      ),
-                    ),
-                  ),
               ],
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
+  }
+
+  void _navigateToProperty(PropertyModel property, BuildContext context) {
+    // Implement property details navigation
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(property.title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(property.address),
+            const SizedBox(height: 8),
+            Text('${property.city}, ${property.state} - ${property.pincode}'),
+            const SizedBox(height: 8),
+            Text('Type: ${property.propertyType}'),
+            Text('Area: ${property.areaSqft} sqft'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  IconData _getPropertyIcon(String propertyType) {
+    switch (propertyType.toLowerCase()) {
+      case 'apartment':
+        return Icons.apartment;
+      case 'house':
+        return Icons.house;
+      case 'villa':
+        return Icons.villa;
+      case 'office':
+        return Icons.work;
+      case 'land':
+        return Icons.landscape;
+      default:
+        return Icons.location_on;
+    }
   }
 }
