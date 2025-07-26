@@ -2,6 +2,7 @@ import 'package:omspos/screen/booking/state/booking_state.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
 import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:omspos/screen/login/state/login_state.dart';
+import 'package:omspos/screen/map/state/map_state.dart';
 import 'package:omspos/screen/profile/state/profile_state.dart';
 import 'package:omspos/screen/properties/state/properties_state.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
@@ -18,4 +19,6 @@ List<SingleChildWidget> myStateList = [
   ChangeNotifierProvider(create: (_) => PropertiesState()),
   ChangeNotifierProvider(create: (_) => RoomState()),
   ChangeNotifierProvider(create: (_) => BookingState()),
+  ChangeNotifierProvider(create: (_) => MapState()),
+  
 ];

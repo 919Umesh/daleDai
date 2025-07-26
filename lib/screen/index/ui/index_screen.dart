@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:omspos/screen/booking/ui/bookig_screen.dart';
 import 'package:omspos/screen/home/ui/home_screen.dart';
 import 'package:omspos/screen/index/state/index_state.dart';
+import 'package:omspos/screen/map/screen/map_screen.dart';
 import 'package:omspos/screen/profile/ui/profile_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -11,8 +12,8 @@ class IndexScreen extends StatelessWidget {
 
   static final List<Widget> _screens = [
     const HomeScreen(),
+    const MapScreen(),
     const BookingListScreen(),
-    const WishlistScreen(),
     const ProfileScreen(),
   ];
 
@@ -73,14 +74,14 @@ class IndexScreen extends StatelessWidget {
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(context, Icons.list_alt_outlined,
-                    Icons.list_alt, 1, state.currentIndex),
-                label: 'Bookings',
+                icon: _buildNavIcon(context, Icons.explore, Icons.list_alt, 1,
+                    state.currentIndex),
+                label: 'Explore',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(context, Icons.favorite_outline,
+                icon: _buildNavIcon(context, Icons.list_alt_outlined,
                     Icons.favorite, 2, state.currentIndex),
-                label: 'Wishlist',
+                label: 'Bookings',
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(context, Icons.person_outline, Icons.person,
@@ -159,7 +160,6 @@ class IndexScreen extends StatelessWidget {
     );
   }
 }
-
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
