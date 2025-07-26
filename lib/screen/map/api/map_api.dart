@@ -6,6 +6,7 @@ class MapLocationApi {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
       limit: 100, // Increased limit for better map coverage
+      cacheFirst: false,
     );
 
     if (response['error'] == true) {
