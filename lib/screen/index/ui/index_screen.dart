@@ -74,13 +74,13 @@ class IndexScreen extends StatelessWidget {
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(context, Icons.explore, Icons.list_alt, 1,
-                    state.currentIndex),
+                icon: _buildNavIcon(context, Icons.explore_outlined,
+                    Icons.explore, 1, state.currentIndex),
                 label: 'Explore',
               ),
               BottomNavigationBarItem(
-                icon: _buildNavIcon(context, Icons.list_alt_outlined,
-                    Icons.favorite, 2, state.currentIndex),
+                icon: _buildNavIcon(context, Icons.list_alt,
+                    Icons.list_alt_outlined, 2, state.currentIndex),
                 label: 'Bookings',
               ),
               BottomNavigationBarItem(
