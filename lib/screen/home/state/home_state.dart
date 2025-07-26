@@ -8,9 +8,7 @@ import 'package:omspos/services/location/location_service.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class HomeState extends ChangeNotifier {
-  HomeState() {
-    _getCurrentLocation();
-  }
+  HomeState();
 
   BuildContext? _context;
   BuildContext? get context => _context;
@@ -32,15 +30,9 @@ class HomeState extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // Map and location related variables
-  final MapController _mapController = MapController();
-  MapController get mapController => _mapController;
-
   LatLng? _currentPosition;
-  LatLng? get currentPosition => _currentPosition;
 
   bool _isLoadingLocation = true;
-  bool get isLoadingLocation => _isLoadingLocation;
 
   Future<void> initialize() async {
     await clean();
@@ -54,32 +46,6 @@ class HomeState extends ChangeNotifier {
     _areas = [];
     _properties = [];
     notifyListeners();
-  }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      _isLoadingLocation = true;
-      notifyListeners();
-
-      final lat = await LocationService.getLatitude();
-      final lng = await LocationService.getLongitude();
-
-      if (lat != null && lng != null) {
-        _currentPosition = LatLng(double.parse(lat), double.parse(lng));
-        // Center map on current location
-        _mapController.move(_currentPosition!, 14.0);
-      } else {
-        // Default to Kathmandu if location not available
-        _currentPosition = const LatLng(27.7172, 85.3240);
-      }
-    } catch (e) {
-      CustomLog.errorLog(value: 'Location error: $e');
-      // Fallback to default location
-      _currentPosition = const LatLng(27.7172, 85.3240);
-    } finally {
-      _isLoadingLocation = false;
-      notifyListeners();
-    }
   }
 
   Future<void> loadAllAreas() async {
@@ -126,17 +92,5 @@ class HomeState extends ChangeNotifier {
 
   Future<void> refreshProperties() async {
     await loadProperties();
-    await _getCurrentLocation();
-  }
-
-  Future<void> centerMapOnUserLocation() async {
-    if (_currentPosition != null) {
-      _mapController.move(_currentPosition!, 14.0);
-    } else {
-      await _getCurrentLocation();
-      if (_currentPosition != null) {
-        _mapController.move(_currentPosition!, 14.0);
-      }
-    }
   }
 }
