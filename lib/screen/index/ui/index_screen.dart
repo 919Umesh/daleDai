@@ -113,52 +113,6 @@ class IndexScreen extends StatelessWidget {
       ),
     );
   }
-
-  void _handleFabPress(BuildContext context, int currentIndex) {
-    HapticFeedback.lightImpact();
-
-    final List<String> messages = [
-      'Home action',
-      'New booking',
-      'Add to wishlist',
-      'Profile settings'
-    ];
-
-    final List<IconData> icons = [
-      Icons.home,
-      Icons.add,
-      Icons.favorite,
-      Icons.settings,
-    ];
-
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icons[currentIndex],
-              color: Colors.white,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              messages[currentIndex],
-              style: const TextStyle(fontSize: 14),
-            ),
-          ],
-        ),
-        backgroundColor: Theme.of(context).primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(milliseconds: 1500),
-      ),
-    );
-  }
 }
 
 class WishlistScreen extends StatelessWidget {
