@@ -1,10 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:omspos/screen/home/api/home_api.dart';
 import 'package:omspos/screen/home/model/home_model.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
-import 'package:omspos/services/location/location_service.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class HomeState extends ChangeNotifier {
@@ -29,10 +26,6 @@ class HomeState extends ChangeNotifier {
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
-
-  LatLng? _currentPosition;
-
-  bool _isLoadingLocation = true;
 
   Future<void> initialize() async {
     await clean();
