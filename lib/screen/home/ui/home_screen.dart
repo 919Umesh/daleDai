@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
 import 'package:omspos/screen/properties/ui/properties_screen.dart';
