@@ -714,63 +714,20 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _navigateToProperty(PropertyModel property, BuildContext context) {
-    // Implement property details navigation
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Row(
-          children: [
-            Icon(
-              _getPropertyIcon(property.propertyType),
-              color: Theme.of(context).primaryColor,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                property.title,
-                style: const TextStyle(fontSize: 18),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDialogDetailRow('Address', property.address),
-            _buildDialogDetailRow('Location',
-                '${property.city}, ${property.state} - ${property.pincode}'),
-            _buildDialogDetailRow('Type', property.propertyType),
-            _buildDialogDetailRow('Area', '${property.areaSqft} sqft'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Close',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: const Text('View Details'),
-          ),
-        ],
-      ),
+Future<void> _navigateToProperty(property, BuildContext context) async {
+    await SharedPrefService.setValue<String>(
+      PrefKey.landLordId,
+      property.landlordId,
     );
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => RoomScreen(propertyId: property.propertyId),
+        ),
+      );
+    }
   }
+  
 
   Widget _buildDialogDetailRow(String label, String value) {
     return Padding(
