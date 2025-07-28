@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class OneSignalService {
-  static const String _appId = 'YOUR_ONESIGNAL_APP_ID';
+  static const String _appId = 'c44aac8b-4f28-446a-a3d9-c8ba30a8f9bd';
   static const String _apiKey =
-      'YOUR_ONESIGNAL_REST_API_KEY'; // Get this from OneSignal dashboard
+      'os_v2_app_yrfkzc2pfbcgvi6zzc5dbkhzxwuifp2f7kreft5mja4dwsf4lwpplaqgjif53kw7iv7k5ng35tuvd74moyewqvrxs5pxkcble2w2dxy'; // Get this from OneSignal dashboard
 
   static Future<void> initialize() async {
     // Initialization for push notifications (if needed)
