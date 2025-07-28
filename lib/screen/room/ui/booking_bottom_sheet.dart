@@ -262,7 +262,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                               .read<RoomState>()
                               .createBooking(formData);
                           await OneSignalService.sendBookingConfirmationEmail(
-                            email: 'user@example.com',
+                            email: 'thakuriumesh919@gmail.com',
                             tenantName: 'John Doe',
                             propertyName: 'Sunshine Apartments',
                             roomName: 'Room 101',
