@@ -4,6 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
+import 'package:omspos/services/notification/onesignal_service.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
@@ -260,6 +261,14 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                           await context
                               .read<RoomState>()
                               .createBooking(formData);
+                          await OneSignalService.sendBookingConfirmationEmail(
+                            email: 'user@example.com',
+                            tenantName: 'John Doe',
+                            propertyName: 'Sunshine Apartments',
+                            roomName: 'Room 101',
+                            moveInDate: DateTime.now(),
+                            monthlyRent: 1200,
+                          );
 
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
