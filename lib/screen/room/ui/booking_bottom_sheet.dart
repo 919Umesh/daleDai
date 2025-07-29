@@ -261,14 +261,14 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                           await context
                               .read<RoomState>()
                               .createBooking(formData);
-                          await OneSignalService.sendBookingConfirmationEmail(
-                            email: 'thakuriumesh919@gmail.com',
-                            tenantName: 'John Doe',
-                            propertyName: 'Sunshine Apartments',
-                            roomName: 'Room 101',
-                            moveInDate: DateTime.now(),
-                            monthlyRent: 1200,
-                          );
+                          // await OneSignalService.sendBookingConfirmationEmail(
+                          //   email: 'thakuriumesh919@gmail.com',
+                          //   tenantName: 'John Doe',
+                          //   propertyName: 'Sunshine Apartments',
+                          //   roomName: 'Room 101',
+                          //   moveInDate: DateTime.now(),
+                          //   monthlyRent: 1200,
+                          // );
 
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
