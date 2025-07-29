@@ -257,7 +257,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                             'landlord_id': landlordId,
                             'status': 'pending',
                           };
-
                           await context
                               .read<RoomState>()
                               .createBooking(formData);

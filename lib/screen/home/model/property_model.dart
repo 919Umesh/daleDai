@@ -17,6 +17,8 @@ class PropertyModel {
   final DateTime updatedAt;
   final DateTime createdAt;
   final String areaId;
+  final String images_id;
+  final String image_url;
 
   PropertyModel({
     required this.propertyId,
@@ -37,6 +39,8 @@ class PropertyModel {
     required this.updatedAt,
     required this.createdAt,
     required this.areaId,
+    required this.images_id,
+    required this.image_url,
   });
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) {
@@ -54,13 +58,15 @@ class PropertyModel {
       propertyType: json['property_type'] as String,
       furnishingStatus: json['furnishing_status'] as String,
       areaSqft: json['area_sqft'] as int,
-      availableFrom: json['available_from'] != null 
-          ? DateTime.parse(json['available_from'] as String) 
+      availableFrom: json['available_from'] != null
+          ? DateTime.parse(json['available_from'] as String)
           : null,
       isActive: json['is_active'] as bool,
       updatedAt: DateTime.parse(json['updated_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       areaId: json['area_id'] as String,
+      images_id: json['images_id'] as String,
+      image_url: json['image_url'] as String,
     );
   }
 
@@ -84,6 +90,8 @@ class PropertyModel {
       'updated_at': updatedAt.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'area_id': areaId,
+      'images_id': images_id,
+      'image_url': image_url,
     };
   }
 }

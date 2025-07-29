@@ -1,4 +1,5 @@
 import 'package:omspos/screen/home/model/home_model.dart';
+// ignore: unused_import
 import 'package:omspos/screen/home/model/images_model.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
@@ -6,7 +7,7 @@ import 'package:omspos/services/api/supabase_helper.dart';
 class HomeApi {
   static Future<List<PropertyModel>> getAllProperties() async {
     final response = await SupabaseProvider.fetchData(
-      tableName: 'properties',
+      tableName: 'property_with_primary_image',
       limit: 10,
     );
 
@@ -22,7 +23,7 @@ class HomeApi {
         .map((propertyJson) => PropertyModel.fromJson(propertyJson))
         .toList();
   }
-  
+
   static Future<List<PropertyModel>> getPropertiesByArea(String areaId) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
