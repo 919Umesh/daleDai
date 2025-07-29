@@ -1,4 +1,5 @@
 import 'package:omspos/screen/home/model/home_model.dart';
+import 'package:omspos/screen/home/model/images_model.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
 
@@ -7,6 +8,23 @@ class HomeApi {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
       limit: 10,
+    );
+
+    if (response['error'] == true) {
+      throw Exception(response['message'] ?? 'Failed to fetch properties');
+    }
+
+    if (response['data'].isEmpty) {
+      return [];
+    }
+
+    return (response['data'] as List)
+        .map((propertyJson) => PropertyModel.fromJson(propertyJson))
+        .toList();
+  }
+  static Future<List<PropertyImageModel>> getPrppertyImages({String propertiesId}) async {
+    final response = await SupabaseProvider.fetchData(
+      tableName: 'images',
     );
 
     if (response['error'] == true) {

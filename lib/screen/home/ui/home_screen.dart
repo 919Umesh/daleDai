@@ -50,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildAppBar(context),
                   _buildSearchSection(),
                   _buildCarouselSection(state),
-                  _buildAreasSection(state),
                   _buildPropertiesSection(state),
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
@@ -578,35 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Areas Section
-  Widget _buildAreasSection(HomeState state) {
-    return SliverToBoxAdapter(
-      child: Column(
-        children: [
-          _buildSectionHeader(
-            'Browse Areas',
-            '${state.areas.length} locations available',
-            () {
-              // Navigate to all areas
-            },
-          ),
-          Container(
-            height: 120,
-            margin: const EdgeInsets.only(bottom: 10),
-            child: state.areas.isNotEmpty
-                ? ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: state.areas.length,
-                    itemBuilder: (context, index) =>
-                        _buildAreaCard(state.areas[index]),
-                  )
-                : _buildEmptyState('No areas available', Icons.location_off),
-          ),
-        ],
-      ),
-    );
-  }
+ 
 
   // Section Header
   Widget _buildSectionHeader(
@@ -660,78 +631,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Area Card
-  Widget _buildAreaCard(area) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => PropertiesScreen(areaId: area.areaId),
-          ),
-        );
-      },
-      child: Container(
-        width: 100,
-        margin: const EdgeInsets.only(right: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              spreadRadius: 0,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
-                ),
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: area.areaImage != null
-                      ? NetworkImage(area.areaImage!)
-                      : null,
-                  child: area.areaImage == null
-                      ? Icon(
-                          Icons.location_on,
-                          size: 28,
-                          color: Theme.of(context).primaryColor,
-                        )
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                area.name,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Properties Section
+  
   Widget _buildPropertiesSection(HomeState state) {
     return SliverToBoxAdapter(
       child: Column(
