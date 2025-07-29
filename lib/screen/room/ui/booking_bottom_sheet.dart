@@ -269,7 +269,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                           //   moveInDate: DateTime.now(),
                           //   monthlyRent: 1200,
                           // );
-
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
