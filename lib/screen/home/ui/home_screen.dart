@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
@@ -577,8 +578,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- 
-
   // Section Header
   Widget _buildSectionHeader(
       String title, String subtitle, VoidCallback onViewAll) {
@@ -680,44 +679,44 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Property Image Header
   Widget _buildPropertyImageHeader(property) {
     return Container(
       height: 180,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).primaryColor.withOpacity(0.1),
-            Theme.of(context).primaryColor.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
       ),
       child: Stack(
         children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  _getPropertyIcon(property.propertyType),
-                  size: 40,
-                  color: Theme.of(context).primaryColor.withOpacity(0.6),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  property.propertyType.toUpperCase(),
-                  style: TextStyle(
+          // Main image using CachedNetworkImage
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: CachedNetworkImage(
+              width: double.infinity,
+              height: double.infinity,
+              imageUrl:
+                  property.image_url ?? "http://via.placeholder.com/200x150",
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                child: Center(
+                  child: CircularProgressIndicator(
                     color: Theme.of(context).primaryColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
                   ),
                 ),
-              ],
+              ),
+              errorWidget: (context, url, error) => Container(
+                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                child: Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    color: Theme.of(context).primaryColor.withOpacity(0.6),
+                    size: 40,
+                  ),
+                ),
+              ),
             ),
           ),
+          // Availability badge
           Positioned(
             top: 12,
             right: 12,
