@@ -631,7 +631,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  
   Widget _buildPropertiesSection(HomeState state) {
     return SliverToBoxAdapter(
       child: Column(

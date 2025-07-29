@@ -22,24 +22,7 @@ class HomeApi {
         .map((propertyJson) => PropertyModel.fromJson(propertyJson))
         .toList();
   }
-  static Future<List<PropertyImageModel>> getPrppertyImages({String propertiesId}) async {
-    final response = await SupabaseProvider.fetchData(
-      tableName: 'images',
-    );
-
-    if (response['error'] == true) {
-      throw Exception(response['message'] ?? 'Failed to fetch properties');
-    }
-
-    if (response['data'].isEmpty) {
-      return [];
-    }
-
-    return (response['data'] as List)
-        .map((propertyJson) => PropertyModel.fromJson(propertyJson))
-        .toList();
-  }
-
+  
   static Future<List<PropertyModel>> getPropertiesByArea(String areaId) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
