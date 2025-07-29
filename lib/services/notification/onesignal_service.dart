@@ -8,8 +8,6 @@ class OneSignalService {
       'os_v2_app_yrfkzc2pfbcgvi6zzc5dbkhzxwuifp2f7kreft5mja4dwsf4lwpplaqgjif53kw7iv7k5ng35tuvd74moyewqvrxs5pxkcble2w2dxy'; // Get this from OneSignal dashboard
 
   static Future<void> initialize() async {
-    // Initialization for push notifications (if needed)
-    // Email doesn't require initialization in the SDK
   }
 
   static Future<void> sendBookingConfirmationEmail({
