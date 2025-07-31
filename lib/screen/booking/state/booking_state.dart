@@ -37,7 +37,7 @@ class BookingState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadBookings() async {
+  Future<void> loadBookings({bool? isRefresh}) async {
     if (_isLoading) return;
 
     _isLoading = true;
@@ -51,7 +51,10 @@ class BookingState extends ChangeNotifier {
 
       if (userId == "-") throw Exception('User not authenticated');
 
-      _allBookings = await BookingAPI.getBookingsByUserId(userId.toString());
+      _allBookings = await BookingAPI.getBookingsByUserId(
+        userId.toString(),
+        isRefresh ?? false,
+      );
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_allBookings.length} bookings');
     } catch (e) {
@@ -64,5 +67,5 @@ class BookingState extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshBookings() async => loadBookings();
+  Future<void> refreshBookings() async => loadBookings(isRefresh: true);
 }
