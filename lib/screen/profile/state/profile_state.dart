@@ -10,7 +10,7 @@ class ProfileState extends ChangeNotifier {
 
   BuildContext? _context;
   BuildContext? get context => _context;
-  
+
   set getContext(BuildContext value) {
     _context = value;
     initialize();
@@ -18,10 +18,10 @@ class ProfileState extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-  
+
   UserModel? _user;
   UserModel? get user => _user;
-  
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
@@ -39,7 +39,7 @@ class ProfileState extends ChangeNotifier {
 
   Future<void> loadUserProfile() async {
     if (_isLoading) return;
-    
+
     _isLoading = true;
     notifyListeners();
 
@@ -48,7 +48,7 @@ class ProfileState extends ChangeNotifier {
         PrefKey.userId,
         defaultValue: "-",
       );
-      
+
       if (userId == "-") {
         throw Exception('User not authenticated');
       }
@@ -67,5 +67,23 @@ class ProfileState extends ChangeNotifier {
 
   Future<void> refreshProfile() async {
     await loadUserProfile();
+  }
+
+  Future<void> logout() async {
+    try {
+      await SharedPrefService.clearAll();
+      if (_context != null && _context!.mounted) {
+        Navigator.of(_context!).pushNamedAndRemoveUntil(
+          '/loginPath',
+          (Route<dynamic> route) => false,
+        );
+      }
+
+      CustomLog.successLog(value: 'User logged out successfully');
+    } catch (e) {
+      CustomLog.errorLog(value: 'Logout error: $e');
+      _errorMessage = 'Failed to logout. Please try again.';
+      notifyListeners();
+    }
   }
 }
