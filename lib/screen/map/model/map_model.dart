@@ -17,8 +17,6 @@ class MapModel {
   final DateTime updatedAt;
   final DateTime createdAt;
   final String areaId;
-  final String images_id;
-  final String image_url;
 
   MapModel({
     required this.propertyId,
@@ -39,8 +37,6 @@ class MapModel {
     required this.updatedAt,
     required this.createdAt,
     required this.areaId,
-    required this.images_id,
-    required this.image_url,
   });
 
   factory MapModel.fromJson(Map<String, dynamic> json) {
@@ -65,8 +61,6 @@ class MapModel {
       updatedAt: DateTime.parse(json['updated_at'] as String),
       createdAt: DateTime.parse(json['created_at'] as String),
       areaId: json['area_id'] as String,
-      images_id: json['images_id'] as String,
-      image_url: json['image_url'] as String,
     );
   }
 
@@ -90,8 +84,6 @@ class MapModel {
       'updated_at': updatedAt.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'area_id': areaId,
-      'images_id': images_id,
-      'image_url': image_url,
     };
   }
 }
