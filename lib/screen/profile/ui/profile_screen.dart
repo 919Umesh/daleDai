@@ -49,76 +49,27 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget build(BuildContext context) {
     final profileState = Provider.of<ProfileState>(context);
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(profileState),
-          SliverToBoxAdapter(
-            child: _buildBody(profileState),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Enhanced Sliver AppBar
-  Widget _buildSliverAppBar(ProfileState profileState) {
-    return SliverAppBar(
-      expandedHeight: 120.0,
-      floating: false,
-      pinned: true,
-      elevation: 0,
-      backgroundColor: Theme.of(context).primaryColor,
-      foregroundColor: Colors.white,
-      flexibleSpace: FlexibleSpaceBar(
-        title: const Text(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
           'My Profile',
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            color: Colors.white,
-            fontSize: 18,
+            color: Colors.black87,
           ),
         ),
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).primaryColor,
-                Theme.of(context).primaryColor.withOpacity(0.8),
-              ],
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                top: 40,
-                right: -30,
-                child: Icon(
-                  Icons.person_outline,
-                  size: 120,
-                  color: Colors.white.withOpacity(0.1),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 8),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh, color: Colors.grey[600]),
             onPressed: profileState.refreshProfile,
             tooltip: 'Refresh Profile',
           ),
-        ),
-      ],
+        ],
+      ),
+      body: _buildBody(profileState),
     );
   }
 
@@ -144,539 +95,71 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // Enhanced Loading State
   Widget _buildLoadingState() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 0,
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+            strokeWidth: 3,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                    ),
-                  ),
-                  CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).primaryColor),
-                    strokeWidth: 3,
-                  ),
-                  Icon(
-                    Icons.person_outline,
-                    color: Theme.of(context).primaryColor,
-                    size: 32,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Loading your profile...',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Enhanced Error State
-  Widget _buildErrorState(String errorMessage) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
-      child: Center(
-        child: Container(
-          margin: const EdgeInsets.all(24),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 0,
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.error_outline_rounded,
-                  color: Colors.red.shade400,
-                  size: 48,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Oops! Something went wrong',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                errorMessage,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                  height: 1.4,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: () =>
-                    Provider.of<ProfileState>(context, listen: false)
-                        .refreshProfile(),
-                icon: const Icon(Icons.refresh, size: 18),
-                label: const Text('Try Again'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade400,
-                  foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  elevation: 2,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Enhanced No Data State
-  Widget _buildNoDataState() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.6,
-      child: Center(
-        child: Container(
-          margin: const EdgeInsets.all(24),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 0,
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.person_off_outlined,
-                  color: Colors.orange.shade600,
-                  size: 48,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'No Profile Data',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Your profile information is not available at the moment',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 14,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileContent(UserModel user) {
-    return Column(
-      children: [
-        // Profile Header Section
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Theme.of(context).primaryColor,
-                Theme.of(context).primaryColor.withOpacity(0.8),
-              ],
+          SizedBox(height: 16),
+          Text(
+            'Loading your profile...',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 16,
             ),
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              // Profile Image with enhanced styling
-              Hero(
-                tag: 'profile_image',
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Colors.white,
-                        child: user.profileImage != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(66),
-                                child: Image.network(
-                                  user.profileImage!,
-                                  width: 132,
-                                  height: 132,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 132,
-                                      height: 132,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.grey.shade300,
-                                            Colors.grey.shade400,
-                                          ],
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        Icons.person_rounded,
-                                        size: 60,
-                                        color: Colors.white,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                            : Container(
-                                width: 132,
-                                height: 132,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Colors.grey.shade300,
-                                      Colors.grey.shade400,
-                                    ],
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.person_rounded,
-                                  size: 60,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ),
-                      // Verification badge
-                      if (user.isVerified)
-                        Positioned(
-                          bottom: 5,
-                          right: 5,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 3),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.green.withOpacity(0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.verified,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // User Name with enhanced styling
-              Text(
-                user.name,
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              // User Type Badge with enhanced styling
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.badge_outlined,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      user.userType.toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
-
-        // Profile Details Section with enhanced cards
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Personal Information',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Email Card
-              _buildInfoCard(
-                icon: Icons.email_outlined,
-                title: 'Email Address',
-                value: user.email,
-                color: Colors.blue,
-                gradient: [Colors.blue.shade50, Colors.blue.shade100],
-              ),
-              const SizedBox(height: 16),
-
-              // Phone Card
-              _buildInfoCard(
-                icon: Icons.phone_outlined,
-                title: 'Phone Number',
-                value: user.phone,
-                color: Colors.green,
-                gradient: [Colors.green.shade50, Colors.green.shade100],
-              ),
-              const SizedBox(height: 16),
-
-              // Verification Status Card
-              _buildInfoCard(
-                icon: user.isVerified
-                    ? Icons.verified_user_rounded
-                    : Icons.gpp_maybe_outlined,
-                title: 'Account Status',
-                value: user.isVerified
-                    ? 'Verified Account'
-                    : 'Pending Verification',
-                color: user.isVerified ? Colors.green : Colors.orange,
-                gradient: user.isVerified
-                    ? [Colors.green.shade50, Colors.green.shade100]
-                    : [Colors.orange.shade50, Colors.orange.shade100],
-              ),
-
-              const SizedBox(height: 30),
-
-              // Action Buttons Section
-              _buildActionButtons(),
-
-              const SizedBox(height: 30),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Enhanced Info Card
-  Widget _buildInfoCard({
-    required IconData icon,
-    required String title,
-    required String value,
-    required MaterialColor color,
-    required List<Color> gradient,
-  }) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: gradient,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.1),
-            spreadRadius: 0,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
+    );
+  }
+
+  Widget _buildErrorState(String errorMessage) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [color.shade400, color.shade600],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            Icon(
+              Icons.error_outline,
+              color: Colors.red,
+              size: 64,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Something went wrong',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 8),
+            Text(
+              errorMessage,
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () => Provider.of<ProfileState>(context, listen: false)
+                  .refreshProfile(),
+              child: Text('Try Again'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(
-                icon,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.arrow_forward_ios,
-                color: color.shade600,
-                size: 16,
               ),
             ),
           ],
@@ -685,38 +168,255 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // Action Buttons Section
+  Widget _buildNoDataState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.person_off_outlined,
+            color: Colors.orange,
+            size: 64,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No Profile Data',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Your profile information is not available',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileContent(UserModel user) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
+          // Profile Picture Section
+          Center(
+            child: Stack(
+              children: [
+                Hero(
+                  tag: 'profile_image',
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: Colors.grey[300],
+                    child: user.profileImage != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(60),
+                            child: Image.network(
+                              user.profileImage!,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.person,
+                                  size: 60,
+                                  color: Colors.grey[600],
+                                );
+                              },
+                            ),
+                          )
+                        : Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.grey[600],
+                          ),
+                  ),
+                ),
+                if (user.isVerified)
+                  Positioned(
+                    bottom: 5,
+                    right: 5,
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 12,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+
+          // User Name
+          Text(
+            user.name,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8),
+
+          // User Type
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.blue.withOpacity(0.3)),
+            ),
+            child: Text(
+              user.userType.toUpperCase(),
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+          SizedBox(height: 32),
+
+          // Profile Information
+          _buildSectionTitle('Personal Information'),
+          SizedBox(height: 16),
+
+          _buildInfoItem(
+            icon: Icons.email_outlined,
+            title: 'Email',
+            value: user.email,
+          ),
+          SizedBox(height: 12),
+
+          _buildInfoItem(
+            icon: Icons.phone_outlined,
+            title: 'Phone',
+            value: user.phone,
+          ),
+          SizedBox(height: 12),
+
+          _buildInfoItem(
+            icon: user.isVerified ? Icons.verified_user : Icons.gpp_maybe,
+            title: 'Status',
+            value: user.isVerified ? 'Verified' : 'Pending Verification',
+            valueColor: user.isVerified ? Colors.green : Colors.orange,
+          ),
+          SizedBox(height: 32),
+
+          // Action Buttons
+          _buildSectionTitle('Quick Actions'),
+          SizedBox(height: 16),
+
+          _buildActionButtons(),
+          SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoItem({
+    required IconData icon,
+    required String title,
+    required String value,
+    Color? valueColor,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: Colors.grey[600],
+            size: 20,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: valueColor ?? Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildActionButtons() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Quick Actions',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
               child: _buildActionButton(
                 icon: Icons.edit_outlined,
                 label: 'Edit Profile',
-                color: Theme.of(context).primaryColor,
+                color: Colors.blue,
                 onTap: () {
                   // Edit profile functionality
                 },
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: _buildActionButton(
                 icon: Icons.settings_outlined,
                 label: 'Settings',
-                color: Colors.grey.shade600,
+                color: Colors.grey[600]!,
                 onTap: () {
                   // Settings functionality
                 },
@@ -724,27 +424,27 @@ class _ProfileScreenState extends State<ProfileScreen>
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Row(
           children: [
             Expanded(
               child: _buildActionButton(
                 icon: Icons.help_outline,
                 label: 'Help & Support',
-                color: Colors.orange.shade600,
+                color: Colors.orange,
                 onTap: () {
                   // Help functionality
                 },
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: _buildActionButton(
                 icon: Icons.logout_outlined,
                 label: 'Sign Out',
-                color: Colors.red.shade600,
+                color: Colors.red,
                 onTap: () {
-                  // Logout functionality
+                  // Sign out functionality
                 },
               ),
             ),
@@ -764,35 +464,20 @@ class _ProfileScreenState extends State<ProfileScreen>
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              spreadRadius: 0,
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: Border.all(color: Colors.grey[200]!),
         ),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
-              ),
+            Icon(
+              icon,
+              color: color,
+              size: 24,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               label,
               style: TextStyle(
