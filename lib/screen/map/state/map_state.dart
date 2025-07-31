@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/screen/map/api/map_api.dart';
 import 'package:omspos/screen/map/model/map_model.dart';
 import 'package:omspos/services/location/location_service.dart';
