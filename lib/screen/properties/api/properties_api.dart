@@ -1,9 +1,8 @@
-import 'package:omspos/screen/home/model/property_model.dart';
-import 'package:omspos/screen/room/model/images_model.dart';
+import 'package:omspos/screen/properties/model/properties_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
 
 class PropertiesApi {
-  static Future<List<PropertyModel>> getAllProperties({int limit = 10}) async {
+  static Future<List<PropertiesModel>> getAllProperties({int limit = 10}) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
       limit: limit,
@@ -18,11 +17,11 @@ class PropertiesApi {
     }
 
     return (response['data'] as List)
-        .map((propertyJson) => PropertyModel.fromJson(propertyJson))
+        .map((propertyJson) => PropertiesModel.fromJson(propertyJson))
         .toList();
   }
 
-  static Future<List<PropertyModel>> getPropertiesByArea(String areaId) async {
+  static Future<List<PropertiesModel>> getPropertiesByArea(String areaId) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
       filterColumn: 'area_id',
@@ -40,11 +39,11 @@ class PropertiesApi {
     }
 
     return (response['data'] as List)
-        .map((propertyJson) => PropertyModel.fromJson(propertyJson))
+        .map((propertyJson) => PropertiesModel.fromJson(propertyJson))
         .toList();
   }
 
-  static Future<PropertyModel> getPropertyById(String propertyId) async {
+  static Future<PropertiesModel> getPropertyById(String propertyId) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
       filterColumn: 'property_id',
@@ -59,7 +58,7 @@ class PropertiesApi {
       throw Exception('Property not found');
     }
 
-    return PropertyModel.fromJson(response['data'][0]);
+    return PropertiesModel.fromJson(response['data'][0]);
   }
 
 
