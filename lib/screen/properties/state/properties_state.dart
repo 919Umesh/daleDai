@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/screen/properties/api/properties_api.dart';
+import 'package:omspos/screen/properties/model/properties_model.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class PropertiesState extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  List<PropertyModel> _properties = [];
-  List<PropertyModel> get properties => _properties;
+  List<PropertiesModel> _properties = [];
+  List<PropertiesModel> get properties => _properties;
 
   String? _errorMessage;
   String? get errorMessage => _errorMessage;

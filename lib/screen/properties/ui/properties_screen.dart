@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:omspos/screen/properties/model/properties_model.dart';
 import 'package:omspos/screen/properties/state/properties_state.dart';
 import 'package:omspos/screen/room/ui/room_screen.dart';
 import 'package:omspos/widgets/no_data_widget.dart';
@@ -96,7 +97,7 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
 }
 
 class _PropertyCard extends StatelessWidget {
-  final PropertyModel property;
+  final PropertiesModel property;
 
   const _PropertyCard({required this.property});
 
