@@ -443,8 +443,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                 icon: Icons.logout_outlined,
                 label: 'Sign Out',
                 color: Colors.red,
-                onTap: () {
-                  // Sign out functionality
+                onTap: () async {
+                  await Provider.of<ProfileState>(context, listen: false)
+                      .logout();
                 },
               ),
             ),
