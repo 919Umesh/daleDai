@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/profile/api/profile_api.dart';
 import 'package:omspos/screen/profile/model/user_model.dart';
+import 'package:omspos/services/router/router_name.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
@@ -71,16 +73,18 @@ class ProfileState extends ChangeNotifier {
 
   Future<void> logout() async {
     try {
+      // 1. Clear all SharedPreferences data
       await SharedPrefService.clearAll();
+
+      // 2. Navigate to login screen and remove all previous routes
       if (_context != null && _context!.mounted) {
-        Navigator.of(_context!).pushNamedAndRemoveUntil(
-          '/loginPath',
-          (Route<dynamic> route) => false,
-        );
+        GoRouter.of(_context!).go(loginPath);
       }
 
+      // 3. Log success
       CustomLog.successLog(value: 'User logged out successfully');
     } catch (e) {
+      // 4. Handle errors
       CustomLog.errorLog(value: 'Logout error: $e');
       _errorMessage = 'Failed to logout. Please try again.';
       notifyListeners();
