@@ -38,25 +38,25 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: Colors.white,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(28),
-          topRight: Radius.circular(28),
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
         ],
       ),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          left: 24,
-          right: 24,
-          top: 12,
+          left: 20,
+          right: 20,
+          top: 8,
         ),
         child: SingleChildScrollView(
           child: FormBuilder(
@@ -66,148 +66,165 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Modern Drag Handle
+                // Simple Drag Handle
                 Center(
                   child: Container(
-                    width: 48,
+                    width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: colorScheme.onSurfaceVariant.withOpacity(0.4),
+                      color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-
-                // Modern Header
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        Icons.home_rounded,
-                        color: colorScheme.onPrimaryContainer,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Book This Room',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                          Text(
-                            'Fill in the details to confirm your booking',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-
-                // Date Section
-                _buildSectionTitle(
-                    'Booking Dates', Icons.event_rounded, context),
                 const SizedBox(height: 16),
+
+                // Simple Header
+                Text(
+                  'Book Room',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                Text(
+                  'Fill in the details below',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 24),
 
                 // Booking Date
-                _buildModernDatePicker(
-                  name: 'booking_date',
-                  label: 'Booking Date',
-                  hint: 'When did you book?',
-                  icon: Icons.event_note_rounded,
-                  context: context,
-                  validator: FormBuilderValidators.required(
-                    errorText: 'Please select booking date',
+                _buildSimpleField(
+                  child: FormBuilderDateTimePicker(
+                    name: 'booking_date',
+                    initialValue: null,
+                    inputType: InputType.date,
+                    format: DateFormat('MMM dd, yyyy'),
+                    decoration: _getInputDecoration(
+                        'Booking Date', Icons.calendar_today),
+                    validator: FormBuilderValidators.required(
+                      errorText: 'Please select booking date',
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
 
                 // Move-In Date
-                _buildModernDatePicker(
-                  name: 'move_in_date',
-                  label: 'Move-In Date',
-                  hint: 'When will you move in?',
-                  icon: Icons.login_rounded,
-                  context: context,
-                  validator: FormBuilderValidators.required(
-                    errorText: 'Please select move-in date',
+                _buildSimpleField(
+                  child: FormBuilderDateTimePicker(
+                    name: 'move_in_date',
+                    initialValue: null,
+                    inputType: InputType.date,
+                    format: DateFormat('MMM dd, yyyy'),
+                    decoration:
+                        _getInputDecoration('Move-In Date', Icons.login),
+                    validator: FormBuilderValidators.required(
+                      errorText: 'Please select move-in date',
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
 
-                // Move-Out Date
-                _buildModernDatePicker(
-                  name: 'move_out_date',
-                  label: 'Move-Out Date',
-                  hint: 'When will you move out? (Optional)',
-                  icon: Icons.logout_rounded,
-                  context: context,
-                  isOptional: true,
+                // Move-Out Date (Optional)
+                _buildSimpleField(
+                  child: FormBuilderDateTimePicker(
+                    name: 'move_out_date',
+                    initialValue: null,
+                    inputType: InputType.date,
+                    format: DateFormat('MMM dd, yyyy'),
+                    decoration: _getInputDecoration(
+                        'Move-Out Date (Optional)', Icons.logout),
+                  ),
+                ),
+
+                // Monthly Rent
+                _buildSimpleField(
+                  child: FormBuilderTextField(
+                    name: 'monthly_rent',
+                    initialValue: initialRent.toStringAsFixed(2),
+                    decoration: _getInputDecoration(
+                        'Monthly Rent (\$)', Icons.attach_money),
+                    keyboardType: TextInputType.number,
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(
+                          errorText: 'Enter monthly rent'),
+                      FormBuilderValidators.numeric(
+                          errorText: 'Must be a valid number'),
+                    ]),
+                  ),
+                ),
+
+                // Security Deposit
+                _buildSimpleField(
+                  child: FormBuilderTextField(
+                    name: 'security_deposit',
+                    initialValue: initialDeposit.toStringAsFixed(2),
+                    decoration: _getInputDecoration(
+                        'Security Deposit (\$)', Icons.security),
+                    keyboardType: TextInputType.number,
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(
+                          errorText: 'Enter security deposit'),
+                      FormBuilderValidators.numeric(
+                          errorText: 'Must be a valid number'),
+                    ]),
+                  ),
+                ),
+
+                // Profession
+                _buildSimpleField(
+                  child: FormBuilderTextField(
+                    name: 'profession',
+                    decoration: _getInputDecoration('Profession', Icons.work),
+                    validator: FormBuilderValidators.required(
+                      errorText: 'Please enter your profession',
+                    ),
+                  ),
+                ),
+
+                // Number of People (Slider)
+                _buildSimpleField(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Number of People',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      FormBuilderSlider(
+                        name: 'peoples',
+                        min: 1,
+                        max: 10,
+                        initialValue: 1,
+                        divisions: 9,
+                        activeColor: Colors.blue,
+                        inactiveColor: Colors.grey[300],
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        displayValues: DisplayValues.current,
+                        validator: FormBuilderValidators.required(
+                          errorText: 'Please select number of people',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 32),
 
-                // Payment Section
-                _buildSectionTitle(
-                    'Payment Details', Icons.payments_rounded, context),
-                const SizedBox(height: 16),
-
-                // Monthly Rent
-                _buildModernTextField(
-                  name: 'monthly_rent',
-                  label: 'Monthly Rent',
-                  hint: 'Enter monthly rent amount',
-                  icon: Icons.attach_money_rounded,
-                  prefixText: '\$ ',
-                  initialValue: initialRent.toStringAsFixed(2),
-                  context: context,
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(
-                        errorText: 'Enter monthly rent'),
-                    FormBuilderValidators.numeric(
-                        errorText: 'Must be a valid number'),
-                  ]),
-                ),
-                const SizedBox(height: 16),
-
-                // Security Deposit
-                _buildModernTextField(
-                  name: 'security_deposit',
-                  label: 'Security Deposit',
-                  hint: 'Enter security deposit amount',
-                  icon: Icons.security_rounded,
-                  prefixText: '\$ ',
-                  initialValue: initialDeposit.toStringAsFixed(2),
-                  context: context,
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(
-                        errorText: 'Enter security deposit'),
-                    FormBuilderValidators.numeric(
-                        errorText: 'Must be a valid number'),
-                  ]),
-                ),
-
-                const SizedBox(height: 40),
-
-                // Modern Confirm Button
+                // Simple Confirm Button
                 SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: 50,
                   child: ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.saveAndValidate()) {
@@ -225,7 +242,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
                           final formValues = _formKey.currentState!.value;
 
-                          // Parse numeric values safely - first to double, then to int
+                          // Parse numeric values safely
                           final monthlyRent = (double.tryParse(
                                       formValues['monthly_rent'].toString()) ??
                                   0)
@@ -235,8 +252,10 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                                           .toString()) ??
                                   0)
                               .toInt();
+                          final peoples =
+                              (formValues['peoples'] as double).toInt();
 
-                          // Format dates to match the 'date' type in your table (not timestamp)
+                          // Format dates
                           final formatDate = (DateTime date) =>
                               date.toIso8601String().split('T')[0];
 
@@ -252,29 +271,25 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                                 : null,
                             'monthly_rent': monthlyRent,
                             'security_deposit': securityDeposit,
+                            'profession': formValues['profession'] as String,
+                            'peoples': peoples,
                             'room_id': widget.room.roomId,
                             'tenant_id': userId,
                             'landlord_id': landlordId,
                             'status': 'pending',
                           };
+
                           await context
                               .read<RoomState>()
                               .createBooking(formData);
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.check_circle_rounded,
-                                      color: Colors.white),
-                                  const SizedBox(width: 12),
-                                  const Text('Booking confirmed successfully!'),
-                                ],
-                              ),
+                              content: Text('Booking confirmed successfully!'),
                               backgroundColor: Colors.green,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
                           );
@@ -282,21 +297,11 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                           CustomLog.successLog(value: 'Error: ${e.toString()}');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.error_rounded,
-                                      color: Colors.white),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child:
-                                        Text('Booking failed: ${e.toString()}'),
-                                  ),
-                                ],
-                              ),
+                              content: Text('Booking failed: ${e.toString()}'),
                               backgroundColor: Colors.red,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
                           );
@@ -304,26 +309,19 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check_circle_rounded, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Confirm Booking',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: colorScheme.onPrimary,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'Confirm Booking',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
@@ -336,190 +334,47 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
     );
   }
 
-  Widget _buildSectionTitle(String title, IconData icon, BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: colorScheme.secondaryContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: colorScheme.onSecondaryContainer,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
-          ),
-        ),
-      ],
+  Widget _buildSimpleField({required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: child,
     );
   }
 
-  Widget _buildModernDatePicker({
-    required String name,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required BuildContext context,
-    String? Function(DateTime?)? validator,
-    bool isOptional = false,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return FormBuilderDateTimePicker(
-      name: name,
-      initialValue: null,
-      inputType: InputType.date,
-      format: DateFormat('MMM dd, yyyy'),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Container(
-          margin: const EdgeInsets.all(12),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: colorScheme.primaryContainer.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: colorScheme.primary,
-          ),
-        ),
-        suffixIcon: isOptional
-            ? Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Chip(
-                  label: Text(
-                    'Optional',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                  backgroundColor: colorScheme.surfaceVariant,
-                  side: BorderSide.none,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-              )
-            : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.error,
-          ),
-        ),
-        filled: true,
-        fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 20,
-        ),
+  InputDecoration _getInputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(
+        icon,
+        color: Colors.grey[600],
+        size: 20,
       ),
-      validator: validator,
-    );
-  }
-
-  Widget _buildModernTextField({
-    required String name,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required BuildContext context,
-    String? prefixText,
-    String? initialValue,
-    String? Function(String?)? validator,
-  }) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return FormBuilderTextField(
-      name: name,
-      initialValue: initialValue,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Container(
-          margin: const EdgeInsets.all(12),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: colorScheme.primaryContainer.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: colorScheme.primary,
-          ),
-        ),
-        prefixText: prefixText,
-        prefixStyle: TextStyle(
-          color: colorScheme.onSurface,
-          fontWeight: FontWeight.w500,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withOpacity(0.2),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: colorScheme.error,
-          ),
-        ),
-        filled: true,
-        fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 20,
-        ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[300]!),
       ),
-      keyboardType: TextInputType.number,
-      validator: validator,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.blue, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.red),
+      ),
+      filled: true,
+      fillColor: Colors.grey[50],
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 16,
+      ),
+      labelStyle: TextStyle(
+        color: Colors.grey[700],
+        fontSize: 14,
+      ),
     );
   }
 }
