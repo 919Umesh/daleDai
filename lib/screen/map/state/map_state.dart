@@ -3,13 +3,14 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/screen/map/api/map_api.dart';
+import 'package:omspos/screen/map/model/map_model.dart';
 import 'package:omspos/services/location/location_service.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class MapState extends ChangeNotifier {
   BuildContext? _context;
   final MapController _mapController = MapController();
-  List<PropertyModel> _properties = [];
+  List<MapModel> _properties = [];
   LatLng? _currentPosition;
   bool _isLoading = false;
   bool _isLoadingLocation = false;
@@ -17,7 +18,7 @@ class MapState extends ChangeNotifier {
 
   BuildContext? get context => _context;
   MapController get mapController => _mapController;
-  List<PropertyModel> get properties => _properties;
+  List<MapModel> get properties => _properties;
   LatLng? get currentPosition => _currentPosition;
   bool get isLoading => _isLoading;
   bool get isLoadingLocation => _isLoadingLocation;

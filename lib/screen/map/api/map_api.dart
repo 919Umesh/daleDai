@@ -1,8 +1,10 @@
+// ignore: unused_import
 import 'package:omspos/screen/home/model/property_model.dart';
+import 'package:omspos/screen/map/model/map_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
 
 class MapLocationApi {
-  static Future<List<PropertyModel>> getAllProperties() async {
+  static Future<List<MapModel>> getAllProperties() async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'properties',
       limit: 100, // Increased limit for better map coverage
@@ -18,7 +20,7 @@ class MapLocationApi {
     }
 
     return (response['data'] as List)
-        .map((propertyJson) => PropertyModel.fromJson(propertyJson))
+        .map((propertyJson) => MapModel.fromJson(propertyJson))
         .toList();
   }
 }

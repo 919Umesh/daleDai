@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
+import 'package:omspos/screen/map/model/map_model.dart';
 import 'package:omspos/screen/map/state/map_state.dart';
 import 'package:omspos/screen/room/ui/room_screen.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
@@ -461,7 +462,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   }
 
   // Enhanced Property Bottom Sheet
-  void _showPropertyBottomSheet(PropertyModel property, BuildContext context) {
+  void _showPropertyBottomSheet(MapModel property, BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
