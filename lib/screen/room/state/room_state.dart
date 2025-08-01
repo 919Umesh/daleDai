@@ -46,7 +46,7 @@ class RoomState extends ChangeNotifier {
   Future<void> getAllImages(String propertyId, {bool isRefresh = false}) async {
     try {
       _setRefreshingState(isRefresh, true);
-      
+
       final images = await RoomApi.getPropertyImages(propertyId);
       _images = images;
       _handleSuccess('Loaded ${_images.length} images');
@@ -58,7 +58,8 @@ class RoomState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadRoomsByProperty(String propertyId, {bool isRefresh = false}) async {
+  Future<void> loadRoomsByProperty(String propertyId,
+      {bool isRefresh = false}) async {
     if (_shouldSkipLoad(propertyId, isRefresh)) return;
 
     _currentPropertyId = propertyId;
@@ -79,7 +80,7 @@ class RoomState extends ChangeNotifier {
   Future<void> getRoomDetails(String roomID, {bool isRefresh = false}) async {
     try {
       _setLoadingState(isRefresh, true);
-      
+
       final room = await RoomApi.getRoomById(roomID);
       _selectedRoom = room;
       _handleSuccess('Loaded room details');
@@ -91,24 +92,38 @@ class RoomState extends ChangeNotifier {
     }
   }
 
-Future<void> createBooking(Map<String, dynamic> formData) async {
-  try {
-    _setLoading(true);
-    
-    await RoomApi.createBooking(formData);
-    _handleSuccess('Booking created successfully!');
-    
-  
-    if (_currentPropertyId != null) {
-      await loadRoomsByProperty(_currentPropertyId!);
+  Future<void> createBooking(Map<String, dynamic> formData) async {
+    try {
+      _setLoading(true);
+
+      await RoomApi.createBooking(formData);
+      _handleSuccess('Booking created successfully!');
+
+      if (_currentPropertyId != null) {
+        await loadRoomsByProperty(_currentPropertyId!);
+      }
+    } catch (e) {
+      _handleError('Booking failed: ${e.toString()}');
+      rethrow;
+    } finally {
+      _setLoading(false);
     }
-  } catch (e) {
-    _handleError('Booking failed: ${e.toString()}');
-    rethrow;
-  } finally {
-    _setLoading(false);
   }
-}
+
+  Future<void> createReview(Map<String, dynamic> formData) async {
+    try {
+      _setLoading(true);
+
+      await RoomApi.createReview(formData);
+      _handleSuccess('Review created successfully!');
+    } catch (e) {
+      _handleError('Review creation failed: ${e.toString()}');
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   Future<void> refreshData() async {
     if (_currentPropertyId == null || _isRefreshing) return;
 

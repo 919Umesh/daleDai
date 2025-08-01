@@ -48,7 +48,28 @@ class RoomApi {
       throw Exception(response['message'] ?? 'Failed to create review');
     }
 
-    return response['data']; // Return the created booking record
+    return response['data'];
+  }
+
+  static Future<List<ReviewModel>> getReviewsByProperty(
+      String propertyId) async {
+    final response = await SupabaseProvider.fetchData(
+      tableName: 'reviews',
+      filterColumn: 'property_id',
+      filterValue: propertyId,
+    );
+
+    if (response['error'] == true) {
+      throw Exception(response['message'] ?? 'Failed to fetch reviews');
+    }
+
+    if (response['data'].isEmpty) {
+      return [];
+    }
+
+    return (response['data'] as List)
+        .map((reviewJson) => ReviewModel.fromJson(reviewJson))
+        .toList();
   }
 
   static Future<RoomModel> getRoomById(String roomId) async {
