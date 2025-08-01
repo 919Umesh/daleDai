@@ -4,7 +4,6 @@ import 'package:omspos/screen/properties/state/properties_state.dart';
 import 'package:omspos/screen/room/ui/room_screen.dart';
 import 'package:omspos/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:omspos/screen/home/model/property_model.dart';
 
 class PropertiesScreen extends StatefulWidget {
   final String? areaId;
