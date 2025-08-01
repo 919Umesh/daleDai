@@ -45,7 +45,7 @@ class RoomApi {
     );
 
     if (response['error'] == true) {
-      throw Exception(response['message'] ?? 'Failed to create booking');
+      throw Exception(response['message'] ?? 'Failed to create review');
     }
 
     return response['data']; // Return the created booking record
