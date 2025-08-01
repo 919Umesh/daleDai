@@ -10,6 +10,7 @@ class RoomState extends ChangeNotifier {
   bool _isRefreshing = false;
   List<RoomModel> _rooms = [];
   List<ImageModel> _images = [];
+  List<ImageModel> _images = [];
   String? _errorMessage;
   String? _currentPropertyId;
   RoomModel? _selectedRoom;
