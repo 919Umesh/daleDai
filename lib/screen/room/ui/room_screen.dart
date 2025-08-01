@@ -32,6 +32,7 @@ class _RoomScreenState extends State<RoomScreen> {
     await Future.wait([
       _roomState.loadRoomsByProperty(widget.propertyId),
       _roomState.getAllImages(widget.propertyId),
+      _roomState.getReviewsByProperty(widget.propertyId),
     ]);
   }
 
