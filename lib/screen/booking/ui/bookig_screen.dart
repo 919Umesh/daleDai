@@ -534,8 +534,10 @@ class _BookingListScreenState extends State<BookingListScreen>
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {
-                            // View details functionality
+                          onPressed: () async {
+                            await Provider.of<BookingState>(context,
+                                    listen: false)
+                                .generatePdf(booking);
                           },
                           icon: const Icon(Icons.visibility_outlined, size: 16),
                           label: const Text('View Details'),

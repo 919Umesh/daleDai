@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/widgets.dart';
 import 'package:omspos/screen/booking/api/booking_api.dart';
 import 'package:omspos/screen/booking/model/booking_model.dart';
+import 'package:omspos/screen/booking/pdf/booking_pdf.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 class BookingState extends ChangeNotifier {
   BookingState();
@@ -63,6 +68,32 @@ class BookingState extends ChangeNotifier {
       CustomLog.errorLog(value: 'Booking load error: $_errorMessage');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> generatePdf(BookingModel bookingData) async {
+    try {
+      // Generate the PDF
+      final pdfBytes = await generateBookingPdf(
+        bookingData: bookingData,
+        companyName: 'Dale Dai',
+        companyPhone: '9868732774',
+        companyPan: '456452853',
+        agentName: 'Umesh',
+      );
+
+      // Save the PDF to device
+      final directory = await getApplicationDocumentsDirectory();
+      final path = directory.path;
+      final file = File('$path/Booking_${bookingData.bookingId}.pdf');
+      await file.writeAsBytes(pdfBytes, flush: true);
+
+      // Open the PDF
+      OpenFilex.open(file.path);
+    } catch (e) {
+      _errorMessage = 'Failed to generate PDF: ${e.toString()}';
+      CustomLog.errorLog(value: 'PDF generation error: $_errorMessage');
       notifyListeners();
     }
   }
