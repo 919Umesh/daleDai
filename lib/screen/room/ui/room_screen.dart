@@ -83,7 +83,8 @@ class _RoomScreenState extends State<RoomScreen> {
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  expandedHeight: 220,
+                  expandedHeight: 420,
+                  backgroundColor: Colors.transparent,
                   pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
                     background: _buildImageHeader(state),
@@ -94,7 +95,7 @@ class _RoomScreenState extends State<RoomScreen> {
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       _buildRoomsSection(state),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 10),
                       _buildReviewsSection(state),
                     ]),
                   ),
@@ -148,7 +149,6 @@ class _RoomScreenState extends State<RoomScreen> {
             color: Colors.black87,
           ),
         ),
-        const SizedBox(height: 8),
         state.rooms.isEmpty
             ? const NoDataWidget()
             : GridView.builder(
@@ -280,15 +280,13 @@ class _RoomScreenState extends State<RoomScreen> {
               ),
           ],
         ),
-        const SizedBox(height: 8),
         state.reviews.isEmpty
             ? const NoDataWidget()
             : ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: state.reviews.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
+                separatorBuilder: (context, index) => const SizedBox(height: 2),
                 itemBuilder: (context, index) {
                   final review = state.reviews[index];
                   return Card(
