@@ -32,7 +32,6 @@ class _BookingListScreenState extends State<BookingListScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: _buildAppBar(theme),
@@ -49,11 +48,12 @@ class _BookingListScreenState extends State<BookingListScreen>
           return TabBarView(
             controller: _tabController,
             children: [
-              _buildBookingList(state.pendingBookings, BookingStatus.pending),
               _buildBookingList(
-                  state.confirmedBookings, BookingStatus.confirmed),
+                  state.pendingBookings, BookingStatus.pending, state),
               _buildBookingList(
-                  state.completedBookings, BookingStatus.completed),
+                  state.confirmedBookings, BookingStatus.confirmed, state),
+              _buildBookingList(
+                  state.completedBookings, BookingStatus.completed, state),
             ],
           );
         },
@@ -297,7 +297,8 @@ class _BookingListScreenState extends State<BookingListScreen>
     );
   }
 
-  Widget _buildBookingList(List<BookingModel> bookings, BookingStatus status) {
+  Widget _buildBookingList(
+      List<BookingModel> bookings, BookingStatus status, BookingState state) {
     if (bookings.isEmpty) {
       return _buildEmptyState(status);
     }
@@ -308,7 +309,8 @@ class _BookingListScreenState extends State<BookingListScreen>
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: bookings.length,
-        itemBuilder: (context, index) => _buildBookingCard(bookings[index]),
+        itemBuilder: (context, index) =>
+            _buildBookingCard(bookings[index], state),
       ),
     );
   }
@@ -389,7 +391,7 @@ class _BookingListScreenState extends State<BookingListScreen>
   }
 
   // Enhanced Booking Card
-  Widget _buildBookingCard(BookingModel booking) {
+  Widget _buildBookingCard(BookingModel booking, BookingState state) {
     final theme = Theme.of(context);
 
     return Container(
@@ -553,30 +555,24 @@ class _BookingListScreenState extends State<BookingListScreen>
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () async {
-                             try {
-    await Provider.of<BookingState>(context, listen: false)
-        .callDialer('9868732774');
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $e')),
-    );
-  }
-                          },
-                          icon: const Icon(Icons.phone_outlined, size: 16),
-                          label: const Text('Contact'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 2,
-                          ),
-                        ),
-                      ),
+                          child: ElevatedButton(
+                        onPressed: state.isCalling
+                            ? null
+                            : () async {
+                                try {
+                                  await context
+                                      .read<BookingState>()
+                                      .callDialer('9868732774');
+                                } catch (e) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Error: $e')),
+                                  );
+                                }
+                              },
+                        child: state.isCalling
+                            ? CircularProgressIndicator()
+                            : Text('Call 9868732774'),
+                      )),
                     ],
                   ),
                 ],

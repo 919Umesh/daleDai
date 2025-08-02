@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:omspos/screen/booking/api/booking_api.dart';
 import 'package:omspos/screen/booking/model/booking_model.dart';
@@ -9,12 +10,16 @@ import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BookingState extends ChangeNotifier {
   BookingState();
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _isCalling = false;
+  bool get isCalling => _isCalling;
 
   List<BookingModel> _allBookings = [];
   String? _errorMessage;
@@ -97,10 +102,14 @@ class BookingState extends ChangeNotifier {
       notifyListeners();
     }
   }
-Future<void> callDialer(String phoneNumber) async {
+
+  Future<void> callDialer(String phoneNumber) async {
+    _isCalling = true;
+    notifyListeners();
+
     try {
       final url = 'tel:$phoneNumber';
-      
+
       if (await canLaunch(url)) {
         await launch(url);
       } else {
@@ -110,6 +119,9 @@ Future<void> callDialer(String phoneNumber) async {
       throw 'Failed to make call: ${e.message}';
     } catch (e) {
       throw 'Failed to make call: $e';
+    } finally {
+      _isCalling = false;
+      notifyListeners();
     }
   }
 
