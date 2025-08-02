@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
+import 'package:omspos/services/sharedPreference/preference_keys.dart';
+import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:provider/provider.dart';
 
 class ReviewBottomSheet extends StatefulWidget {
@@ -19,9 +21,14 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
   Future<void> _submitReview() async {
     if (_reviewFormKey.currentState!.validate()) {
       final roomState = Provider.of<RoomState>(context, listen: false);
+      final userId = await SharedPrefService.getValue<String>(
+        PrefKey.userId,
+        defaultValue: "-",
+      );
       try {
         final formData = {
           'property_id': widget.propertyId,
+          "user_id": userId,
           'rating': _rating.toInt(),
           'comment': _commentController.text.trim(),
         };

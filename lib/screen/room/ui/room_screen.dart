@@ -47,7 +47,7 @@ class _RoomScreenState extends State<RoomScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Colors.white,
       body: Consumer<RoomState>(
         builder: (context, state, child) {
           if (state.isLoading && !state.isRefreshing) {
@@ -67,6 +67,10 @@ class _RoomScreenState extends State<RoomScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _loadInitialData,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                    ),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -79,27 +83,14 @@ class _RoomScreenState extends State<RoomScreen> {
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  expandedHeight: 240,
+                  expandedHeight: 220,
                   pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
-                    title: Text(
-                      'Property Details',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
                     background: _buildImageHeader(state),
                   ),
                 ),
                 SliverPadding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       _buildRoomsSection(state),
@@ -113,9 +104,12 @@ class _RoomScreenState extends State<RoomScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: _showReviewBottomSheet,
-        child: const Icon(Icons.add_comment),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        icon: Icon(Icons.add),
+        label: Text('Add Review'),
       ),
     );
   }
@@ -123,7 +117,7 @@ class _RoomScreenState extends State<RoomScreen> {
   Widget _buildImageHeader(RoomState state) {
     return state.images.isEmpty
         ? Container(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Colors.grey[200],
             child: const Center(child: NoDataWidget()),
           )
         : PageView.builder(
@@ -134,7 +128,7 @@ class _RoomScreenState extends State<RoomScreen> {
                 image.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: Colors.grey[200],
                   child: const Center(child: Icon(Icons.broken_image)),
                 ),
               );
@@ -146,13 +140,15 @@ class _RoomScreenState extends State<RoomScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Available Rooms',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         state.rooms.isEmpty
             ? const NoDataWidget()
             : GridView.builder(
@@ -160,20 +156,20 @@ class _RoomScreenState extends State<RoomScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
                   childAspectRatio: 0.85,
                 ),
                 itemCount: state.rooms.length,
                 itemBuilder: (context, index) {
                   final room = state.rooms[index];
                   return Card(
-                    elevation: 0,
+                    elevation: 2,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    clipBehavior: Clip.antiAlias,
                     child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => RoomDetailScreen(
@@ -185,10 +181,15 @@ class _RoomScreenState extends State<RoomScreen> {
                         children: [
                           Expanded(
                             child: Container(
-                              color:
-                                  Theme.of(context).colorScheme.surfaceVariant,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                              ),
                               child: const Center(
-                                child: Icon(Icons.king_bed, size: 40),
+                                child: Icon(Icons.king_bed,
+                                    size: 40, color: Colors.blue),
                               ),
                             ),
                           ),
@@ -202,16 +203,14 @@ class _RoomScreenState extends State<RoomScreen> {
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    color: Colors.black87,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   room.roomType,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withOpacity(0.6),
+                                  style: const TextStyle(
+                                    color: Colors.grey,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -225,24 +224,20 @@ class _RoomScreenState extends State<RoomScreen> {
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
+                                        color: Colors.black87,
                                       ),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withOpacity(0.1),
+                                        color: Colors.blue.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: Text(
+                                      child: const Text(
                                         'View',
                                         style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
+                                          color: Colors.blue,
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -270,24 +265,22 @@ class _RoomScreenState extends State<RoomScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Reviews',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
             if (state.reviews.isNotEmpty)
               Text(
                 '${state.reviews.length} reviews',
-                style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.6)),
+                style: const TextStyle(color: Colors.grey),
               ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         state.reviews.isEmpty
             ? const NoDataWidget()
             : ListView.separated(
@@ -298,10 +291,14 @@ class _RoomScreenState extends State<RoomScreen> {
                     const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final review = state.reviews[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceVariant,
+                  return Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
+                      ),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -340,12 +337,9 @@ class _RoomScreenState extends State<RoomScreen> {
                           const SizedBox(height: 12),
                           Text(
                             'Posted on ${review.createdAt.toString().split(' ')[0]}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.6),
+                              color: Colors.grey,
                             ),
                           ),
                         ],

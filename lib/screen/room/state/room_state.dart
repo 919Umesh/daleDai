@@ -100,7 +100,7 @@ class RoomState extends ChangeNotifier {
 
   Future<void> refreshData() async {
     if (_currentPropertyId == null) return;
-    
+
     _setRefreshing(true);
     try {
       await Future.wait([
@@ -144,9 +144,10 @@ class RoomState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadRoomsByProperty(String propertyId, {bool isRefresh = false}) async {
+  Future<void> loadRoomsByProperty(String propertyId,
+      {bool isRefresh = false}) async {
     _currentPropertyId = propertyId;
-    
+
     if (isRefresh) {
       _setRefreshing(true);
     } else {
@@ -176,7 +177,8 @@ class RoomState extends ChangeNotifier {
     }
   }
 
-  Future<void> getReviewsByProperty(String propertyId, {bool isRefresh = false}) async {
+  Future<void> getReviewsByProperty(String propertyId,
+      {bool isRefresh = false}) async {
     if (isRefresh) {
       _setRefreshing(true);
     } else {
@@ -186,11 +188,6 @@ class RoomState extends ChangeNotifier {
     try {
       await _loadReviews(propertyId);
       _handleSuccess('Loaded ${_reviews.length} reviews');
-      
-      // Log review comments for debugging
-      for (var review in _reviews) {
-        CustomLog.successLog(value: 'Review: ${review.comment}');
-      }
     } catch (e) {
       _setError('Failed to load reviews: ${e.toString()}');
     }
@@ -237,11 +234,6 @@ class RoomState extends ChangeNotifier {
     try {
       await RoomApi.createReview(formData);
       _handleSuccess('Review created successfully!');
-
-      // Refresh reviews data to show new review
-      if (_currentPropertyId != null) {
-        await _loadReviews(_currentPropertyId!);
-      }
     } catch (e) {
       _setError('Failed to create review: ${e.toString()}');
       rethrow;
@@ -259,7 +251,8 @@ class RoomState extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get hasData => _rooms.isNotEmpty || _images.isNotEmpty || _reviews.isNotEmpty;
+  bool get hasData =>
+      _rooms.isNotEmpty || _images.isNotEmpty || _reviews.isNotEmpty;
   bool get isEmpty => !hasData && !_isLoading;
 
   @override
