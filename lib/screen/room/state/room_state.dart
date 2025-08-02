@@ -147,6 +147,11 @@ class RoomState extends ChangeNotifier {
 
       final reviews = await RoomApi.getReviewsByProperty(propertyId);
       _reviews.addAll(reviews);
+      if (reviews is List) {
+        for (var review in reviews) {
+          CustomLog.successLog(value: review.comment);
+        }
+      }
       _handleSuccess('Loaded ${_reviews.length} reviews');
     } catch (e) {
       _handleError('Reviews load error: ${e.toString()}');
