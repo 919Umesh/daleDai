@@ -4,6 +4,8 @@ import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/model/review_model.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
 import 'package:omspos/screen/room/ui/room_details.dart';
+import 'package:omspos/services/sharedPreference/preference_keys.dart';
+import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -26,9 +28,7 @@ class _RoomScreenState extends State<RoomScreen> {
   void initState() {
     super.initState();
     _roomState = Provider.of<RoomState>(context, listen: false);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadInitialData();
-    });
+    _loadInitialData();
   }
 
   Future<void> _loadInitialData() async {
@@ -45,22 +45,32 @@ class _RoomScreenState extends State<RoomScreen> {
 
   Future<void> _submitReview() async {
     if (_reviewFormKey.currentState!.validate()) {
+      final userId = await SharedPrefService.getValue<String>(
+        PrefKey.userId,
+        defaultValue: "-",
+      );
       try {
         final formData = {
-          'propertyId': widget.propertyId,
+          'property_id': widget.propertyId,
+          "user_id": userId,
           'rating': _rating.toInt(),
-          'comment': _commentController.text,
+          'comment': _commentController.text.trim(),
         };
-        debugPrint(formData.toString());
-        // await _roomState.createReview(formData);
+        await _roomState.createReview(formData);
         _commentController.clear();
         _rating = 3.0;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Review submitted successfully!')),
+          const SnackBar(
+            content: Text('Review submitted successfully!'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit review: ${e.toString()}')),
+          SnackBar(
+            content: Text('Failed to submit review: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
@@ -77,7 +87,9 @@ class _RoomScreenState extends State<RoomScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Room Details'),
+        title: const Text('Property Details'),
+        centerTitle: true,
+        elevation: 0,
       ),
       body: Consumer<RoomState>(
         builder: (context, state, child) {
@@ -90,7 +102,11 @@ class _RoomScreenState extends State<RoomScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(state.errorMessage!),
+                  Text(
+                    state.errorMessage!,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _loadInitialData,
@@ -103,29 +119,36 @@ class _RoomScreenState extends State<RoomScreen> {
 
           return RefreshIndicator(
             onRefresh: _handleRefresh,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Property Images Section
-                    _buildPropertyImages(state),
-                    const SizedBox(height: 24),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: CustomScrollView(
+                slivers: [
+                  // Property Images Section
 
-                    // Rooms List Section
-                    _buildRoomsList(state),
-                    const SizedBox(height: 24),
+                  _buildImageHeader(state),
 
-                    // Reviews Section
-                    _buildReviewsSection(state),
-                    const SizedBox(height: 24),
-
-                    // Add Review Form
-                    _buildReviewForm(),
-                  ],
-                ),
+                  // Main Content
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 24),
+                          // Rooms Section
+                          _buildRoomsSection(state),
+                          const SizedBox(height: 24),
+                          // Reviews Section
+                          _buildReviewsSection(state),
+                          const SizedBox(height: 24),
+                          // Review Form
+                          _buildReviewForm(),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -134,92 +157,140 @@ class _RoomScreenState extends State<RoomScreen> {
     );
   }
 
-  Widget _buildPropertyImages(RoomState state) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Property Images',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 200,
-          child: state.images.isEmpty
-              ? const NoDataWidget()
-              : ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: state.images.length,
-                  itemBuilder: (context, index) {
-                    final image = state.images[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          image.imageUrl,
-                          width: 300,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                            width: 300,
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.broken_image),
-                          ),
+  Widget _buildImageHeader(RoomState state) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: 220,
+        child: state.images.isEmpty
+            ? const NoDataWidget()
+            : PageView.builder(
+                itemCount: state.images.length,
+                itemBuilder: (context, index) {
+                  final image = state.images[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
+                      ),
+                      child: Image.network(
+                        image.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[200],
+                          child: const Center(child: Icon(Icons.broken_image)),
                         ),
                       ),
-                    );
-                  },
-                ),
-        ),
-      ],
+                    ),
+                  );
+                },
+              ),
+      ),
     );
   }
 
-  Widget _buildRoomsList(RoomState state) {
+  Widget _buildRoomsSection(RoomState state) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Available Rooms',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         state.rooms.isEmpty
             ? const NoDataWidget()
-            : ListView.builder(
+            : GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.9,
+                ),
                 itemCount: state.rooms.length,
                 itemBuilder: (context, index) {
                   final room = state.rooms[index];
                   return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: ListTile(
-                      title: Text('Room ${room.roomNumber}'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Type: ${room.roomType}'),
-                          Text('Rent: \$${room.rentAmount.toStringAsFixed(2)}'),
-                          Text(
-                            'Status: ${room.isOccupied ? 'Occupied' : 'Available'}',
-                            style: TextStyle(
-                              color:
-                                  room.isOccupied ? Colors.red : Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => RoomDetailsScreen(room: room),
-                        //   ),
-                        // );
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => RoomDetailScreen(
+                                  roomID: room.roomId,
+                                )));
                       },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Room ${room.roomNumber}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                // Container(
+                                //   padding: const EdgeInsets.symmetric(
+                                //       horizontal: 8, vertical: 4),
+                                //   decoration: BoxDecoration(
+                                //     color: room.isOccupied
+                                //         ? Colors.red[50]
+                                //         : Colors.green[50],
+                                //     borderRadius: BorderRadius.circular(12),
+                                //   ),
+                                //   child: Text(
+                                //     room.isOccupied ? 'Occupied' : 'Available',
+                                //     style: TextStyle(
+                                //       color: room.isOccupied
+                                //           ? Colors.red
+                                //           : Colors.green,
+                                //       fontSize: 12,
+                                //     ),
+                                //   ),
+                                // ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              room.roomType,
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              '\$${room.rentAmount.toStringAsFixed(2)}/mo',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Security:',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },
@@ -232,23 +303,44 @@ class _RoomScreenState extends State<RoomScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Reviews',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Reviews',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            if (state.reviews.isNotEmpty)
+              Text(
+                '${state.reviews.length} reviews',
+                style: const TextStyle(color: Colors.grey),
+              ),
+          ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         state.reviews.isEmpty
             ? const NoDataWidget()
-            : ListView.builder(
+            : ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: state.reviews.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final review = state.reviews[index];
                   return Card(
-                    margin: const EdgeInsets.only(bottom: 8),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: Colors.grey.shade200,
+                        width: 1,
+                      ),
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -266,20 +358,24 @@ class _RoomScreenState extends State<RoomScreen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                '${review.rating}/5',
+                                '${review.rating}.0',
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(review.comment),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
+                          Text(
+                            review.comment,
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          const SizedBox(height: 12),
                           Text(
                             'Posted on ${review.createdAt.toString().split(' ')[0]}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey,
+                              color: Colors.grey.shade600,
                             ),
                           ),
                         ],
@@ -294,6 +390,14 @@ class _RoomScreenState extends State<RoomScreen> {
 
   Widget _buildReviewForm() {
     return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: Colors.grey.shade200,
+          width: 1,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -301,33 +405,50 @@ class _RoomScreenState extends State<RoomScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Add Your Review',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Rating: ${_rating.toInt()}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Slider(
-                value: _rating,
-                min: 1,
-                max: 5,
-                divisions: 4,
-                label: _rating.toInt().toString(),
-                onChanged: (value) {
-                  setState(() {
-                    _rating = value;
-                  });
-                },
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      _rating.toInt().toString(),
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Slider(
+                      value: _rating,
+                      min: 1,
+                      max: 5,
+                      divisions: 4,
+                      onChanged: (value) {
+                        setState(() {
+                          _rating = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 4),
+                    const Text('Tap to rate'),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _commentController,
-                decoration: const InputDecoration(
-                  labelText: 'Your Review',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: 'Your review',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
                 maxLines: 3,
                 validator: (value) {
@@ -342,6 +463,12 @@ class _RoomScreenState extends State<RoomScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _submitReview,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                   child: const Text('Submit Review'),
                 ),
               ),

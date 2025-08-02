@@ -58,6 +58,7 @@ class RoomApi {
       tableName: 'reviews',
       filterColumn: 'property_id',
       filterValue: propertyId,
+      cacheFirst: false,
     );
 
     if (response['error'] == true) {
