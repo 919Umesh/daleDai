@@ -64,6 +64,7 @@ dependencies:
   latlong2: ^0.9.1
   onesignal_flutter: ^5.3.4
   smooth_page_indicator: ^1.2.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

@@ -97,6 +97,21 @@ class BookingState extends ChangeNotifier {
       notifyListeners();
     }
   }
+Future<void> callDialer(String phoneNumber) async {
+    try {
+      final url = 'tel:$phoneNumber';
+      
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch dialer';
+      }
+    } on PlatformException catch (e) {
+      throw 'Failed to make call: ${e.message}';
+    } catch (e) {
+      throw 'Failed to make call: $e';
+    }
+  }
 
   Future<void> refreshBookings() async => loadBookings(isRefresh: true);
 }

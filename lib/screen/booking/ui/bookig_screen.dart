@@ -554,8 +554,15 @@ class _BookingListScreenState extends State<BookingListScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Contact functionality
+                          onPressed: () async {
+                             try {
+    await Provider.of<BookingState>(context, listen: false)
+        .callDialer('9868732774');
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
+    );
+  }
                           },
                           icon: const Icon(Icons.phone_outlined, size: 16),
                           label: const Text('Contact'),
