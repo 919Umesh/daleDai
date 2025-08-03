@@ -38,6 +38,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
         _commentController.clear();
         //Setting the default value of the rating bar
         _rating = 3.0;
+        //To close the drawer after posting the data
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
