@@ -33,6 +33,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
           'rating': _rating.toInt(),
           'comment': _commentController.text.trim(),
         };
+        //To post the review data to the server
         await roomState.createReview(formData);
         _commentController.clear();
         _rating = 3.0;
