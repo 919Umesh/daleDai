@@ -21,6 +21,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
   Future<void> _submitReview() async {
     if (_reviewFormKey.currentState!.validate()) {
       final roomState = Provider.of<RoomState>(context, listen: false);
+      //To get the user id from the preference
       final userId = await SharedPrefService.getValue<String>(
         PrefKey.userId,
         defaultValue: "-",
