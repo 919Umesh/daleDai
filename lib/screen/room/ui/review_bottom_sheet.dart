@@ -36,6 +36,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
         //To post the review data to the server
         await roomState.createReview(formData);
         _commentController.clear();
+        //Setting the default value of the rating bar
         _rating = 3.0;
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
