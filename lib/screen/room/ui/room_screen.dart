@@ -288,6 +288,7 @@ class _RoomScreenState extends State<RoomScreen> {
                 itemCount: state.reviews.length,
                 separatorBuilder: (context, index) => const SizedBox(height: 2),
                 itemBuilder: (context, index) {
+                  //To access the data with direct method
                   final review = state.reviews[index];
                   return Card(
                     elevation: 0,
