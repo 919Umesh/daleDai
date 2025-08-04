@@ -1,10 +1,10 @@
 name: omspos
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: ">=3.4.3 <4.0.0"
 
 dependencies:
   flutter:
@@ -67,7 +67,7 @@ dependencies:
   url_launcher: ^6.3.2
 
   esewa_flutter_sdk:
-    path: ./external_sdk/esewa_sdk/esewa_flutter_sdk
+    path: ./esewa_sdk/esewa_flutter_sdk
 
 dev_dependencies:
   flutter_test:
