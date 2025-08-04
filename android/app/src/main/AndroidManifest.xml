@@ -10,6 +10,7 @@
     <application
         android:label="OMS|POS"
         android:name="${applicationName}"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
