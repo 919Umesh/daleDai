@@ -5,6 +5,7 @@ import 'package:esewa_flutter_sdk/esewa_config.dart';
 import 'package:esewa_flutter_sdk/esewa_payment.dart';
 import 'package:esewa_flutter_sdk/esewa_payment_success_result.dart';
 import 'package:flutter/material.dart';
+import 'package:omspos/constants/esewa.dart';
 
 class Esewa {
   pay() {
@@ -19,6 +20,7 @@ class Esewa {
           productId: "1d71jd81",
           productName: "Product One",
           productPrice: "1000",
+          callbackUrl: 'https://umesh-shahi.com.np/',
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult result) {
           debugPrint('SUCCESS');
