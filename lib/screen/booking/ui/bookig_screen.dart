@@ -116,6 +116,7 @@ class _BookingListScreenState extends State<BookingListScreen>
           child: IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.white),
             onPressed: () {
+              //This is the esewa init button
               Esewa esewa = Esewa();
               esewa.pay();
             },
