@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:omspos/services/esewa/esewa_service.dart';
 import 'package:provider/provider.dart';
 import 'package:omspos/screen/booking/state/booking_state.dart';
 import 'package:omspos/screen/booking/model/booking_model.dart';
@@ -115,7 +116,8 @@ class _BookingListScreenState extends State<BookingListScreen>
           child: IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.white),
             onPressed: () {
-              // Add notification functionality
+             Esewa esewa = Esewa();
+              esewa.pay();
             },
             tooltip: 'Notifications',
           ),
