@@ -204,12 +204,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset(
-                              'assets/images/esewa.png', // Add your eSewa logo asset
-                              height: 24,
-                              width: 24,
-                            ),
-                            const SizedBox(width: 8),
                             const Text(
                               'eSewa',
                               style: TextStyle(fontWeight: FontWeight.w500),
