@@ -185,11 +185,63 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                 _buildSimpleField(
                     child: FormBuilderChoiceChips(
                   name: 'paymentMethods',
+                  decoration: const InputDecoration(
+                    labelText: 'Payment Method',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 8,
+                  runSpacing: 8,
+                  selectedColor: Theme.of(context).colorScheme.primary,
                   options: [
-                    FormBuilderChipOption(value: 'Esewa'),
-                    FormBuilderChipOption(value: 'PayLater'),
+                    FormBuilderChipOption(
+                      value: 'Esewa',
+                      child: Container(
+                        width: 120,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/esewa.png', // Add your eSewa logo asset
+                              height: 24,
+                              width: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'eSewa',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    FormBuilderChipOption(
+                      value: 'PayLater',
+                      child: Container(
+                        width: 120,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.schedule, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Pay Later',
+                              style: TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
-                ),),
+                  validator: FormBuilderValidators.required(
+                    errorText: 'Please select a payment method',
+                  ),
+                )),
 
                 // Number of People (Slider)
                 _buildSimpleField(
