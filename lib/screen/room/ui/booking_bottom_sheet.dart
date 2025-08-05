@@ -183,41 +183,44 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     ),
                   ),
                 ),
-
-                // Number of People (Slider)
                 _buildSimpleField(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Number of People',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[700],
+                  child: FormBuilderChoiceChip<String>(
+                    name: 'payment_method',
+                    decoration: const InputDecoration(
+                      labelText: 'Select payment method',
+                      border: InputBorder.none,
+                    ),
+                    validator: FormBuilderValidators.required(
+                      errorText: 'Please select a payment method',
+                    ),
+                    options: [
+                      FormBuilderFieldOption<String>(
+                        value: 'esewa',
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.payment, color: Colors.green),
+                            SizedBox(width: 5),
+                            Text('eSewa'),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      FormBuilderSlider(
-                        name: 'peoples',
-                        min: 1,
-                        max: 10,
-                        initialValue: 1,
-                        divisions: 9,
-                        activeColor: Colors.blue,
-                        inactiveColor: Colors.grey[300],
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        displayValues: DisplayValues.current,
-                        validator: FormBuilderValidators.required(
-                          errorText: 'Please select number of people',
+                      FormBuilderFieldOption<String>(
+                        value: 'paylater',
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.schedule, color: Colors.orange),
+                            SizedBox(width: 5),
+                            Text('Pay Later'),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
+
+                // Number of People (Slider)
                 _buildSimpleField(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
