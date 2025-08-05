@@ -4,7 +4,6 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
-import 'package:omspos/services/notification/onesignal_service.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
@@ -184,41 +183,13 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                   ),
                 ),
                 _buildSimpleField(
-                  child: FormBuilderChoiceChip<String>(
-                    name: 'payment_method',
-                    decoration: const InputDecoration(
-                      labelText: 'Select payment method',
-                      border: InputBorder.none,
-                    ),
-                    validator: FormBuilderValidators.required(
-                      errorText: 'Please select a payment method',
-                    ),
-                    options: [
-                      FormBuilderFieldOption<String>(
-                        value: 'esewa',
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.payment, color: Colors.green),
-                            SizedBox(width: 5),
-                            Text('eSewa'),
-                          ],
-                        ),
-                      ),
-                      FormBuilderFieldOption<String>(
-                        value: 'paylater',
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.schedule, color: Colors.orange),
-                            SizedBox(width: 5),
-                            Text('Pay Later'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                    child: FormBuilderChoiceChips(
+                  name: 'paymentMethods',
+                  options: [
+                    FormBuilderChipOption(value: 'Esewa'),
+                    FormBuilderChipOption(value: 'PayLater'),
+                  ],
+                ),),
 
                 // Number of People (Slider)
                 _buildSimpleField(
