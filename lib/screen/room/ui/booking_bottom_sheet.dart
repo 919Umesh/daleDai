@@ -218,6 +218,52 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     ],
                   ),
                 ),
+                Text('PAYMENT')
+                  _buildSimpleField(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PAYMENT',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                        FormBuilderChoiceChip(
+  name: 'icon_chips',
+  decoration: InputDecoration(labelText: 'Select with icons'),
+  options: [
+    FormBuilderFieldOption(
+      value: 'Esewa',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.email),
+          SizedBox(width: 5),
+          Text('Esewa'),
+        ],
+      ),
+    ),
+    FormBuilderFieldOption(
+      value: 'paylater',
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.phone),
+          SizedBox(width: 5),
+          Text('paylater'),
+        ],
+      ),
+    ),
+  ],
+),
+                    ],
+                  ),
+                ),
+              
 
                 const SizedBox(height: 32),
 
@@ -278,7 +324,8 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                             'landlord_id': landlordId,
                             'status': 'pending',
                           };
-
+                      // Esewa esewa = Esewa();
+                      // esewa.pay();
                           await context
                               .read<RoomState>()
                               .createBooking(formData);
