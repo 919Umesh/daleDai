@@ -32,9 +32,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -94,7 +91,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     color: Colors.grey[600],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 10),
 
                 // Booking Date
                 _buildSimpleField(
@@ -250,7 +247,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                           color: Colors.grey[700],
                         ),
                       ),
-                      const SizedBox(height: 8),
                       FormBuilderSlider(
                         name: 'peoples',
                         min: 1,
@@ -390,7 +386,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
   Widget _buildSimpleField({required Widget child}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 5),
       child: child,
     );
   }
