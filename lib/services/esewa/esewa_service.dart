@@ -55,8 +55,6 @@ class Esewa {
           },
         ),
       );
-      debugPrint('dgdfgdhgjdkdfdfhdfkhdfhk');
-      CustomLog.errorLog(value: 'gdfgfdgdfgdfgdfgf');
       print(response.data);
     } catch (e) {
       print(e);

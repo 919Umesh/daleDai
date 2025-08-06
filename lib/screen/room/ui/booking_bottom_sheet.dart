@@ -342,29 +342,8 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                           // Navigator.pop(context);
                           CustomLog.successLog(
                               value: formValues['paymentMethods']);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Booking confirmed successfully!'),
-                              backgroundColor: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
                         } catch (e) {
                           CustomLog.successLog(value: 'Error: ${e.toString()}');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Booking failed: ${e.toString()}'),
-                              backgroundColor: Colors.red,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          );
                         }
                       }
                     },
