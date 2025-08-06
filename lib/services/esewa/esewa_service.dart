@@ -6,6 +6,7 @@ import 'package:esewa_flutter_sdk/esewa_payment.dart';
 import 'package:esewa_flutter_sdk/esewa_payment_success_result.dart';
 import 'package:flutter/material.dart';
 import 'package:omspos/constants/esewa.dart';
+import 'package:omspos/utils/custom_log.dart';
 
 class Esewa {
   pay() {
@@ -24,6 +25,7 @@ class Esewa {
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult result) {
           debugPrint('SUCCESS');
+
           verify(result);
         },
         onPaymentFailure: () {
@@ -54,6 +56,7 @@ class Esewa {
           },
         ),
       );
+      CustomLog.successLog(value: 'Umesh dfdsfgdfdsfgdsyhgdfhfg');
       print(response.data);
     } catch (e) {
       print(e);

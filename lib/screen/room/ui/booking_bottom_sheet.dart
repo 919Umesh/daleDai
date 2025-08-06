@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
+import 'package:omspos/services/esewa/esewa_service.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/custom_log.dart';
@@ -192,7 +194,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                   selectedColor: Theme.of(context).colorScheme.primary,
                   options: [
                     FormBuilderChipOption(
-                      value: 'Esewa',
+                      value: 'eSewa',
                       child: Container(
                         width: 120,
                         padding: const EdgeInsets.symmetric(
@@ -209,7 +211,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                       ),
                     ),
                     FormBuilderChipOption(
-                      value: 'PayLater',
+                      value: 'payLater',
                       child: Container(
                         width: 120,
                         padding: const EdgeInsets.symmetric(
@@ -323,16 +325,24 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                             'landlord_id': landlordId,
                             'status': 'pending',
                           };
-                          debugPrint(
-                              '-------------------------dfgfdgfdgdfgfdhgyrthyt----------');
-                          CustomLog.successLog(
-                              value: formValues['paymentMethods']);
-                          // Esewa esewa = Esewa();
-                          // esewa.pay();
+
+                          // String methods = formValues['profession'] as String;
+                          // if (methods == 'eSewa') {
+
+                          //   debugPrint(
+                          //       '-------------------------dfgfdgfdgdfgfdhgyrthyt----------');
+                          //   Fluttertoast.showToast(msg: 'Esewa');
+                          //   return;
+                          // }
+                          Esewa esewa = Esewa();
+                          esewa.pay();
                           // await context
                           //     .read<RoomState>()
                           //     .createBooking(formData);
                           // Navigator.pop(context);
+                          CustomLog.successLog(
+                              value: formValues['paymentMethods']);
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Booking confirmed successfully!'),
