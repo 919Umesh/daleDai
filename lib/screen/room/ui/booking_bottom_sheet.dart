@@ -323,7 +323,10 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                             'landlord_id': landlordId,
                             'status': 'pending',
                           };
-                             CustomLog.
+                          debugPrint(
+                              '-------------------------dfgfdgfdgdfgfdhgyrthyt----------');
+                          CustomLog.successLog(
+                              value: formValues['paymentMethods']);
                           // Esewa esewa = Esewa();
                           // esewa.pay();
                           // await context
