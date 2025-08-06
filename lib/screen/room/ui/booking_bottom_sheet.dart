@@ -187,9 +187,8 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
                   ),
-                  alignment: WrapAlignment.spaceBetween,
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 3,
+                  runSpacing: 3,
                   selectedColor: Theme.of(context).colorScheme.primary,
                   options: [
                     FormBuilderChipOption(
@@ -229,9 +228,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                       ),
                     ),
                   ],
-                  validator: FormBuilderValidators.required(
-                    errorText: 'Please select a payment method',
-                  ),
                 )),
 
                 // Number of People (Slider)
@@ -327,12 +323,13 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                             'landlord_id': landlordId,
                             'status': 'pending',
                           };
+                             CustomLog.
                           // Esewa esewa = Esewa();
                           // esewa.pay();
-                          await context
-                              .read<RoomState>()
-                              .createBooking(formData);
-                          Navigator.pop(context);
+                          // await context
+                          //     .read<RoomState>()
+                          //     .createBooking(formData);
+                          // Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Booking confirmed successfully!'),
