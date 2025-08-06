@@ -24,8 +24,7 @@ class Esewa {
           callbackUrl: 'https://umesh-shahi.com.np/',
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult result) {
-          debugPrint('SUCCESS');
-
+          debugPrint('SUCCESS UMESH');
           verify(result);
         },
         onPaymentFailure: () {
@@ -56,7 +55,8 @@ class Esewa {
           },
         ),
       );
-      CustomLog.successLog(value: 'Umesh dfdsfgdfdsfgdsyhgdfhfg');
+      debugPrint('dgdfgdhgjdkdfdfhdfkhdfhk');
+      CustomLog.errorLog(value: 'gdfgfdgdfgdfgdfgf');
       print(response.data);
     } catch (e) {
       print(e);
