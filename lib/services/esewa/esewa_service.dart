@@ -80,7 +80,7 @@ class Esewa {
     required Function() onCancel,
   }) async {
     try {
-      await EsewaFlutterSdk.initPayment(
+      EsewaFlutterSdk.initPayment(
         esewaConfig: EsewaConfig(
           environment: Environment.test,
           clientId: kEsewaClientId,
@@ -130,7 +130,7 @@ class Esewa {
         options: Options(headers: {'Authorization': basic}),
       );
 
-      CustomLog.debugLog(
+      CustomLog.successLog(
           value: 'eSewa Verification Response: ${response.data}');
       return response.statusCode == 200;
     } catch (e) {

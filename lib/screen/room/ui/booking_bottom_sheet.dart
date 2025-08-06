@@ -24,12 +24,120 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
   final _formKey = GlobalKey<FormBuilderState>();
   late final double initialRent;
   late final double initialDeposit;
+  bool _isProcessingPayment = false;
 
   @override
   void initState() {
     super.initState();
     initialRent = widget.room.rentAmount;
     initialDeposit = widget.room.securityDeposit;
+  }
+
+  Future<void> _handleBooking(Map<String, dynamic> formData) async {
+    try {
+      await context.read<RoomState>().createBooking(formData);
+      Navigator.pop(context);
+      Fluttertoast.showToast(
+        msg: 'Booking successful!',
+        toastLength: Toast.LENGTH_LONG,
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Booking failed: ${e.toString()}',
+        toastLength: Toast.LENGTH_LONG,
+        backgroundColor: Colors.red,
+      );
+      CustomLog.errorLog(value: 'Booking Error: ${e.toString()}');
+    }
+  }
+
+  Future<void> _processPaymentAndBooking() async {
+    if (!_formKey.currentState!.saveAndValidate()) return;
+
+    setState(() => _isProcessingPayment = true);
+
+    try {
+      final userId = await SharedPrefService.getValue<String>(
+        PrefKey.userId,
+        defaultValue: "-",
+      );
+      final landlordId = await SharedPrefService.getValue<String>(
+        PrefKey.landLordId,
+        defaultValue: "-",
+      );
+
+      final formValues = _formKey.currentState!.value;
+      final paymentMethod =
+          formValues['paymentMethods'] as String? ?? 'payLater';
+
+      // Format dates
+      final formatDate =
+          (DateTime date) => date.toIso8601String().split('T')[0];
+
+      final Map<String, dynamic> formData = {
+        'booking_date': formatDate(formValues['booking_date'] as DateTime),
+        'move_in_date': formatDate(formValues['move_in_date'] as DateTime),
+        'move_out_date': formValues['move_out_date'] != null
+            ? formatDate(formValues['move_out_date'] as DateTime)
+            : null,
+        'monthly_rent':
+            (double.tryParse(formValues['monthly_rent'].toString()) ?? 0)
+                .toInt(),
+        'security_deposit':
+            (double.tryParse(formValues['security_deposit'].toString()) ?? 0)
+                .toInt(),
+        'profession': formValues['profession'] as String,
+        'peoples': (formValues['peoples'] as double).toInt(),
+        'room_id': widget.room.roomId,
+        'tenant_id': userId,
+        'landlord_id': landlordId,
+        'status': paymentMethod == 'eSewa' ? 'paid' : 'pending',
+        'payment_method': paymentMethod,
+      };
+
+      if (paymentMethod == 'eSewa') {
+        // Process eSewa payment first
+        final totalAmount =
+            (formData['monthly_rent'] + formData['security_deposit'])
+                .toString();
+
+        final esewa = Esewa();
+        await esewa.pay(
+          amount: totalAmount,
+          onSuccess: (result) async {
+            // Payment succeeded, now create booking
+            await _handleBooking(formData);
+          },
+          onFailure: () {
+            Fluttertoast.showToast(
+              msg: 'Payment failed. Please try again.',
+              toastLength: Toast.LENGTH_LONG,
+              backgroundColor: Colors.red,
+            );
+          },
+          onCancel: () {
+            Fluttertoast.showToast(
+              msg: 'Payment was cancelled.',
+              toastLength: Toast.LENGTH_LONG,
+            );
+          },
+        );
+      } else {
+        // Pay Later - just create booking
+        await _handleBooking(formData);
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: 'Error: ${e.toString()}',
+        toastLength: Toast.LENGTH_LONG,
+        backgroundColor: Colors.red,
+      );
+      CustomLog.errorLog(value: 'Payment Processing Error: ${e.toString()}');
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessingPayment = false);
+      }
+    }
   }
 
   @override
@@ -269,77 +377,8 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.saveAndValidate()) {
-                        try {
-                          final userId =
-                              await SharedPrefService.getValue<String>(
-                            PrefKey.userId,
-                            defaultValue: "-",
-                          );
-                          final landlordId =
-                              await SharedPrefService.getValue<String>(
-                            PrefKey.landLordId,
-                            defaultValue: "-",
-                          );
-                          final formValues = _formKey.currentState!.value;
-                          final monthlyRent = (double.tryParse(
-                                      formValues['monthly_rent'].toString()) ??
-                                  0)
-                              .toInt();
-                          final securityDeposit = (double.tryParse(
-                                      formValues['security_deposit']
-                                          .toString()) ??
-                                  0)
-                              .toInt();
-                          final peoples =
-                              (formValues['peoples'] as double).toInt();
-
-                          // Format dates
-                          final formatDate = (DateTime date) =>
-                              date.toIso8601String().split('T')[0];
-
-                          final Map<String, dynamic> formData = {
-                            ...formValues,
-                            'booking_date': formatDate(
-                                formValues['booking_date'] as DateTime),
-                            'move_in_date': formatDate(
-                                formValues['move_in_date'] as DateTime),
-                            'move_out_date': formValues['move_out_date'] != null
-                                ? formatDate(
-                                    formValues['move_out_date'] as DateTime)
-                                : null,
-                            'monthly_rent': monthlyRent,
-                            'security_deposit': securityDeposit,
-                            'profession': formValues['profession'] as String,
-                            'peoples': peoples,
-                            'room_id': widget.room.roomId,
-                            'tenant_id': userId,
-                            'landlord_id': landlordId,
-                            'status': 'pending',
-                          };
-
-                          String methods = formValues['profession'] as String;
-                          if (methods == 'eSewa') {
-
-                            debugPrint(
-                                '-------------------------dfgfdgfdgdfgfdhgyrthyt----------');
-                            Fluttertoast.showToast(msg: 'Esewa');
-                            return;
-                          }
-                          Esewa esewa = Esewa();
-                          esewa.pay();
-                          await context
-                              .read<RoomState>()
-                              .createBooking(formData);
-                          Navigator.pop(context);
-                          CustomLog.successLog(
-                              value: formValues['paymentMethods']);
-                        } catch (e) {
-                          CustomLog.successLog(value: 'Error: ${e.toString()}');
-                        }
-                      }
-                    },
+                    onPressed:
+                        _isProcessingPayment ? null : _processPaymentAndBooking,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
@@ -348,13 +387,15 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Text(
-                      'Confirm Booking',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: _isProcessingPayment
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(
+                            'Confirm Booking',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -381,7 +422,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
         color: Colors.grey[600],
         size: 20,
       ),
-      
     );
   }
 }
