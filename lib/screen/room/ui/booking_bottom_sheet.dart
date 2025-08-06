@@ -103,7 +103,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
 
         final esewa = Esewa();
         await esewa.pay(
-          amount: totalAmount,
+          amount: '100',
           onSuccess: (result) async {
             // Payment succeeded, now create booking
             await _handleBooking(formData);
