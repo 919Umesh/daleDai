@@ -231,8 +231,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     ),
                   ],
                 )),
-
-                // Number of People (Slider)
                 _buildSimpleField(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,8 +265,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                 ),
 
                 const SizedBox(height: 32),
-
-                // Simple Confirm Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -286,10 +282,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                             PrefKey.landLordId,
                             defaultValue: "-",
                           );
-
                           final formValues = _formKey.currentState!.value;
-
-                          // Parse numeric values safely
                           final monthlyRent = (double.tryParse(
                                       formValues['monthly_rent'].toString()) ??
                                   0)
@@ -326,20 +319,20 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                             'status': 'pending',
                           };
 
-                          // String methods = formValues['profession'] as String;
-                          // if (methods == 'eSewa') {
+                          String methods = formValues['profession'] as String;
+                          if (methods == 'eSewa') {
 
-                          //   debugPrint(
-                          //       '-------------------------dfgfdgfdgdfgfdhgyrthyt----------');
-                          //   Fluttertoast.showToast(msg: 'Esewa');
-                          //   return;
-                          // }
+                            debugPrint(
+                                '-------------------------dfgfdgfdgdfgfdhgyrthyt----------');
+                            Fluttertoast.showToast(msg: 'Esewa');
+                            return;
+                          }
                           Esewa esewa = Esewa();
                           esewa.pay();
-                          // await context
-                          //     .read<RoomState>()
-                          //     .createBooking(formData);
-                          // Navigator.pop(context);
+                          await context
+                              .read<RoomState>()
+                              .createBooking(formData);
+                          Navigator.pop(context);
                           CustomLog.successLog(
                               value: formValues['paymentMethods']);
                         } catch (e) {
@@ -388,32 +381,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
         color: Colors.grey[600],
         size: 20,
       ),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.blue, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.red),
-      ),
-      filled: true,
-      fillColor: Colors.grey[50],
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 16,
-      ),
-      labelStyle: TextStyle(
-        color: Colors.grey[700],
-        fontSize: 14,
-      ),
+      
     );
   }
 }
