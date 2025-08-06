@@ -87,10 +87,10 @@ class Esewa {
           secretId: kEsewaSecretKey,
         ),
         esewaPayment: EsewaPayment(
-          productId: DateTime.now().millisecondsSinceEpoch.toString(),
-          productName: "Room Booking Payment",
-          productPrice: amount,
-          callbackUrl: 'https://example.com/callback',
+          productId: "1d71jd81",
+          productName: "Product One",
+          productPrice: "1000",
+          callbackUrl: 'https://umesh-shahi.com.np/',
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult result) async {
           CustomLog.successLog(value: 'eSewa Payment Success: $result');
