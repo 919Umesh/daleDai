@@ -95,6 +95,7 @@ class Esewa {
           callbackUrl: 'https://umesh-shahi.com.np/',
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult result) async {
+          //Custom Log for result
           CustomLog.successLog(value: 'eSewa Payment Success: $result');
 
           // Verify payment with eSewa server
