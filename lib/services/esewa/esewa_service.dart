@@ -123,6 +123,7 @@ class Esewa {
 
   Future<bool> _verifyPayment(EsewaPaymentSuccessResult result) async {
     try {
+      //Use the network call similar like the http
       Dio dio = Dio();
       String basic =
           'Basic ${base64.encode(utf8.encode('$kEsewaClientId:$kEsewaSecretKey'))}';
