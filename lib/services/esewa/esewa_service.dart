@@ -127,7 +127,7 @@ class Esewa {
       Dio dio = Dio();
       String basic =
           'Basic ${base64.encode(utf8.encode('$kEsewaClientId:$kEsewaSecretKey'))}';
-
+      //Base URL Methods
       Response response = await dio.get(
         'https://esewa.com.np/mobile/transaction',
         queryParameters: {'txnRefId': result.refId},
