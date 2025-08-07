@@ -91,6 +91,7 @@ class Esewa {
           productId: "1d71jd81",
           productName: "Product One",
           productPrice: "1000",
+          //Call Back Url
           callbackUrl: 'https://umesh-shahi.com.np/',
         ),
         onPaymentSuccess: (EsewaPaymentSuccessResult result) async {
