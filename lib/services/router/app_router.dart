@@ -9,6 +9,7 @@ import 'package:omspos/screen/splash/splash_screen.dart';
 import 'package:omspos/services/router/router_name.dart';
 
 final GoRouter appRouter = GoRouter(
+  //Default Routes
   initialLocation: splashPath,
   routes: [
     GoRoute(
