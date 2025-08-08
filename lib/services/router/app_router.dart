@@ -22,6 +22,7 @@ final GoRouter appRouter = GoRouter(
       path: loginPath,
       builder: (context, state) => const LoginScreen(),
     ),
+    //Index Screen Path
     GoRoute(
       path: indexScreenPath,
       builder: (context, state) => const IndexScreen(),
