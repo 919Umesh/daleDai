@@ -13,6 +13,7 @@ final GoRouter appRouter = GoRouter(
   initialLocation: splashPath,
   routes: [
     GoRoute(
+      //Splash Path
       path: splashPath,
       builder: (context, state) => const SplashScreen(),
     ),
