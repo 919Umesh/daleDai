@@ -17,6 +17,7 @@ final GoRouter appRouter = GoRouter(
       path: splashPath,
       builder: (context, state) => const SplashScreen(),
     ),
+    //Login Path
     GoRoute(
       path: loginPath,
       builder: (context, state) => const LoginScreen(),
