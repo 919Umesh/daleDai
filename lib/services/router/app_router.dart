@@ -32,7 +32,7 @@ final GoRouter appRouter = GoRouter(
       path: homeScreenPath,
       builder: (context, state) => const HomeScreen(),
     ),
-    
+
     GoRoute(
       path: profileScreenPath,
       builder: (context, state) => const ProfileScreen(),

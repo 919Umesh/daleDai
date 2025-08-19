@@ -211,8 +211,15 @@ class SupabaseProvider {
       };
     }
   }
+  /// ========== GOOGLE SIGN IN HELPERS ==========
+ static Future<Map<String,dynamic>> signWithGoogle(){
+  try{
+    final response = _client.
+  }
+ }
 
   /// ========== CACHE HELPERS ==========
+  
   static Future<void> _cacheResponse(String key, dynamic data) async {
     try {
       await CustomCache.instance.putFile(
