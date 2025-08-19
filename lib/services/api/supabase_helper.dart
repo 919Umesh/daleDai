@@ -211,15 +211,47 @@ class SupabaseProvider {
       };
     }
   }
+
   /// ========== GOOGLE SIGN IN HELPERS ==========
- static Future<Map<String,dynamic>> signWithGoogle(){
-  try{
-    final response = _client.
+  static Future<Map<String, dynamic>> signWithGoogle() async {
+  try {
+    // Perform Google OAuth sign-in
+    final response = await _client.auth.signInWithOAuth(OAuthProvider.google,);
+    final user = response.user;
+
+    if (user == null) {
+      return {
+        'error': true,
+        'message': 'Google login failed. No user found',
+      };
+    }
+
+    // Successfully signed in
+    return {
+      'error': false,
+      'userId': user.id,
+      'email': user.email,
+      'message': 'Google login successful',
+    };
+  } on AuthException catch (e) {
+    // Handle AuthException from Supabase
+    return {
+      'error': true,
+      'message': e.message,
+      'code': e.statusCode, // or e.code depending on Supabase version
+    };
+  } catch (e) {
+    // Handle any other exceptions
+    return {
+      'error': true,
+      'message': e.toString(),
+    };
   }
- }
+}
+
 
   /// ========== CACHE HELPERS ==========
-  
+
   static Future<void> _cacheResponse(String key, dynamic data) async {
     try {
       await CustomCache.instance.putFile(
