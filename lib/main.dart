@@ -13,6 +13,5 @@ Future<void> main() async {
   );
   //Init the location Service
   await LocationService.initialize();
-  await OneSignalService.initialize();
   runApp(const MyApp());
 }

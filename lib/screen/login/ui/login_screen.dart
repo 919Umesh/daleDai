@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/login/state/login_state.dart';
+import 'package:omspos/services/api/supabase_helper.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -164,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            // Navigate to sign up screen
+                            SupabaseProvider.signWithGoogle();
                           },
                           child: Text(
                             'Sign Up',
