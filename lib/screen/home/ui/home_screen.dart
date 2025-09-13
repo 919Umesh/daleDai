@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
-import 'package:omspos/services/language/change_language.dart';
-import 'package:omspos/services/language/translation_extension.dart';
-import 'package:omspos/widgets/change_theme.dart';
+import 'package:omspos/widgets/modals/profile_modal.dart';
+import 'package:omspos/widgets/modals/property_modal.dart';
 import 'package:provider/provider.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,15 +32,23 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Consumer<HomeState>(
       builder: (context, state, child) {
-        return Scaffold(
-          backgroundColor: Theme.of(context).highlightColor,
-          appBar: AppBar(
-            title: Text(context.translate('home_title')),
-            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-            actions: [
-              ChangeLanguage(),
-              ThemeToggle(),
-            ],
+        return SafeArea(
+          child: Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.only(left: 8, right: 8),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      ProfileModalWidget(),
+                      const SizedBox(height: 16.0),
+                      Text('Properties'),
+                      PropertyModalWidget(),
+                    ]),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
