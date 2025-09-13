@@ -1,4 +1,3 @@
-// utils/translation_extension.dart
 import 'package:flutter/material.dart';
 import 'package:omspos/services/language/localization_state.dart';
 import 'package:provider/provider.dart';

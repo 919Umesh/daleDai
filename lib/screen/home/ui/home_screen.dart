@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
 import 'package:omspos/services/language/change_language.dart';
-import 'package:omspos/services/language/localization_state.dart';
+import 'package:omspos/services/language/translation_extension.dart';
 import 'package:omspos/widgets/change_theme.dart';
 import 'package:provider/provider.dart';
-import 'package:omspos/utils/translation_extension.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

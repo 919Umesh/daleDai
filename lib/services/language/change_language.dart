@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:omspos/services/language/localization_state.dart';
 import 'package:provider/provider.dart';
 
-
 class ChangeLanguage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
