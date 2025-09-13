@@ -1,9 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
+import 'package:omspos/services/language/change_language.dart';
+import 'package:omspos/services/language/localization_state.dart';
 import 'package:omspos/widgets/change_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:omspos/utils/translation_extension.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,11 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<HomeState>(
       builder: (context, state, child) {
         return Scaffold(
-          backgroundColor: Colors.grey[50],
+          backgroundColor: Theme.of(context).highlightColor,
           appBar: AppBar(
-            title: Text('Home Screen'),
+            title: Text(context.translate('home_title')),
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
             actions: [
-               ThemeToggle(),
+              ChangeLanguage(),
+              ThemeToggle(),
             ],
           ),
         );

@@ -69,6 +69,10 @@ dependencies:
   esewa_flutter_sdk:
     path: ./esewa_sdk/esewa_flutter_sdk
 
+  flutter_localizations:
+    sdk: flutter
+  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -80,3 +84,4 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/fonts/
+    - assets/locales/

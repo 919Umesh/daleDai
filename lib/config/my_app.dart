@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:omspos/services/language/localization_state.dart';
 import 'package:omspos/services/router/app_router.dart';
 import 'package:omspos/themes/theme_state.dart';
 import 'package:provider/provider.dart';
 import 'state_list.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -11,12 +13,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: myStateList,
-      child: Consumer<ThemeState>(
-        builder: (context, themeState, child) {
+      child: Consumer2<ThemeState,LocalizationState>(
+        builder: (context, themeState, localizationState,child) {
           return MaterialApp.router(
             title: 'Dale|Dai',
             debugShowCheckedModeBanner: false,
             theme: themeState.currentTheme,
+            locale: localizationState.currentLocale,
+            supportedLocales: const [
+              Locale('en', 'US'), 
+              Locale('ne', 'NP'), 
+            ],
+            localizationsDelegates:  [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
             routerConfig: appRouter,
           );
         },
