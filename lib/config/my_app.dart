@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/services/router/app_router.dart';
+import 'package:omspos/themes/theme_state.dart';
 import 'package:provider/provider.dart';
-import '../themes/colors.dart';
 import 'state_list.dart';
 
 class MyApp extends StatelessWidget {
@@ -11,15 +11,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: myStateList,
-      child: MaterialApp.router(
-        title: 'OMS|Retail',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: false,
-          primarySwatch: primarySwatch,
-          primaryColor: primaryColor,
-        ),
-        routerConfig: appRouter,
+      child: Consumer<ThemeState>(
+        builder: (context, themeState, child) {
+          return MaterialApp.router(
+            title: 'Dale|Dai',
+            debugShowCheckedModeBanner: false,
+            theme: themeState.currentTheme,
+            routerConfig: appRouter,
+          );
+        },
       ),
     );
   }
