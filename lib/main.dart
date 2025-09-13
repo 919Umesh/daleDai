@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/services/location/location_service.dart';
-import 'package:omspos/services/notification/onesignal_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'config/config.dart';
 

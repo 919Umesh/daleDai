@@ -17,3 +17,8 @@ Color tableColor2 = Colors.black12;
 
 ///
 Color productOrderColor = Colors.orange;
+
+// Color myColor = Color(0xFF29950B);
+// Color darkColor = Color(0xFF1A1512);
+// Color darkGreen = Color(0xFF253A19);
+// Color darkGray = Color(0xFF242424);
