@@ -16,7 +16,6 @@ class LocationService {
 
     if (!serviceEnabled) {
       CustomLog.actionLog(value: "Requesting to enable location services");
-      // await Geolocator.openLocationSettings();
       return false;
     }
     return true;

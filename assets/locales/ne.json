@@ -6,5 +6,9 @@
   "language": "भाषा",
   "theme": "थीम",
   "english": "अङ्ग्रेजी",
-  "nepali": "नेपाली"
+  "nepali": "नेपाली",
+  "home": "गृह",
+  "explore": "अन्वेषण",
+  "bookings": "बुकिङहरू",
+  "profile": "प्रोफाइल"
 }

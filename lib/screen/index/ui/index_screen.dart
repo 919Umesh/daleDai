@@ -5,6 +5,7 @@ import 'package:omspos/screen/home/ui/home_screen.dart';
 import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:omspos/screen/map/screen/map_screen.dart';
 import 'package:omspos/screen/profile/ui/profile_screen.dart';
+import 'package:omspos/services/language/translation_extension.dart';
 import 'package:provider/provider.dart';
 
 class IndexScreen extends StatelessWidget {
@@ -71,22 +72,22 @@ class IndexScreen extends StatelessWidget {
               BottomNavigationBarItem(
                 icon: _buildNavIcon(context, Icons.home_outlined, Icons.home, 0,
                     state.currentIndex),
-                label: 'Home',
+                label: context.translate('home'),
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(context, Icons.explore_outlined,
                     Icons.explore, 1, state.currentIndex),
-                label: 'Explore',
+                label: context.translate('explore'),
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(context, Icons.list_alt,
                     Icons.list_alt_outlined, 2, state.currentIndex),
-                label: 'Bookings',
+                label: context.translate('bookings'),
               ),
               BottomNavigationBarItem(
                 icon: _buildNavIcon(context, Icons.person_outline, Icons.person,
                     3, state.currentIndex),
-                label: 'Profile',
+                label: context.translate('profile'),
               ),
             ],
           ),
@@ -114,4 +115,3 @@ class IndexScreen extends StatelessWidget {
     );
   }
 }
-

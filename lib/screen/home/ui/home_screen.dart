@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/home/state/home_state.dart';
+import 'package:omspos/services/language/change_language.dart';
 import 'package:omspos/widgets/modals/profile_modal.dart';
 import 'package:omspos/widgets/modals/property_modal.dart';
 import 'package:provider/provider.dart';
@@ -42,7 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     delegate: SliverChildListDelegate([
                       ProfileModalWidget(),
                       const SizedBox(height: 16.0),
-                      Text('Properties'),
+                      InkWell(
+                          onTap: () {
+                            ChangeLanguage();
+                          },
+                          child: Text('Properties')),
                       PropertyModalWidget(),
                     ]),
                   ),

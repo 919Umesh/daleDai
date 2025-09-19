@@ -6,5 +6,9 @@
   "language": "Language",
   "theme": "Theme",
   "english": "English",
-  "nepali": "Nepali"
+  "nepali": "Nepali",
+  "home": "Home",
+  "explore": "Explore",
+  "bookings": "Bookings",
+  "profile": "Profile"
 }
