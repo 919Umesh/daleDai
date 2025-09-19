@@ -9,7 +9,6 @@ class HomeState extends ChangeNotifier {
 
   BuildContext? _context;
   BuildContext? get context => _context;
-
   set getContext(BuildContext value) {
     _context = value;
     initialize();
@@ -41,13 +40,13 @@ class HomeState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadAllAreas() async {
+  Future<void> loadAllAreas({bool? isRefresh}) async {
     if (_isLoading) return;
     _isLoading = true;
     notifyListeners();
 
     try {
-      _areas = await HomeApi.getAllAreas();
+      _areas = await HomeApi.getAllAreas(isRefresh ?? false);
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_areas.length} areas');
     } catch (e) {
@@ -60,13 +59,13 @@ class HomeState extends ChangeNotifier {
     }
   }
 
-  Future<void> loadProperties() async {
+  Future<void> loadProperties({bool? isRefresh}) async {
     if (_isLoading) return;
     _isLoading = true;
     notifyListeners();
 
     try {
-      _properties = await HomeApi.getAllProperties();
+      _properties = await HomeApi.getAllProperties(isRefresh ?? false);
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_properties.length} properties');
     } catch (e) {
@@ -80,10 +79,10 @@ class HomeState extends ChangeNotifier {
   }
 
   Future<void> refreshAreas() async {
-    await loadAllAreas();
+    await loadAllAreas(isRefresh: true);
   }
 
   Future<void> refreshProperties() async {
-    await loadProperties();
+    await loadProperties(isRefresh: true);
   }
 }

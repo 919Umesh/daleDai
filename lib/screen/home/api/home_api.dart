@@ -1,14 +1,13 @@
 import 'package:omspos/screen/home/model/home_model.dart';
-// ignore: unused_import
-import 'package:omspos/screen/home/model/images_model.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
 
 class HomeApi {
-  static Future<List<PropertyModel>> getAllProperties() async {
+  static Future<List<PropertyModel>> getAllProperties(bool? isRefresh) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'property_with_primary_image',
       limit: 10,
+      cacheFirst: isRefresh != null ? !isRefresh : false
     );
 
     if (response['error'] == true) {
@@ -46,10 +45,11 @@ class HomeApi {
         .toList();
   }
 
-  static Future<List<AreaModel>> getAllAreas() async {
+  static Future<List<AreaModel>> getAllAreas( bool? isRefresh) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'area',
       limit: 10,
+      cacheFirst: isRefresh != null ? !isRefresh : false
     );
 
     if (response['error'] == true) {
