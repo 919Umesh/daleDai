@@ -1,0 +1,7 @@
+const String CLIENT_ID = 'JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R';
+const String SECRET_KEY = 'BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==';
+const String MERCHANT_ID = 'JB0BBQ4aD0UqIThFJwAKBgAXEUkEGQUBBAwdOgABHD4DChwUAB0R';
+const String MERCHANT_SECRET = 'BhwIWQQADhIYSxILExMcAgFXFhcOBwAKBgAXEQ==';
+
+
+const String ESEWA_VERIFICATION_URL = 'https://rc.esewa.com.np/mobile/transaction';
