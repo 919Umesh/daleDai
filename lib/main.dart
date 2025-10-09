@@ -10,6 +10,5 @@ Future<void> main() async {
     url: EnvConfig.supabaseUrl,
     anonKey: EnvConfig.supabaseAnonKey,
   );
-  //Umesh Has switch to dev and commit to the dev branch
   runApp(const MyApp());
 }
