@@ -55,3 +55,84 @@
 //               setState(() => _loading = false);
 //             }
 //           },
+
+
+
+// import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:supabase_flutter/supabase_flutter.dart';
+
+// class SignInService {
+//   final SupabaseClient _client = Supabase.instance.client;
+
+//   Future<AuthResponse> googleSignIn() async {
+//     const webClientId =
+//         'YOUR_GOOGLE_WEB_CLIENT_ID.apps.googleusercontent.com';
+
+//     final scopes = ['email', 'profile'];
+//     final googleSignIn = GoogleSignIn.instance;
+
+//     await googleSignIn.initialize(serverClientId: webClientId);
+
+//     final googleUser = await googleSignIn.attemptLightweightAuthentication() ??
+//         await googleSignIn.authenticate();
+
+//     if (googleUser == null) {
+//       throw AuthException('Google Sign-In failed.');
+//     }
+
+//     // Request authorization for scopes to get access token
+//     final authorization = await googleUser.authorizationClient
+//             .authorizationForScopes(scopes) ??
+//         await googleUser.authorizationClient.authorizeScopes(scopes);
+
+//     final idToken = googleUser.authentication.idToken;
+//     final accessToken = authorization.accessToken;
+
+//     if (idToken == null) throw AuthException('Missing Google ID Token.');
+
+//     // Authenticate with Supabase
+//     final response = await _client.auth.signInWithIdToken(
+//       provider: OAuthProvider.google,
+//       idToken: idToken,
+//       accessToken: accessToken,
+//     );
+
+//     // Once signed in, get user info from Supabase
+//     final user = response.user;
+//     if (user == null) throw AuthException('User not found after sign-in.');
+
+//     // 🔥 Check if user exists in your app's "users" table
+//     final existingUser = await _client
+//         .from('users')
+//         .select()
+//         .eq('id', user.id)
+//         .maybeSingle();
+
+//     if (existingUser == null) {
+//       // 🚀 Create new user record using info from Google
+//       final googleProfile = googleUser;
+//       final newUser = await _client.from('users').insert({
+//         'id': user.id,
+//         'email': googleProfile.email,
+//         'name': googleProfile.displayName,
+//         'avatar_url': googleProfile.photoUrl,
+//         'created_at': DateTime.now().toIso8601String(),
+//       }).select().single();
+
+//       print('✅ New user created: $newUser');
+//       return response;
+//     } else {
+//       // ✅ Existing user found — you can return or cache their data
+//       print('👤 Existing user: $existingUser');
+//       return response;
+//     }
+//   }
+
+//   Future<void> signOut() async {
+//     final googleSignIn = GoogleSignIn.instance;
+//     await googleSignIn.disconnect();
+//     await _client.auth.signOut();
+//   }
+// }
+
+
