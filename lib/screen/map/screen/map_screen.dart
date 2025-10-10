@@ -1,12 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:omspos/screen/map/model/map_model.dart';
-import 'package:omspos/screen/map/state/map_state.dart';
-import 'package:omspos/screen/room/ui/room_screen.dart';
-import 'package:omspos/services/sharedPreference/preference_keys.dart';
-import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
-import 'package:provider/provider.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -47,15 +39,4 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       ),
     );
   }
-
-  
-
-
-
-
-
-
-  
-
-  
 }
