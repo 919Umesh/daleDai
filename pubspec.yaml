@@ -65,8 +65,7 @@ dependencies:
   onesignal_flutter: ^5.3.4
   smooth_page_indicator: ^1.2.1
   url_launcher: ^6.3.2
-
-  
+  google_sign_in: ^7.2.0
 
   flutter_localizations:
     sdk: flutter
@@ -79,7 +78,6 @@ dev_dependencies:
   esewa_flutter_sdk:
     path: ./esewa_flutter_sdk
 
-    
   flutter_lints: ^6.0.0
 
 flutter:
