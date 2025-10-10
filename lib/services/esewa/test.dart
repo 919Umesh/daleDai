@@ -66,7 +66,7 @@
 
 //   Future<AuthResponse> googleSignIn() async {
 //     const webClientId =
-//         '651442185293-r312td422g097899qeg60gkdmjhes8t9.apps.googleusercontent.com';
+//         '65eusercontent.com';
 
 //     final scopes = ['email', 'profile'];
 //     final googleSignIn = GoogleSignIn.instance;
@@ -134,5 +134,6 @@
 //     await _client.auth.signOut();
 //   }
 // }
+
 
 
