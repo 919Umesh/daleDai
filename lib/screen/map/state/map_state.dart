@@ -80,6 +80,25 @@ class MapState extends ChangeNotifier {
     }
   }
 
+  Future<void> loadLocations() async {
+    if (_isLoading) return;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _locations = await MapLocationApi.getLocations();
+      _errorMessage = null;
+      CustomLog.successLog(value: 'Loaded ${_locations.length} properties');
+    } catch (e) {
+      _errorMessage = e.toString();
+      _locations = [];
+      CustomLog.errorLog(value: 'Properties load error: $_errorMessage');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> centerMapOnUserLocation() async {
     if (_currentPosition != null) {
       _mapController.move(_currentPosition!, 14.0);
