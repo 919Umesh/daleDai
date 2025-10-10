@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:omspos/screen/map/api/map_api.dart';
+import 'package:omspos/screen/map/model/location_view_model.dart';
 import 'package:omspos/screen/map/model/map_model.dart';
 import 'package:omspos/services/location/location_service.dart';
 import 'package:omspos/utils/custom_log.dart';
@@ -27,6 +28,9 @@ class MapState extends ChangeNotifier {
 
   List<MapModel> _properties = [];
   List<MapModel> get properties => _properties;
+
+  List<LocationView> _locations = [];
+  List<LocationView> get locations => _locations;
 
   LatLng? _currentPosition;
   LatLng? get currentPosition => _currentPosition;
