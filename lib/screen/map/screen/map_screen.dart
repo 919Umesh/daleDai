@@ -8,27 +8,9 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
-  late AnimationController _fabAnimationController;
-  late Animation<double> _fabAnimation;
-
   @override
   void initState() {
     super.initState();
-    _fabAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _fabAnimation = CurvedAnimation(
-      parent: _fabAnimationController,
-      curve: Curves.easeInOut,
-    );
-    _fabAnimationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _fabAnimationController.dispose();
-    super.dispose();
   }
 
   @override
