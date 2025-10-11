@@ -1,4 +1,3 @@
-import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/screen/map/model/location_view_model.dart';
 import 'package:omspos/screen/map/model/map_model.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
