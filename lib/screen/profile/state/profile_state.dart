@@ -1,10 +1,11 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/profile/api/profile_api.dart';
 import 'package:omspos/screen/profile/model/user_model.dart';
 import 'package:omspos/services/router/router_name.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
+import 'package:omspos/utils/connection_status.dart';
 import 'package:omspos/utils/custom_log.dart';
 
 class ProfileState extends ChangeNotifier {
@@ -15,11 +16,14 @@ class ProfileState extends ChangeNotifier {
 
   set getContext(BuildContext value) {
     _context = value;
-    initialize();
+    checkConnection();
   }
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _hasInternet = true;
+  bool get hasInternet => _hasInternet;
 
   UserModel? _user;
   UserModel? get user => _user;
@@ -27,19 +31,40 @@ class ProfileState extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  Future<void> checkConnection() async {
+    final hasNetwork = await CheckNetwork.check();
+    if (hasNetwork) {
+      await _onNetworkSuccess();
+    } else {
+      _onNetworkFailure();
+    }
+  }
+
+  Future<void> _onNetworkSuccess() async {
+    _hasInternet = true;
+    _errorMessage = null;
+    await initialize();
+  }
+
+  void _onNetworkFailure() {
+    _hasInternet = false;
+    _errorMessage = 'No Internet Connection';
+    notifyListeners();
+  }
+
   Future<void> initialize() async {
-    await clean();
+    _resetState();
     await loadUserProfile();
   }
 
-  Future<void> clean() async {
+  void _resetState() {
     _isLoading = false;
     _errorMessage = null;
     _user = null;
     notifyListeners();
   }
 
-  Future<void> loadUserProfile( {bool? isRefresh}) async {
+  Future<void> loadUserProfile({bool isRefresh = false}) async {
     if (_isLoading) return;
 
     _isLoading = true;
@@ -51,11 +76,11 @@ class ProfileState extends ChangeNotifier {
         defaultValue: "-",
       );
 
-      if (userId == "-") {
+      if (userId == "-" || userId!.isEmpty) {
         throw Exception('User not authenticated');
       }
 
-      _user = await UserAPI.getUserById(userId.toString(),isRefresh ?? false);
+      _user = await UserAPI.getUserById(userId, isRefresh);
       _errorMessage = null;
       CustomLog.successLog(value: 'Profile loaded for user: ${_user?.email}');
     } catch (e) {
@@ -67,27 +92,23 @@ class ProfileState extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshProfile() async {
-    await loadUserProfile(isRefresh: true);
-  }
-
   Future<void> logout() async {
     try {
-      // 1. Clear all SharedPreferences data
       await SharedPrefService.clearAll();
 
-      // 2. Navigate to login screen and remove all previous routes
       if (_context != null && _context!.mounted) {
         GoRouter.of(_context!).go(loginPath);
       }
 
-      // 3. Log success
       CustomLog.successLog(value: 'User logged out successfully');
     } catch (e) {
-      // 4. Handle errors
       CustomLog.errorLog(value: 'Logout error: $e');
       _errorMessage = 'Failed to logout. Please try again.';
       notifyListeners();
     }
+  }
+
+  Future<void> refreshProfile() async {
+    await loadUserProfile(isRefresh: true);
   }
 }
