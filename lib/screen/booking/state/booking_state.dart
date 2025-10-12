@@ -37,20 +37,20 @@ class BookingState extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-
   Future<void> checkConnection() async {
     bool network = await CheckNetwork.check();
     if (network) {
       await networkSuccess();
     } else {
-      await networkFailed(); 
+      await networkFailed();
     }
   }
 
   Future<void> networkSuccess() async {
     _isLoading = true;
     notifyListeners();
-    CustomLog.successLog(value: '--------------Internet Connected-----------------');
+    CustomLog.successLog(
+        value: '--------------Internet Connected-----------------');
     await initialize();
     _isLoading = false;
     notifyListeners();
@@ -75,10 +75,8 @@ class BookingState extends ChangeNotifier {
     notifyListeners();
   }
 
-  
-  Future<void> loadBookings({bool? isRefresh}) async {
+  Future<void> loadBookings({String? status, bool? isRefresh}) async {
     if (_isLoading) return;
-
     _isLoading = true;
     notifyListeners();
 
@@ -92,7 +90,8 @@ class BookingState extends ChangeNotifier {
 
       _bookings = await BookingAPI.getBookingsByUser(
         userId.toString(),
-        isRefresh ?? false,
+        status: status ?? "confirmed",
+        isRefresh: isRefresh ?? false,
       );
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_bookings.length} bookings');
@@ -116,12 +115,11 @@ class BookingState extends ChangeNotifier {
         agentName: 'Umesh',
       );
 
-    
       final directory = await getApplicationDocumentsDirectory();
-      final file = File('${directory.path}/Booking_${bookingData.bookingId}.pdf');
+      final file =
+          File('${directory.path}/Booking_${bookingData.bookingId}.pdf');
       await file.writeAsBytes(pdfBytes, flush: true);
 
-     
       await OpenFilex.open(file.path);
     } catch (e) {
       _errorMessage = 'Failed to generate PDF: ${e.toString()}';
@@ -129,7 +127,6 @@ class BookingState extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   Future<void> callDialer(String phoneNumber) async {
     _isCalling = true;

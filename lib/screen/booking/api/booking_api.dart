@@ -3,7 +3,10 @@ import 'package:omspos/services/api/supabase_helper.dart';
 
 class BookingAPI {
   static Future<List<BookingModel>> getBookingsByUser(
-      String userId, bool? isRefresh) async {
+    String userId, {
+    String? status,
+    bool isRefresh = false,
+  }) async {
     final response = await SupabaseProvider.fetchData(
       tableName: 'booking_details',
       filterColumn: 'tenant_id',
@@ -14,9 +17,15 @@ class BookingAPI {
     if (response['error'] == true) {
       throw Exception(response['message'] ?? 'Failed to fetch bookings');
     }
+    final data = response['data'] as List<dynamic>;
 
-    return (response['data'] as List)
-        .map((json) => BookingModel.fromJson(json))
-        .toList();
+ 
+    final filtered = status != null
+        ? data
+            .where((e) => e['status']?.toLowerCase() == status.toLowerCase())
+            .toList()
+        : data;
+
+    return filtered.map((json) => BookingModel.fromJson(json)).toList();
   }
 }
