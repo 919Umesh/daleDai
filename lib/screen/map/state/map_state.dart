@@ -57,27 +57,7 @@ class MapState extends ChangeNotifier {
 
   Future<void> initialize() async {
     await _getCurrentLocation();
-    await loadProperties();
     await loadLocations();
-  }
-
-  Future<void> loadProperties() async {
-    if (_isLoading) return;
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      _properties = await MapLocationApi.getAllProperties();
-      _errorMessage = null;
-      CustomLog.successLog(value: 'Loaded ${_properties.length} properties');
-    } catch (e) {
-      _errorMessage = e.toString();
-      _properties = [];
-      CustomLog.errorLog(value: 'Properties load error: $_errorMessage');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   Future<void> loadLocations() async {
@@ -87,8 +67,10 @@ class MapState extends ChangeNotifier {
 
     try {
       _locations = await MapLocationApi.getLocations();
+  
+
       CustomLog.successLog(
-          value: '--------------Loaded Locations-----------------');
+          value: '--------------truyyuyoiujytuhygyhyyu-----------------');
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_locations.length} properties');
     } catch (e) {
@@ -134,9 +116,5 @@ class MapState extends ChangeNotifier {
       _isLoadingLocation = false;
       notifyListeners();
     }
-  }
-
-  Future<void> refreshProperties() async {
-    await loadProperties();
   }
 }
