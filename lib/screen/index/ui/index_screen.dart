@@ -35,8 +35,12 @@ class IndexScreen extends StatelessWidget {
                   child: _screens[state.currentIndex],
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                bottom: state.isBottomBarVisible ? 0 : -100,
+                left: 0,
+                right: 0,
                 child: _buildBottomNavigationBar(context, state),
               ),
             ],
