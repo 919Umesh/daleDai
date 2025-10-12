@@ -36,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Welcome Back',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
                     ),
               ),
               const SizedBox(height: 8),
@@ -106,12 +105,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {
-                          // Add forgot password functionality
-                        },
+                        onPressed: () {},
                         child: Text(
                           'Forgot Password?',
-                          style: TextStyle(color: Colors.blue.shade600),
                         ),
                       ),
                     ),
@@ -121,7 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 50,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue.shade600,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -163,7 +158,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           child: Text(
                             'Sign Up',
-                            style: TextStyle(color: Colors.blue.shade600),
                           ),
                         ),
                       ],

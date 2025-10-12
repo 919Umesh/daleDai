@@ -4,9 +4,7 @@ import 'package:omspos/constants/assets_list.dart';
 import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:omspos/screen/profile/state/profile_state.dart';
 import 'package:omspos/services/language/change_language.dart';
-import 'package:omspos/services/language/localization_state.dart';
 import 'package:omspos/themes/change_theme.dart';
-import 'package:omspos/themes/theme_state.dart';
 import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -97,168 +95,175 @@ class _ProfileScreenState extends State<ProfileScreen> {
             body: Center(child: Text('No user data found')),
           );
         }
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Profile'),
-            centerTitle: true,
-          ),
-          body: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverPadding(
-                padding: const EdgeInsets.all(16),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    Center(
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundImage: user.profileImage != null
-                                ? NetworkImage(user.profileImage!)
-                                : AssetImage(AssetsList.noInternet)
-                                    as ImageProvider,
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            user.name,
-                            style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            user.email,
-                            style: const TextStyle(
-                                fontSize: 14, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Card(
-                      margin: const EdgeInsets.symmetric(vertical: 6),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
+        return SafeArea(
+          child: Scaffold(
+            appBar: AppBar(
+              title: const Text('Profile'),
+              centerTitle: true,
+            ),
+            body: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.all(16),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Account Information',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundImage: user.profileImage != null
+                                  ? NetworkImage(user.profileImage!)
+                                  : AssetImage(AssetsList.noInternet)
+                                      as ImageProvider,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              user.name,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              user.email,
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Card(
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Account Information',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            _buildInfoItem(
-                              'Phone Number',
-                              user.phone,
-                              Icons.phone,
-                            ),
-                            _buildInfoItem(
-                              'User Type',
-                              user.userType,
-                              Icons.person,
-                            ),
-                            _buildInfoItem(
-                              'Verification Status',
-                              user.isVerified ? 'Verified' : 'Not Verified',
-                              user.isVerified ? Icons.verified : Icons.pending,
-                            ),
-                          ],
+                              _buildInfoItem(
+                                'Phone Number',
+                                user.phone,
+                                Icons.phone,
+                              ),
+                              _buildInfoItem(
+                                'User Type',
+                                user.userType,
+                                Icons.person,
+                              ),
+                              _buildInfoItem(
+                                'Verification Status',
+                                user.isVerified ? 'Verified' : 'Not Verified',
+                                user.isVerified
+                                    ? Icons.verified
+                                    : Icons.pending,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.light_mode,
-                                    color: Theme.of(context).primaryColor),
-                                const SizedBox(width: 12),
-                                const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Theme',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                    Text(
-                                      'Switch between light and dark mode',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            ThemeToggle(),
-                          ],
+                      const SizedBox(height: 8),
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.light_mode,
+                                      color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 12),
+                                  const Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Theme',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      Text(
+                                        'Switch between light and dark mode',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              ThemeToggle(),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.language,
-                                    color: Theme.of(context).primaryColor),
-                                const SizedBox(width: 12),
-                                const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Language',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                    Text(
-                                      'Change app language',
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            ChangeLanguage(),
-                          ],
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.language,
+                                      color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 12),
+                                  const Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Language',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      Text(
+                                        'Change app language',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              ChangeLanguage(),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListTile(
-                        leading: Icon(Icons.logout,
-                            color: Theme.of(context).colorScheme.error),
-                        title: const Text(
-                          'Logout',
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                      Card(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        child: ListTile(
+                          leading: Icon(Icons.logout,
+                              color: Theme.of(context).colorScheme.error),
+                          title: const Text(
+                            'Logout',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: const Text(
+                            'Sign out from your account',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          trailing:
+                              const Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () async {
+                            await Provider.of<ProfileState>(context,
+                                    listen: false)
+                                .logout();
+                          },
                         ),
-                        subtitle: const Text(
-                          'Sign out from your account',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () async {
-                          await Provider.of<ProfileState>(context,
-                                  listen: false)
-                              .logout();
-                        },
                       ),
-                    ),
-                  ]),
+                    ]),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
