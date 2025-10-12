@@ -124,4 +124,9 @@ class MapState extends ChangeNotifier {
           msg: "Current location not available to move the map.");
     }
   }
+
+  Future<void> refresh() async {
+    await getCurrentLocation();
+    await loadLocations(isRefresh: true);
+  }
 }
