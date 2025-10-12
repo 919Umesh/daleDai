@@ -25,6 +25,11 @@ class BookingState extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  void setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
   bool _hasInternet = true;
   bool get hasInternet => _hasInternet;
 
@@ -78,6 +83,8 @@ class BookingState extends ChangeNotifier {
   Future<void> loadBookings({String? status, bool? isRefresh}) async {
     if (_isLoading) return;
     _isLoading = true;
+    _errorMessage = null;
+    _bookings = [];
     notifyListeners();
 
     try {
