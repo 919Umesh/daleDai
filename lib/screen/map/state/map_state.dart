@@ -44,7 +44,6 @@ class MapState extends ChangeNotifier {
   Future<void> networkSuccess() async {
     _isLoading = true;
     notifyListeners();
-    CustomLog.successLog(value: '--------------Internet-----------------');
     await initialize();
     _isLoading = false;
     notifyListeners();
@@ -59,6 +58,7 @@ class MapState extends ChangeNotifier {
   Future<void> initialize() async {
     await _getCurrentLocation();
     await loadProperties();
+    await loadLocations();
   }
 
   Future<void> loadProperties() async {
@@ -87,6 +87,8 @@ class MapState extends ChangeNotifier {
 
     try {
       _locations = await MapLocationApi.getLocations();
+      CustomLog.successLog(
+          value: '--------------Loaded Locations-----------------');
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_locations.length} properties');
     } catch (e) {
