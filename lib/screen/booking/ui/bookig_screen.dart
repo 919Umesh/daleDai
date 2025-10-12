@@ -4,6 +4,7 @@ import 'package:omspos/constants/assets_list.dart' show AssetsList;
 import 'package:omspos/screen/booking/model/booking_model.dart';
 import 'package:omspos/screen/booking/state/booking_state.dart';
 import 'package:omspos/screen/booking/ui/widget/booking_widget.dart';
+import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:provider/provider.dart';
 
 class BookingListScreen extends StatefulWidget {
@@ -17,12 +18,15 @@ class _BookingListScreenState extends State<BookingListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<String> _tabs = ["Confirmed", "Pending", "Completed"];
+  late ScrollController _scrollController;
+  double _lastScrollOffset = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
-
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<BookingState>(context, listen: false).getContext = context;
     });
@@ -34,9 +38,23 @@ class _BookingListScreenState extends State<BookingListScreen>
     });
   }
 
+  void _scrollListener() {
+    final currentScrollOffset = _scrollController.offset;
+    final indexState = Provider.of<IndexState>(context, listen: false);
+    if (currentScrollOffset > _lastScrollOffset && currentScrollOffset > 100) {
+      indexState.hideBottomBar();
+    } else if (currentScrollOffset < _lastScrollOffset) {
+      indexState.showBottomBar();
+    }
+
+    _lastScrollOffset = currentScrollOffset;
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -62,7 +80,9 @@ class _BookingListScreenState extends State<BookingListScreen>
               } else if (state.bookings.isEmpty) {
                 return const Center(child: Text("No bookings found"));
               } else {
-                return _BookingListView(bookings: state.bookings);
+                return _BookingListView(
+                    bookings: state.bookings,
+                    scrollController: _scrollController);
               }
             }).toList(),
           ),
@@ -74,12 +94,17 @@ class _BookingListScreenState extends State<BookingListScreen>
 
 class _BookingListView extends StatelessWidget {
   final List<BookingModel> bookings;
+  final ScrollController scrollController;
 
-  const _BookingListView({required this.bookings});
+  const _BookingListView({
+    required this.bookings,
+    required this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      controller: scrollController,
       padding: const EdgeInsets.all(12),
       itemCount: bookings.length,
       itemBuilder: (context, index) {
