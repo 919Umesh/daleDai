@@ -19,7 +19,6 @@ class BookingAPI {
     }
     final data = response['data'] as List<dynamic>;
 
- 
     final filtered = status != null
         ? data
             .where((e) => e['status']?.toLowerCase() == status.toLowerCase())
