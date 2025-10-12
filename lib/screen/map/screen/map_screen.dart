@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:omspos/screen/login/state/login_state.dart';
 import 'package:omspos/screen/map/state/map_state.dart';
 import 'package:provider/provider.dart';
 
