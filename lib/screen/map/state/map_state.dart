@@ -4,7 +4,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:omspos/screen/map/api/map_api.dart';
 import 'package:omspos/screen/map/model/location_view_model.dart';
-import 'package:omspos/screen/map/model/map_model.dart';
 import 'package:omspos/services/location/location_service.dart';
 import 'package:omspos/utils/connection_status.dart';
 import 'package:omspos/utils/custom_log.dart';
@@ -28,9 +27,6 @@ class MapState extends ChangeNotifier {
   final MapController _mapController = MapController();
   MapController get mapController => _mapController;
 
-  List<MapModel> _properties = [];
-  List<MapModel> get properties => _properties;
-
   List<LocationView> _locations = [];
   List<LocationView> get locations => _locations;
 
@@ -43,7 +39,6 @@ class MapState extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  /// Check if internet is available, then initialize map data
   Future<void> checkConnection() async {
     bool network = await CheckNetwork.check();
     if (network) {
@@ -65,7 +60,6 @@ class MapState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Initialize location and map data
   Future<void> initialize() async {
     await getCurrentLocation();
     await loadLocations();
@@ -86,7 +80,6 @@ class MapState extends ChangeNotifier {
         CustomLog.successLog(
             value: "Current position: $_currentPosition (from GPS)");
       } else {
-        // Fallback to Kathmandu if location is not available
         _currentPosition = const LatLng(27.7172, 85.3240);
         Fluttertoast.showToast(
             msg: "Location unavailable. Using default location (Kathmandu).");
@@ -102,15 +95,14 @@ class MapState extends ChangeNotifier {
     }
   }
 
-  /// Load nearby or saved map locations from API
-  Future<void> loadLocations() async {
+  Future<void> loadLocations({bool? isRefresh}) async {
     if (_isLoading) return;
 
     _isLoading = true;
     notifyListeners();
 
     try {
-      _locations = await MapLocationApi.getLocations();
+      _locations = await MapLocationApi.getLocations(isRefresh ?? false);
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_locations.length} map locations');
     } catch (e) {
@@ -124,7 +116,6 @@ class MapState extends ChangeNotifier {
     }
   }
 
-  /// Helper: Center map to current position if available
   void moveToCurrentLocation() {
     if (_currentPosition != null) {
       _mapController.move(_currentPosition!, 14.0);
