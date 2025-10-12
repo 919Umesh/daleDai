@@ -73,17 +73,35 @@ class _BookingListScreenState extends State<BookingListScreen>
           body: TabBarView(
             controller: _tabController,
             children: _tabs.map((tab) {
+              if (!state.hasInternet) {
+                return Scaffold(
+                    appBar: AppBar(
+                      title: Text('No Internet'),
+                    ),
+                    body: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            AssetsList.noInternet,
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                    ));
+              }
               if (state.isLoading) {
                 return Center(child: Lottie.asset(AssetsList.davsan));
-              } else if (state.errorMessage != null) {
-                return Center(child: Text(state.errorMessage!));
-              } else if (state.bookings.isEmpty) {
-                return const Center(child: Text("No bookings found"));
-              } else {
-                return _BookingListView(
-                    bookings: state.bookings,
-                    scrollController: _scrollController);
               }
+              if (state.errorMessage != null) {
+                return Center(child: Text(state.errorMessage!));
+              }
+              if (state.bookings.isEmpty) {
+                return const Center(child: Text("No bookings found"));
+              }
+              return _BookingListView(
+                  bookings: state.bookings,
+                  scrollController: _scrollController);
             }).toList(),
           ),
         );
