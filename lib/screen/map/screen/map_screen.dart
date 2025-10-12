@@ -55,10 +55,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   _showLocationDetails(context, location.title,
                       location.address, location.city, location.propertyId);
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.location_pin,
                   size: 40,
-                  color: Colors.redAccent,
+                  color: location.isActive ? Colors.green : Colors.redAccent,
                 ),
               ),
             );
@@ -84,7 +84,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               mapController: state.mapController,
               options: MapOptions(
                 initialCenter: center,
-                initialZoom: 18.0,
+                initialZoom: 12.0,
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
@@ -140,7 +140,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       String city, String propertyID) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -172,7 +171,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
                     ),
                   ),
                 ),
@@ -187,7 +185,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 Expanded(
                   child: Text(
                     address,
-                    style: const TextStyle(fontSize: 15, color: Colors.black87),
+                    style: const TextStyle(
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ],
@@ -219,8 +219,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
