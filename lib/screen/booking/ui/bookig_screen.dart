@@ -65,6 +65,13 @@ class _BookingListScreenState extends State<BookingListScreen>
         return Scaffold(
           appBar: AppBar(
             title: const Text('Bookings'),
+            actions: [
+              IconButton(
+                  onPressed: () async {
+                    await state.refreshBookings();
+                  },
+                  icon: Icon(Icons.refresh))
+            ],
             bottom: TabBar(
               controller: _tabController,
               tabs: _tabs.map((e) => Tab(text: e)).toList(),
