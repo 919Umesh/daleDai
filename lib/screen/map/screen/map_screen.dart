@@ -29,6 +29,27 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     return SafeArea(
       child: Consumer<MapState>(
         builder: (context, state, _) {
+          if (!state.hasInternet) {
+            return Scaffold(
+                appBar: AppBar(
+                  title: Text('No Internet'),
+                ),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        AssetsList.noInternet,
+                        fit: BoxFit.contain,
+                      ),
+                      ElevatedButton(
+                        onPressed: state.refresh,
+                        child: Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ));
+          }
           if (state.isLoadingLocation || state.isLoading) {
             return Center(child: Lottie.asset(AssetsList.davsan));
           }

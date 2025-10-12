@@ -1,18 +1,3 @@
-enum BookingStatus { pending, confirmed, completed }
-
-extension BookingStatusExtension on BookingStatus {
-  String get value {
-    switch (this) {
-      case BookingStatus.pending:
-        return 'pending';
-      case BookingStatus.confirmed:
-        return 'confirmed';
-      case BookingStatus.completed:
-        return 'completed';
-    }
-  }
-}
-
 class BookingModel {
   final String bookingId;
   final String roomId;
@@ -23,9 +8,23 @@ class BookingModel {
   final DateTime? moveOutDate;
   final int monthlyRent;
   final int securityDeposit;
-  final BookingStatus status;
-  final DateTime createdAt;
+  final String status;
   final DateTime updatedAt;
+  final DateTime createdAt;
+  final String profession;
+  final int peoples;
+  final String propertyId;
+  final String title;
+  final String description;
+  final String address;
+  final String propertyType;
+  final double latitude;
+  final double longitude;
+  final String furnishingStatus;
+  final int areaSqft;
+  final String roomNumber;
+  final int rentAmount;
+  final List<String> attributes;
 
   BookingModel({
     required this.bookingId,
@@ -38,8 +37,22 @@ class BookingModel {
     required this.monthlyRent,
     required this.securityDeposit,
     required this.status,
-    required this.createdAt,
     required this.updatedAt,
+    required this.createdAt,
+    required this.profession,
+    required this.peoples,
+    required this.propertyId,
+    required this.title,
+    required this.description,
+    required this.address,
+    required this.propertyType,
+    required this.latitude,
+    required this.longitude,
+    required this.furnishingStatus,
+    required this.areaSqft,
+    required this.roomNumber,
+    required this.rentAmount,
+    required this.attributes,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
@@ -51,27 +64,28 @@ class BookingModel {
       bookingDate: DateTime.parse(json['booking_date'] as String),
       moveInDate: DateTime.parse(json['move_in_date'] as String),
       moveOutDate: json['move_out_date'] != null
-          ? DateTime.parse(json['move_out_date'] as String)
+          ? DateTime.tryParse(json['move_out_date'] as String)
           : null,
       monthlyRent: json['monthly_rent'] as int,
       securityDeposit: json['security_deposit'] as int,
-      status: _parseStatus(json['status'] as String),
-      createdAt: DateTime.parse(json['created_at'] as String),
+      status: json['status'] as String,
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String),
+      profession: json['profession'] as String,
+      peoples: json['peoples'] as int,
+      propertyId: json['property_id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      address: json['address'] as String,
+      propertyType: json['property_type'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      furnishingStatus: json['furnishing_status'] as String,
+      areaSqft: json['area_sqft'] as int,
+      roomNumber: json['room_number'] as String,
+      rentAmount: json['rent_amount'] as int,
+      attributes: List<String>.from(json['attributes'] as List? ?? []),
     );
-  }
-
-  static BookingStatus _parseStatus(String status) {
-    switch (status) {
-      case 'pending':
-        return BookingStatus.pending;
-      case 'confirmed':
-        return BookingStatus.confirmed;
-      case 'completed':
-        return BookingStatus.completed;
-      default:
-        return BookingStatus.pending;
-    }
   }
 
   Map<String, dynamic> toJson() {
@@ -85,9 +99,23 @@ class BookingModel {
       'move_out_date': moveOutDate?.toIso8601String(),
       'monthly_rent': monthlyRent,
       'security_deposit': securityDeposit,
-      'status': status.value,
-      'created_at': createdAt.toIso8601String(),
+      'status': status,
       'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'profession': profession,
+      'peoples': peoples,
+      'property_id': propertyId,
+      'title': title,
+      'description': description,
+      'address': address,
+      'property_type': propertyType,
+      'latitude': latitude,
+      'longitude': longitude,
+      'furnishing_status': furnishingStatus,
+      'area_sqft': areaSqft,
+      'room_number': roomNumber,
+      'rent_amount': rentAmount,
+      'attributes': attributes,
     };
   }
 }

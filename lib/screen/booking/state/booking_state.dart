@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:omspos/screen/booking/api/booking_api.dart';
@@ -7,6 +6,7 @@ import 'package:omspos/screen/booking/model/booking_model.dart';
 import 'package:omspos/screen/booking/pdf/booking_pdf.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
+import 'package:omspos/utils/connection_status.dart';
 import 'package:omspos/utils/custom_log.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,38 +15,67 @@ import 'package:url_launcher/url_launcher.dart';
 class BookingState extends ChangeNotifier {
   BookingState();
 
+  BuildContext? _context;
+  BuildContext? get context => _context;
+  set getContext(BuildContext value) {
+    _context = value;
+    checkConnection();
+  }
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _hasInternet = true;
+  bool get hasInternet => _hasInternet;
 
   bool _isCalling = false;
   bool get isCalling => _isCalling;
 
-  List<BookingModel> _allBookings = [];
+  List<BookingModel> _bookings = [];
+  List<BookingModel> get bookings => _bookings;
+
   String? _errorMessage;
-
-  List<BookingModel> get pendingBookings =>
-      _allBookings.where((b) => b.status == BookingStatus.pending).toList();
-
-  List<BookingModel> get confirmedBookings =>
-      _allBookings.where((b) => b.status == BookingStatus.confirmed).toList();
-
-  List<BookingModel> get completedBookings =>
-      _allBookings.where((b) => b.status == BookingStatus.completed).toList();
-
   String? get errorMessage => _errorMessage;
 
-  Future<void> initialize() async {
-    await _resetState();
-    await loadBookings();
+
+  Future<void> checkConnection() async {
+    bool network = await CheckNetwork.check();
+    if (network) {
+      await networkSuccess();
+    } else {
+      await networkFailed(); 
+    }
   }
 
-  Future<void> _resetState() async {
+  Future<void> networkSuccess() async {
+    _isLoading = true;
+    notifyListeners();
+    CustomLog.successLog(value: '--------------Internet Connected-----------------');
+    await initialize();
     _isLoading = false;
-    _errorMessage = null;
-    _allBookings = [];
     notifyListeners();
   }
 
+  Future<void> networkFailed() async {
+    _hasInternet = false;
+    _errorMessage = 'No Internet Connection';
+    notifyListeners();
+  }
+
+  Future<void> initialize() async {
+    await clean();
+    await loadBookings();
+  }
+
+  Future<void> clean() async {
+    _isLoading = false;
+    _isCalling = false;
+    _errorMessage = null;
+    _bookings = [];
+    notifyListeners();
+  }
+
+  
   Future<void> loadBookings({bool? isRefresh}) async {
     if (_isLoading) return;
 
@@ -61,15 +90,15 @@ class BookingState extends ChangeNotifier {
 
       if (userId == "-") throw Exception('User not authenticated');
 
-      _allBookings = await BookingAPI.getBookingsByUserId(
+      _bookings = await BookingAPI.getBookingsByUser(
         userId.toString(),
         isRefresh ?? false,
       );
       _errorMessage = null;
-      CustomLog.successLog(value: 'Loaded ${_allBookings.length} bookings');
+      CustomLog.successLog(value: 'Loaded ${_bookings.length} bookings');
     } catch (e) {
       _errorMessage = e.toString();
-      _allBookings = [];
+      _bookings = [];
       CustomLog.errorLog(value: 'Booking load error: $_errorMessage');
     } finally {
       _isLoading = false;
@@ -79,7 +108,6 @@ class BookingState extends ChangeNotifier {
 
   Future<void> generatePdf(BookingModel bookingData) async {
     try {
-      // Generate the PDF
       final pdfBytes = await generateBookingPdf(
         bookingData: bookingData,
         companyName: 'Dale Dai',
@@ -88,14 +116,13 @@ class BookingState extends ChangeNotifier {
         agentName: 'Umesh',
       );
 
-      // Save the PDF to device
+    
       final directory = await getApplicationDocumentsDirectory();
-      final path = directory.path;
-      final file = File('$path/Booking_${bookingData.bookingId}.pdf');
+      final file = File('${directory.path}/Booking_${bookingData.bookingId}.pdf');
       await file.writeAsBytes(pdfBytes, flush: true);
 
-      // Open the PDF
-      OpenFilex.open(file.path);
+     
+      await OpenFilex.open(file.path);
     } catch (e) {
       _errorMessage = 'Failed to generate PDF: ${e.toString()}';
       CustomLog.errorLog(value: 'PDF generation error: $_errorMessage');
@@ -103,15 +130,16 @@ class BookingState extends ChangeNotifier {
     }
   }
 
+
   Future<void> callDialer(String phoneNumber) async {
     _isCalling = true;
     notifyListeners();
 
     try {
-      final url = 'tel:$phoneNumber';
+      final Uri url = Uri(scheme: 'tel', path: phoneNumber);
 
-      if (await canLaunch(url)) {
-        await launch(url);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
       } else {
         throw 'Could not launch dialer';
       }

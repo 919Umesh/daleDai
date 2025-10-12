@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 import 'package:omspos/constants/assets_list.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
