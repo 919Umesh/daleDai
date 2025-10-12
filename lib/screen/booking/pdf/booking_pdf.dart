@@ -61,10 +61,16 @@ class BookingInvoice {
         build: (context) => [
           _buildHeader(context),
           SizedBox(height: 20),
-          _buildBookingDetails(context),
-          SizedBox(height: 30),
-          _buildPaymentDetails(context),
-          SizedBox(height: 30),
+          _buildBookingSummary(context),
+          SizedBox(height: 15),
+          _buildPropertyDetails(context),
+          SizedBox(height: 15),
+          _buildTenantDetails(context),
+          SizedBox(height: 15),
+          _buildFinancialDetails(context),
+          SizedBox(height: 15),
+          _buildTimelineDetails(context),
+          SizedBox(height: 20),
           _buildFooterNotes(context),
         ],
       ),
@@ -87,21 +93,22 @@ class BookingInvoice {
   }
 
   Widget _buildFooter(Context context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Container(
-          child: Text("Copyright ©. All Rights Reserved"),
-        ),
-        Text(
-          '${context.pageNumber}/${context.pagesCount}',
-          style: const TextStyle(
-            fontSize: 12,
-            color: PdfColors.black,
+    return Container(
+      margin: EdgeInsets.only(top: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            "Copyright ©. All Rights Reserved",
+            style: TextStyle(fontSize: 10, color: PdfColors.grey600),
           ),
-        ),
-      ],
+          Text(
+            'Page ${context.pageNumber} of ${context.pagesCount}',
+            style: TextStyle(fontSize: 10, color: PdfColors.grey600),
+          ),
+        ],
+      ),
     );
   }
 
@@ -118,204 +125,286 @@ class BookingInvoice {
                 companyName,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: PdfColors.black,
+                  color: baseColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 20,
+                  fontSize: 24,
                 ),
               ),
-              SizedBox(height: 5),
+              SizedBox(height: 4),
               Text(
-                "Phone: $companyPhone",
+                "Phone: $companyPhone • PAN: $companyPan",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: PdfColors.black,
+                  color: PdfColors.grey700,
                   fontWeight: FontWeight.normal,
-                  fontSize: 10,
-                ),
-              ),
-              SizedBox(height: 5),
-              Text(
-                "PAN: $companyPan",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: PdfColors.black,
-                  fontWeight: FontWeight.normal,
-                  fontSize: 10,
+                  fontSize: 12,
                 ),
               ),
             ],
           ),
         ),
         SizedBox(height: 15),
-        Divider(),
-        Center(
-          child: Text(
-            'BOOKING DETAILS',
+        Container(
+          decoration: BoxDecoration(
+            color: baseColor,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          padding: EdgeInsets.all(12),
+          child: Center(
+            child: Text(
+              'BOOKING CONFIRMATION',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: baseColor,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBookingSummary(Context context) {
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final statusText = bookingData.status.toUpperCase();
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: PdfColors.grey300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'BOOKING SUMMARY',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
+              color: baseColor,
             ),
           ),
-        ),
-        Divider(),
-      ],
-    );
-  }
-
-  Widget _buildBookingDetails(Context context) {
-    final dateFormat = DateFormat('yyyy-MM-dd');
-    final statusText =
-        bookingData.status.toString().split('.').last.toUpperCase();
-
-    return Table(
-      border: TableBorder.all(width: 1),
-      columnWidths: {
-        0: FlexColumnWidth(2),
-        1: FlexColumnWidth(3),
-      },
-      children: [
-        TableRow(
-          children: [
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text('Status',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(padding: EdgeInsets.all(5), child: Text(statusText)),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text('Booking Date',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text(dateFormat.format(bookingData.bookingDate))),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text('Move In Date',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text(dateFormat.format(bookingData.moveInDate))),
-          ],
-        ),
-        if (bookingData.moveOutDate != null)
-          TableRow(
+          SizedBox(height: 10),
+          Table(
+            border: TableBorder.all(color: PdfColors.grey200, width: 0.5),
+            columnWidths: {
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(3),
+            },
             children: [
-              Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Text('Move Out Date',
-                      style: TextStyle(fontWeight: FontWeight.bold))),
-              Padding(
-                  padding: EdgeInsets.all(5),
-                  child: Text(dateFormat.format(bookingData.moveOutDate!))),
+              _buildTableRow('Booking ID', bookingData.bookingId),
+              _buildTableRow('Booking Status', statusText, isHighlighted: true),
+              _buildTableRow('Property Title', bookingData.title),
+              _buildTableRow('Room Number', bookingData.roomNumber),
+              _buildTableRow('Address', bookingData.address),
             ],
           ),
-        TableRow(
-          children: [
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text('Room ID',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
-                padding: EdgeInsets.all(5), child: Text(bookingData.roomId)),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text('Tenant ID',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
-                padding: EdgeInsets.all(5), child: Text(bookingData.tenantId)),
-          ],
-        ),
-        TableRow(
-          children: [
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text('Landlord ID',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
-                padding: EdgeInsets.all(5),
-                child: Text(bookingData.landlordId)),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildPaymentDetails(Context context) {
+  Widget _buildPropertyDetails(Context context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: PdfColors.grey300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'PROPERTY DETAILS',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: baseColor,
+            ),
+          ),
+          SizedBox(height: 10),
+          Table(
+            border: TableBorder.all(color: PdfColors.grey200, width: 0.5),
+            columnWidths: {
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(3),
+            },
+            children: [
+              _buildTableRow('Property ID', bookingData.propertyId),
+              _buildTableRow('Property Type', bookingData.propertyType),
+              _buildTableRow('Furnishing Status', bookingData.furnishingStatus),
+              _buildTableRow('Area (sqft)', bookingData.areaSqft.toString()),
+              _buildTableRow('Description', bookingData.description),
+              _buildTableRow('Coordinates',
+                  '${bookingData.latitude.toStringAsFixed(6)}, ${bookingData.longitude.toStringAsFixed(6)}'),
+            ],
+          ),
+          SizedBox(height: 8),
+          if (bookingData.attributes.isNotEmpty)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Attributes:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  bookingData.attributes.join(', '),
+                  style: TextStyle(fontSize: 11, color: PdfColors.grey700),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTenantDetails(Context context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: PdfColors.grey300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'TENANT DETAILS',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: baseColor,
+            ),
+          ),
+          SizedBox(height: 10),
+          Table(
+            border: TableBorder.all(color: PdfColors.grey200, width: 0.5),
+            columnWidths: {
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(3),
+            },
+            children: [
+              _buildTableRow('Tenant ID', bookingData.tenantId),
+              _buildTableRow('Profession', bookingData.profession),
+              _buildTableRow(
+                  'Number of People', bookingData.peoples.toString()),
+              _buildTableRow('Landlord ID', bookingData.landlordId),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinancialDetails(Context context) {
     final currencyFormat =
         NumberFormat.currency(symbol: 'Rs. ', decimalDigits: 0);
+    final totalAmount = bookingData.monthlyRent + bookingData.securityDeposit;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'PAYMENT DETAILS',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: PdfColors.grey300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'FINANCIAL DETAILS',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: baseColor,
+            ),
           ),
-        ),
-        SizedBox(height: 10),
-        Table(
-          border: TableBorder.all(width: 1),
-          columnWidths: {
-            0: FlexColumnWidth(2),
-            1: FlexColumnWidth(3),
-          },
-          children: [
-            TableRow(
-              children: [
-                Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Text('Monthly Rent',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(5),
-                    child:
-                        Text(currencyFormat.format(bookingData.monthlyRent))),
-              ],
-            ),
-            TableRow(
-              children: [
-                Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Text('Security Deposit',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(5),
+          SizedBox(height: 10),
+          Table(
+            border: TableBorder.all(color: PdfColors.grey200, width: 0.5),
+            columnWidths: {
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(3),
+            },
+            children: [
+              _buildTableRow('Monthly Rent',
+                  currencyFormat.format(bookingData.monthlyRent)),
+              _buildTableRow('Security Deposit',
+                  currencyFormat.format(bookingData.securityDeposit)),
+              _buildTableRow('Room Rent Amount',
+                  currencyFormat.format(bookingData.rentAmount)),
+              TableRow(
+                decoration: BoxDecoration(color: baseColor),
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(6),
                     child: Text(
-                        currencyFormat.format(bookingData.securityDeposit))),
-              ],
-            ),
-            TableRow(
-              decoration: BoxDecoration(color: PdfColors.grey200),
-              children: [
-                Padding(
-                    padding: EdgeInsets.all(5),
-                    child: Text('Total Amount',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(5),
+                      'TOTAL AMOUNT',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(6),
                     child: Text(
-                        currencyFormat.format(bookingData.monthlyRent +
-                            bookingData.securityDeposit),
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-              ],
+                      currencyFormat.format(totalAmount),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineDetails(Context context) {
+    final dateFormat = DateFormat('yyyy-MM-dd hh:mm a');
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: PdfColors.grey300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      padding: EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'TIMELINE',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: baseColor,
             ),
-          ],
-        ),
-      ],
+          ),
+          SizedBox(height: 10),
+          Table(
+            border: TableBorder.all(color: PdfColors.grey200, width: 0.5),
+            columnWidths: {
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(3),
+            },
+            children: [
+              _buildTableRow(
+                  'Booking Date', dateFormat.format(bookingData.bookingDate)),
+              _buildTableRow(
+                  'Move-in Date', dateFormat.format(bookingData.moveInDate)),
+              if (bookingData.moveOutDate != null)
+                _buildTableRow('Move-out Date',
+                    dateFormat.format(bookingData.moveOutDate!)),
+              _buildTableRow(
+                  'Created Date', dateFormat.format(bookingData.createdAt)),
+              _buildTableRow(
+                  'Last Updated', dateFormat.format(bookingData.updatedAt)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -323,36 +412,93 @@ class BookingInvoice {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Divider(),
-        SizedBox(height: 10),
-        Text(
-          'Notes:',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        Container(
+          decoration: BoxDecoration(
+            color: PdfColors.grey50,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Important Notes:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: baseColor,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text('• Please bring this document when moving in'),
+              Text(
+                  '• Contact the landlord for any queries regarding the property'),
+              Text('• Keep this document safe for future reference'),
+              Text('• All payments should be made through proper channels'),
+              Text(
+                  '• Security deposit will be refunded as per agreement terms'),
+            ],
+          ),
         ),
-        SizedBox(height: 5),
-        Text('1. Please bring this document when moving in.'),
-        Text('2. Contact the landlord for any queries.'),
         SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                    'Printed Date: ${NepaliDateTime.now().format("yyyy-MM-dd")}'),
-                Text('Printed By: $agentName'),
+                  'Generated By: $agentName',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Printed On: ${NepaliDateTime.now().format("yyyy-MM-dd hh:mm a")}',
+                  style: TextStyle(fontSize: 10, color: PdfColors.grey600),
+                ),
               ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                SizedBox(height: 30),
+                SizedBox(height: 20),
                 Text('_________________________'),
-                Text('Signature'),
+                Text('Authorized Signature'),
+                Text(
+                  'Agent: $agentName',
+                  style: TextStyle(fontSize: 10, color: PdfColors.grey600),
+                ),
               ],
             ),
           ],
+        ),
+      ],
+    );
+  }
+
+  TableRow _buildTableRow(String label, String value,
+      {bool isHighlighted = false}) {
+    return TableRow(
+      decoration: isHighlighted ? BoxDecoration(color: baseColor) : null,
+      children: [
+        Padding(
+          padding: EdgeInsets.all(6),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.all(6),
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 11,
+              color: isHighlighted ? baseColor : PdfColors.black,
+            ),
+          ),
         ),
       ],
     );
