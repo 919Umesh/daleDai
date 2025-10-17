@@ -10,6 +10,8 @@ class SplashState with ChangeNotifier {
   SplashState();
 
   late final BuildContext _context;
+  Timer? _timer;
+  bool _isDisposed = false;
   set getContext(BuildContext context) {
     _context = context;
     _initialize();
@@ -20,22 +22,37 @@ class SplashState with ChangeNotifier {
   }
 
   Future<void> _startTimer() async {
-    await Future.delayed(const Duration(seconds: 2));
-    await LocationService.initialize();
-    await _navigateUser();
+    _timer = Timer(const Duration(seconds: 2), () async {
+      if (_isDisposed) return;
+      await LocationService.initialize();
+      await _navigateUser();
+    });
   }
 
   Future<void> _navigateUser() async {
     try {
+      if (_isDisposed) return;
+
       final isLoggedIn = await SharedPrefService.getValue<bool>(
             PrefKey.isLogin,
             defaultValue: false,
           ) ??
           false;
-      _context.go(isLoggedIn ? indexScreenPath : loginPath);
+
+      if (!_isDisposed) {
+        _context.go(isLoggedIn ? indexScreenPath : loginPath);
+      }
     } catch (e) {
       debugPrint('Error during navigation: $e');
-      _context.go(loginPath);
+      if (!_isDisposed) {
+        _context.go(loginPath);
+      }
     }
+  }
+
+  void dispose() {
+    _isDisposed = true;
+    _timer?.cancel();
+    _timer = null;
   }
 }
