@@ -88,4 +88,3 @@ flutter:
     - assets/fonts/
     - assets/locales/
     - assets/lottie/
-    - .env
