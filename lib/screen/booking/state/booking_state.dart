@@ -126,7 +126,6 @@ class BookingState extends ChangeNotifier {
       final file =
           File('${directory.path}/Booking_${bookingData.bookingId}.pdf');
       await file.writeAsBytes(pdfBytes, flush: true);
-
       await OpenFilex.open(file.path);
     } catch (e) {
       _errorMessage = 'Failed to generate PDF: ${e.toString()}';
