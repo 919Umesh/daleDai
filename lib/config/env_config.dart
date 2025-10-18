@@ -6,6 +6,6 @@ class EnvConfig {
   static String get webClientId => dotenv.get('WEB_CLIENT_ID');
 
   static Future<void> load() async {
-    await dotenv.load(fileName: '.env');
+    await dotenv.load();
   }
 }

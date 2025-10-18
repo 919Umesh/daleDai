@@ -48,6 +48,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Create dummy .env file for testing
+        run: |
+          mkdir -p assets
+          cat << EOF > assets/.env
+          SUPABASE_URL=https://dummy-supabase-url-for-testing.supabase.co
+          SUPABASE_ANON_KEY=dummy-supabase-anon-key-for-testing
+          WEB_CLIENT_ID=dummy-web-client-id-for-testing
+          EOF
+
       - name: Run tests
         run: flutter test
 
