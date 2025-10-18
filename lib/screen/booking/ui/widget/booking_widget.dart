@@ -141,8 +141,6 @@ class BookingWidget extends StatelessWidget {
             ),
 
             const SizedBox(height: 12),
-
-            // Additional Info
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -161,10 +159,7 @@ class BookingWidget extends StatelessWidget {
                     ),
               ],
             ),
-
             const SizedBox(height: 8),
-
-            // Booking Date
             Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
               child: Row(
