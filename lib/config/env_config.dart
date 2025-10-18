@@ -1,11 +1,5 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 class EnvConfig {
-  static String get supabaseUrl => dotenv.get('SUPABASE_URL');
-  static String get supabaseAnonKey => dotenv.get('SUPABASE_ANON_KEY');
-  static String get webClientId => dotenv.get('WEB_CLIENT_ID');
-
-  static Future<void> load() async {
-    await dotenv.load();
-  }
+  static String get supabaseUrl => "https://xuodtwztsrbqtfiisxrq.supabase.co";
+  static String get supabaseAnonKey => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1b2R0d3p0c3JicXRmaWlzeHJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3NjM4MzQsImV4cCI6MjA2ODMzOTgzNH0.6LgBKcqa_fzM0czazc5eo6Zkj6FX_H_AftJvIy5i_y8";
+  static String get webClientId => "651442185293-r312td422g097899qeg60gkdmjhes8t9.apps.googleusercontent.com";
 }
