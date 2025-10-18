@@ -49,8 +49,7 @@ jobs:
         run: flutter pub get
 
       - name: Run tests
-        run: echo "Tests temporarily disabled - .env asset issue"
-        # run: flutter test
+        run: flutter test
 
       - name: Decode Keystore
         run: |
