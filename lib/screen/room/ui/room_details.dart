@@ -28,7 +28,7 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
   Widget build(BuildContext context) {
     return Consumer<RoomState>(
       builder: (context, state, child) {
-         if (!state.hanInternet) {
+        if (!state.hanInternet) {
           return Scaffold(
               appBar: AppBar(
                 title: Text('No Internet'),
@@ -83,7 +83,7 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                     },
                   ),
                   title: Text(
-                    state.room!.roomNumber,
+                    state.room?.roomNumber ?? 'Loading...',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,

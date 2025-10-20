@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:omspos/screen/booking/model/booking_model.dart';
 import 'package:omspos/screen/booking/state/booking_state.dart';
+import 'package:omspos/services/language/translation_extension.dart';
 import 'package:provider/provider.dart';
 
 class BookingWidget extends StatelessWidget {
@@ -52,7 +53,7 @@ class BookingWidget extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        'Room ${booking.roomNumber}',
+                        '${context.translate('room')} ${booking.roomNumber}',
                         style: TextStyle(
                           fontSize: 14,
                         ),
@@ -111,7 +112,7 @@ class BookingWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _buildBookingDetail(
-                    title: 'Move-in',
+                    title: context.translate('move_in'),
                     value:
                         DateFormat('MMM dd, yyyy').format(booking.moveInDate),
                     context: context,
@@ -122,7 +123,7 @@ class BookingWidget extends StatelessWidget {
                     color: Colors.grey[300],
                   ),
                   _buildBookingDetail(
-                    title: 'Monthly Rent',
+                    title: context.translate('monthly_rent'),
                     value: '₹${booking.monthlyRent}',
                     context: context,
                   ),
@@ -132,7 +133,7 @@ class BookingWidget extends StatelessWidget {
                     color: Colors.grey[300],
                   ),
                   _buildBookingDetail(
-                    title: 'Deposit',
+                    title: context.translate('deposit'),
                     value: '₹${booking.securityDeposit}',
                     context: context,
                   ),
@@ -147,7 +148,7 @@ class BookingWidget extends StatelessWidget {
               children: [
                 if (booking.profession.isNotEmpty)
                   _buildChip(
-                    '${booking.peoples} ${booking.peoples == 1 ? 'Person' : 'People'}',
+                    '${booking.peoples} ${booking.peoples == 1 ? context.translate('person') : context.translate('people')}',
                     Icons.people,
                   ),
                 if (booking.profession.isNotEmpty)

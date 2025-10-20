@@ -24,5 +24,14 @@
   "property_photos": "Property Photos",
   "details": "Details",
   "see_less": "See less", 
-  "see_more": "See more"
+  "see_more": "See more",
+  "room": "Room",
+  "move_in": "Move-in",
+  "monthly_rent": "Monthly Rent", 
+  "deposit": "Deposit",
+  "person": "Person",
+  "people": "People",
+  "confirmed": "Confirmed",
+  "pending": "Pending",
+  "completed": "Completed"
 }
