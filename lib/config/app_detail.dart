@@ -1,5 +1,5 @@
 class AppDetails {
-  static String appName = "Dale|Dai";
+  static String appName = "Basti";
   static String organizeBy = "Umesh Shahi";
   static String appIcon = "";
 }
