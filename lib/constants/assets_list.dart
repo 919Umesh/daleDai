@@ -1,6 +1,7 @@
 class AssetsList {
   //Images
   static String noInternet = "assets/images/no_net.jpg";
+  static String noData = "assets/images/no-data.png";
 
   //Lottie
   static String error = "assets/lottie/404_error.json";

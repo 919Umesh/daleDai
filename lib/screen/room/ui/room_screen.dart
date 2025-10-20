@@ -127,7 +127,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       ),
                       ListView.builder(
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(), // so it scrolls with parent CustomScrollView
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: state.rooms.length,
                         itemBuilder: (context, index) {
                           final room = state.rooms[index];
