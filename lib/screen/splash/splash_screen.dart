@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:omspos/constants/assets_list.dart';
 import 'package:provider/provider.dart';
 import '../../config/app_detail.dart';
 import '../../constants/text_style.dart';
@@ -14,8 +15,13 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  late final SplashState _splashState; // Store reference here
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final SplashState _splashState;
+  late final AnimationController _controller;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+
   @override
   void initState() {
     super.initState();
@@ -23,10 +29,22 @@ class _SplashScreenState extends State<SplashScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _splashState.getContext = context;
     });
+
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 800));
+    _fadeAnimation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+
+    _controller.forward();
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _splashState.dispose();
     super.dispose();
   }
@@ -37,25 +55,51 @@ class _SplashScreenState extends State<SplashScreen> {
       reverseGredient: true,
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            AppDetails.organizeBy,
-            style: subTitleTextStyle.copyWith(color: Colors.white),
-            textAlign: TextAlign.center,
+        body: SafeArea(
+          child: Center(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // App Icon
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      child: Image.asset(
+                        AssetsList.appIcon,
+                        height: 120,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    verticalSpace(20),
+                    Text(
+                      AppDetails.appName,
+                      textAlign: TextAlign.center,
+                      style: cardTextStyleHeader.copyWith(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    verticalSpace(10),
+                    const SizedBox(height: 30),
+                    const CircularProgressIndicator(strokeWidth: 2),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
-        body: Center(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              verticalSpace(10),
-              Text(
-                AppDetails.appName,
-                textAlign: TextAlign.center,
-                style: cardTextStyleHeader,
-              ),
-            ],
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Text(
+            AppDetails.organizeBy,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontStyle: FontStyle.italic,
+                ),
           ),
         ),
       ),
