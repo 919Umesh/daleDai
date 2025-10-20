@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 
 class BookingBottomSheet extends StatefulWidget {
   final RoomModelImage room;
-
   const BookingBottomSheet({super.key, required this.room});
 
   @override
@@ -42,8 +41,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
         ),
       ),
       child: Padding(
-        padding:
-            const EdgeInsets.all(16.0), // Increased padding for better spacing
+        padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
           child: FormBuilder(
             key: _formKey,
@@ -52,33 +50,35 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Header
                 Center(
                   child: Container(
                     width: 40,
                     height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
+                    margin: const EdgeInsets.only(bottom: 8),
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-                Text(
-                  'Book Room',
-                  style: TextStyle(
-                    fontSize: 20, // Slightly larger for better hierarchy
-                    fontWeight: FontWeight.bold,
+
+                const Center(
+                  child: Text(
+                    'Book Room',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 16),
                 _buildFormField(
                   FormBuilderDateTimePicker(
                     name: 'booking_date',
                     initialValue: null,
                     inputType: InputType.date,
                     format: DateFormat('MMM dd, yyyy'),
-                    decoration: _getInputDecoration(
-                        'Booking Date', Icons.calendar_today),
+                    decoration: _getInputDecoration('Booking Date'),
                     validator: FormBuilderValidators.required(
                       errorText: 'Please select booking date',
                     ),
@@ -90,8 +90,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     initialValue: null,
                     inputType: InputType.date,
                     format: DateFormat('MMM dd, yyyy'),
-                    decoration:
-                        _getInputDecoration('Move-In Date', Icons.login),
+                    decoration: _getInputDecoration('Move-In Date'),
                     validator: FormBuilderValidators.required(
                       errorText: 'Please select move-in date',
                     ),
@@ -103,16 +102,15 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                     initialValue: null,
                     inputType: InputType.date,
                     format: DateFormat('MMM dd, yyyy'),
-                    decoration: _getInputDecoration(
-                        'Move-Out Date (Optional)', Icons.logout),
+                    decoration: _getInputDecoration('Move-Out Date (Optional)'),
                   ),
                 ),
+
                 _buildFormField(
                   FormBuilderTextField(
                     name: 'monthly_rent',
                     initialValue: initialRent.toStringAsFixed(2),
-                    decoration: _getInputDecoration(
-                        'Monthly Rent (\$)', Icons.attach_money),
+                    decoration: _getInputDecoration('Monthly Rent (\$)'),
                     keyboardType: TextInputType.number,
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(
@@ -126,8 +124,7 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                   FormBuilderTextField(
                     name: 'security_deposit',
                     initialValue: initialDeposit.toStringAsFixed(2),
-                    decoration: _getInputDecoration(
-                        'Security Deposit (\$)', Icons.security),
+                    decoration: _getInputDecoration('Security Deposit (\$)'),
                     keyboardType: TextInputType.number,
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(
@@ -140,63 +137,68 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                 _buildFormField(
                   FormBuilderTextField(
                     name: 'profession',
-                    decoration: _getInputDecoration('Profession', Icons.work),
+                    decoration: _getInputDecoration('Profession'),
                     validator: FormBuilderValidators.required(
                       errorText: 'Please enter your profession',
                     ),
                   ),
                 ),
                 _buildFormField(
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      FormBuilderSlider(
-                        name: 'peoples',
-                        min: 1,
-                        max: 10,
-                        initialValue: 1,
-                        divisions: 9,
-                        activeColor: Colors.blue,
-                        inactiveColor: Colors.grey[300],
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        displayValues: DisplayValues.current,
-                        validator: FormBuilderValidators.required(
-                          errorText: 'Please select number of people',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                _buildFormField(
-                  FormBuilderRadioGroup(
-                    name: 'payment_method',
-                    initialValue: 'cash',
-                    decoration: InputDecoration(
-                      labelText: 'Payment Method',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.payment),
+                  FormBuilderSlider(
+                    name: 'peoples',
+                    min: 1,
+                    max: 10,
+                    initialValue: 1,
+                    divisions: 9,
+                    decoration: const InputDecoration(
+                      labelText: 'Number of People',
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
                     ),
-                    options: [
-                      FormBuilderFieldOption(
-                          value: 'cash', child: Text('Cash')),
-                      FormBuilderFieldOption(
-                          value: 'esewa', child: Text('eSewa')),
-                    ],
+                    displayValues: DisplayValues.current,
                     validator: FormBuilderValidators.required(
-                      errorText: 'Please select payment method',
+                      errorText: 'Please select number of people',
                     ),
                   ),
                 ),
+                FormBuilderRadioGroup(
+                  name: 'payment_method',
+                  initialValue: 'cash',
+                  decoration: InputDecoration(
+                    labelText: 'Select Payment Method',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                  options: [
+                    FormBuilderFieldOption(
+                      value: 'cash',
+                      child: const Text('Cash'),
+                    ),
+                    FormBuilderFieldOption(
+                      value: 'esewa',
+                      child: const Text('eSewa'),
+                    ),
+                  ],
+                  validator: FormBuilderValidators.required(
+                    errorText: 'Please select payment method',
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Confirm Button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
                     onPressed: processPaymentAndBooking,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      elevation: 10,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -206,7 +208,6 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -226,17 +227,29 @@ class _BookingBottomSheetState extends State<BookingBottomSheet> {
     );
   }
 
-  InputDecoration _getInputDecoration(String label, IconData icon) {
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _getInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
-      prefixIcon: Icon(
-        icon,
-        color: Colors.grey[600],
-        size: 20,
-      ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
       ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 }

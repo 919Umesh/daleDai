@@ -1,3 +1,4 @@
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/booking/ui/bookig_screen.dart';
 import 'package:omspos/screen/home/ui/home_screen.dart';
@@ -69,29 +70,29 @@ class IndexScreen extends StatelessWidget {
           items: [
             BottomNavigationBarItem(
               icon: Center(
-                child: _buildNavIcon(context, Icons.home_outlined, Icons.home,
-                    0, state.currentIndex),
+                child: _buildNavIcon(context, EvaIcons.homeOutline,
+                    EvaIcons.home, 0, state.currentIndex),
               ),
               label: context.translate('home'),
             ),
             BottomNavigationBarItem(
               icon: Center(
-                child: _buildNavIcon(
-                    context, Icons.search, Icons.search, 1, state.currentIndex),
+                child: _buildNavIcon(context, EvaIcons.searchOutline,
+                    EvaIcons.search, 1, state.currentIndex),
               ),
               label: context.translate('explore'),
             ),
             BottomNavigationBarItem(
               icon: Center(
-                child: _buildNavIcon(context, Icons.calendar_today_outlined,
-                    Icons.calendar_today, 2, state.currentIndex),
+                child: _buildNavIcon(context, EvaIcons.calendarOutline,
+                    EvaIcons.calendar, 2, state.currentIndex),
               ),
               label: context.translate('bookings'),
             ),
             BottomNavigationBarItem(
               icon: Center(
-                child: _buildNavIcon(context, Icons.person_outline,
-                    Icons.person, 3, state.currentIndex),
+                child: _buildNavIcon(context, EvaIcons.personOutline,
+                    EvaIcons.person, 3, state.currentIndex),
               ),
               label: context.translate('profile'),
             ),
