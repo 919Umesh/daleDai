@@ -33,5 +33,8 @@
   "people": "मानिसहरू",
   "confirmed": "पुष्टि भयो",
   "pending": "विचाराधीन",
-  "completed": "पूरा भयो"
+  "completed": "पूरा भयो",
+  "good_afternoon": "शुभ दिउँसो",
+  "good_evening": "शुभ साँझ",
+  "good_night": "शुभ रात्री"
 }

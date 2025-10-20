@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/profile/model/user_model.dart';
 import 'package:omspos/services/language/translation_extension.dart';
+import 'package:omspos/utils/greetings_helper.dart';
 
 class ProfileModalWidget extends StatelessWidget {
   final UserModel? userModel;
@@ -65,7 +66,7 @@ class ProfileModalWidget extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        context.translate('good_morning'),
+                        context.translate(GreetingHelper.getGreeting()),
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white70,

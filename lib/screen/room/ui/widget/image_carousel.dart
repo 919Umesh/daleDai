@@ -39,7 +39,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
         ),
       );
     }
-
     return Column(
       children: [
         SizedBox(
@@ -83,7 +82,6 @@ class _ImageCarouselState extends State<ImageCarousel> {
           ),
         ),
         const SizedBox(height: 8),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
