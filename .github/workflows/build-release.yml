@@ -12,10 +12,12 @@ permissions:
 
 env:
   APK_NAME: "omspos"
-  APP_VERSION: "1.0.0+1"
+  APP_VERSION: "1.0.1+1"
   BUILD_NUMBER: ${{ github.run_number }}
   CHANGES: |
-    - Minor bug fixes
+    - New user onboarding flow
+    - Improved performance
+    - Fixed login issues
     - Automated build #${{ github.run_number }}
 
 jobs:
