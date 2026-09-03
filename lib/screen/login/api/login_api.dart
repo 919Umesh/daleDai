@@ -12,4 +12,17 @@ class AuthAPI {
     );
     return AuthModel.fromJson(response);
   }
+
+  static Future<AuthModel> signUp({
+    required String email,
+    required String password,
+    String? name,
+  }) async {
+    final response = await SupabaseProvider.signUpWithPassword(
+      email: email,
+      password: password,
+      name: name,
+    );
+    return AuthModel.fromJson(response);
+  }
 }

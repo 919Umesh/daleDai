@@ -8,77 +8,162 @@ class ResortCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).cardColor),
+        borderRadius: BorderRadius.circular(20),
+        color: theme.cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: property.images[0],
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+          // Image with overlays
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            child: Stack(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: property.images.isNotEmpty ? property.images[0] : '',
+                  height: 170,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Container(
+                    height: 170,
+                    color: theme.cardColor,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: theme.primaryColor,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  ),
+                  errorWidget: (_, __, ___) => Container(
+                    height: 170,
+                    color: theme.cardColor,
+                    child: Icon(Icons.image_not_supported, color: Colors.white30, size: 40),
+                  ),
+                ),
+                // Gradient overlay
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.5),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Property type badge
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      property.propertyType.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
+
+          // Info row
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.all(12),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        property.city,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                        property.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.location_on,
-                              size: 14, color: Colors.white70),
-                          SizedBox(width: 4),
-                          Text(
-                            property.address,
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
+                          Icon(Icons.location_on, size: 13, color: theme.primaryColor),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              '${property.address}, ${property.city}',
+                              style: theme.textTheme.bodySmall,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 6),
+                      // Attributes chips row
+                      if (property.attributes.isNotEmpty)
+                        Wrap(
+                          spacing: 6,
+                          children: property.attributes.take(3).map((a) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: theme.primaryColor.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                a,
+                                style: TextStyle(
+                                  color: theme.primaryColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
                     ],
                   ),
                 ),
+                const SizedBox(width: 10),
+                // Arrow button
                 Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF29950B), // highlight color
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: theme.primaryColor,
                     shape: BoxShape.circle,
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 20,
                   ),
                 ),
               ],

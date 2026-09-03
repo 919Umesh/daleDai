@@ -69,15 +69,28 @@ class _RoomContainerState extends State<RoomContainer> {
             style: titleListTextStyle,
           ),
           Wrap(
-            spacing: 5,
-            runSpacing: 5,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               for (var value in widget.property?.attributes ?? [])
-                Chip(
-                  label: Text(value,
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w500)),
-                  backgroundColor: Theme.of(context).primaryColor,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
             ],
           ),

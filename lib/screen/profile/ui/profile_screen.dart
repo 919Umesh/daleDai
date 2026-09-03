@@ -40,6 +40,125 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _lastScrollOffset = currentOffset;
   }
 
+  void _showEditProfileDialog(ProfileState state) {
+    final user = state.user;
+    if (user == null) return;
+
+    final nameController = TextEditingController(text: user.name);
+    final phoneController = TextEditingController(text: user.phone == 'N/A' ? '' : user.phone);
+    final formKey = GlobalKey<FormState>();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+          ),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Edit Profile',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Full Name',
+                    prefixIcon: const Icon(Icons.person_outline),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 14),
+                TextFormField(
+                  controller: phoneController,
+                  decoration: InputDecoration(
+                    labelText: 'Phone Number',
+                    prefixIcon: const Icon(Icons.phone_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return 'Please enter your phone number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        final success = await state.updateProfile(
+                          name: nameController.text.trim(),
+                          phone: phoneController.text.trim(),
+                        );
+                        if (success && ctx.mounted) {
+                          Navigator.pop(ctx);
+                        }
+                      }
+                    },
+                    child: const Text(
+                      'Save Changes',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
@@ -100,6 +219,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             appBar: AppBar(
               title: const Text('Profile'),
               centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => _showEditProfileDialog(state),
+                ),
+              ],
             ),
             body: CustomScrollView(
               controller: _scrollController,
@@ -111,28 +236,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Center(
                         child: Column(
                           children: [
-                            CircleAvatar(
-                              radius: 50,
-                              backgroundImage: user.profileImage != null
-                                  ? NetworkImage(user.profileImage!)
-                                  : AssetImage(AssetsList.noInternet)
-                                      as ImageProvider,
-                            ),
-                            const SizedBox(height: 6),
+                            user.profileImage != null && user.profileImage!.isNotEmpty
+                                ? CircleAvatar(
+                                    radius: 50,
+                                    backgroundImage: NetworkImage(user.profileImage!),
+                                  )
+                                : CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Theme.of(context).primaryColor,
+                                    child: Text(
+                                      user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                                      style: const TextStyle(
+                                        fontSize: 36,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                            const SizedBox(height: 10),
                             Text(
                               user.name,
-                              style: const TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               user.email,
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.grey),
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.grey,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            OutlinedButton.icon(
+                              onPressed: () => _showEditProfileDialog(state),
+                              icon: const Icon(Icons.edit, size: 16),
+                              label: const Text('Edit Profile'),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 12),
                       Card(
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         child: Padding(
@@ -140,12 +290,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Account Information',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'Account Information',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => _showEditProfileDialog(state),
+                                    child: const Text('Edit'),
+                                  ),
+                                ],
                               ),
                               _buildInfoItem(
                                 'Phone Number',
@@ -259,6 +418,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                         ),
                       ),
+                      const SizedBox(height: 90),
                     ]),
                   ),
                 ),

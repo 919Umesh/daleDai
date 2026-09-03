@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/booking/ui/bookig_screen.dart';
@@ -6,6 +7,7 @@ import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:omspos/screen/map/screen/map_screen.dart';
 import 'package:omspos/screen/profile/ui/profile_screen.dart';
 import 'package:omspos/services/language/translation_extension.dart';
+import 'package:omspos/themes/theme_state.dart';
 import 'package:provider/provider.dart';
 
 class IndexScreen extends StatelessWidget {
@@ -26,23 +28,18 @@ class IndexScreen extends StatelessWidget {
           extendBody: true,
           body: Stack(
             children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
-                child: Container(
-                  key: ValueKey(state.currentIndex),
-                  child: _screens[state.currentIndex],
-                ),
+              // IndexedStack keeps all screens alive → instant tab switching, no rebuild
+              IndexedStack(
+                index: state.currentIndex,
+                children: _screens,
               ),
               AnimatedPositioned(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                bottom: state.isBottomBarVisible ? 0 : -100,
-                left: 0,
-                right: 0,
-                child: _buildBottomNavigationBar(context, state),
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.easeInOutCubic,
+                bottom: state.isBottomBarVisible ? 12 : -100,
+                left: 20,
+                right: 20,
+                child: _FloatingNavBar(state: state),
               ),
             ],
           ),
@@ -50,71 +47,142 @@ class IndexScreen extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget _buildBottomNavigationBar(BuildContext context, IndexState state) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(36),
-        child: BottomNavigationBar(
-          currentIndex: state.currentIndex,
-          onTap: (index) => state.updateIndex(index),
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          elevation: 5,
-          selectedItemColor: Theme.of(context).primaryColor,
-          unselectedItemColor: Colors.white,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          iconSize: 24,
-          items: [
-            BottomNavigationBarItem(
-              icon: Center(
-                child: _buildNavIcon(context, EvaIcons.homeOutline,
-                    EvaIcons.home, 0, state.currentIndex),
-              ),
-              label: context.translate('home'),
+class _FloatingNavBar extends StatelessWidget {
+  final IndexState state;
+  const _FloatingNavBar({required this.state});
+
+  static const _items = [
+    _NavItem(EvaIcons.homeOutline, EvaIcons.home, 'home'),
+    _NavItem(EvaIcons.searchOutline, EvaIcons.search, 'explore'),
+    _NavItem(EvaIcons.calendarOutline, EvaIcons.calendar, 'bookings'),
+    _NavItem(EvaIcons.personOutline, EvaIcons.person, 'profile'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          height: 68,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.8)]
+                  : [Colors.white.withOpacity(0.7), Colors.white.withOpacity(0.9)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            BottomNavigationBarItem(
-              icon: Center(
-                child: _buildNavIcon(context, EvaIcons.searchOutline,
-                    EvaIcons.search, 1, state.currentIndex),
-              ),
-              label: context.translate('explore'),
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withOpacity(0.08)
+                  : Colors.black.withOpacity(0.06),
             ),
-            BottomNavigationBarItem(
-              icon: Center(
-                child: _buildNavIcon(context, EvaIcons.calendarOutline,
-                    EvaIcons.calendar, 2, state.currentIndex),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
-              label: context.translate('bookings'),
-            ),
-            BottomNavigationBarItem(
-              icon: Center(
-                child: _buildNavIcon(context, EvaIcons.personOutline,
-                    EvaIcons.person, 3, state.currentIndex),
-              ),
-              label: context.translate('profile'),
-            ),
-          ],
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(_items.length, (i) {
+              return _NavItemWidget(
+                item: _items[i],
+                index: i,
+                currentIndex: state.currentIndex,
+                isDark: isDark,
+                onTap: () => state.updateIndex(i),
+              );
+            }),
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildNavIcon(BuildContext context, IconData outlineIcon,
-      IconData filledIcon, int index, int currentIndex) {
+class _NavItem {
+  final IconData outlineIcon;
+  final IconData filledIcon;
+  final String labelKey;
+  const _NavItem(this.outlineIcon, this.filledIcon, this.labelKey);
+}
+
+class _NavItemWidget extends StatelessWidget {
+  final _NavItem item;
+  final int index;
+  final int currentIndex;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _NavItemWidget({
+    required this.item,
+    required this.index,
+    required this.currentIndex,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final isSelected = index == currentIndex;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isSelected
-            ? Colors.green.withOpacity(0.2)
-            : Theme.of(context).cardColor,
+    final primaryColor = Theme.of(context).primaryColor;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? primaryColor.withOpacity(0.18)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                isSelected ? item.filledIcon : item.outlineIcon,
+                key: ValueKey(isSelected),
+                color: isSelected
+                    ? primaryColor
+                    : (isDark ? Colors.white54 : Colors.black45),
+                size: 22,
+              ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: isSelected
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 6),
+                      child: Text(
+                        context.translate(item.labelKey),
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
-      child: Icon(isSelected ? filledIcon : outlineIcon),
     );
   }
 }

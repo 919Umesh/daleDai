@@ -31,6 +31,32 @@ class SignInService {
       accessToken: accessToken,
     );
 
+    final user = response.user;
+    if (user != null) {
+      try {
+        final existingUser = await _client
+            .from('users')
+            .select()
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+        if (existingUser == null) {
+          final displayName = googleUser.displayName ?? user.email?.split('@').first ?? 'User';
+          await _client.from('users').insert({
+            'user_id': user.id,
+            'email': user.email ?? googleUser.email,
+            'name': displayName,
+            'profile_image': googleUser.photoUrl,
+            'user_type': 'tenant',
+            'is_verified': true,
+          });
+        }
+      } catch (e) {
+        // Log error inserting user record, but allow auth response to pass
+        print('Error syncing google user to public.users table: $e');
+      }
+    }
+
     return response;
   }
 

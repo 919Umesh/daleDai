@@ -57,33 +57,41 @@ class BookingModel {
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      bookingId: json['booking_id'] as String,
-      roomId: json['room_id'] as String,
-      tenantId: json['tenant_id'] as String,
-      landlordId: json['landlord_id'] as String,
-      bookingDate: DateTime.parse(json['booking_date'] as String),
-      moveInDate: DateTime.parse(json['move_in_date'] as String),
+      bookingId: json['booking_id'] as String? ?? '',
+      roomId: json['room_id'] as String? ?? '',
+      tenantId: json['tenant_id'] as String? ?? '',
+      landlordId: json['landlord_id'] as String? ?? '',
+      bookingDate: json['booking_date'] != null
+          ? (DateTime.tryParse(json['booking_date'] as String) ?? DateTime.now())
+          : DateTime.now(),
+      moveInDate: json['move_in_date'] != null
+          ? (DateTime.tryParse(json['move_in_date'] as String) ?? DateTime.now())
+          : DateTime.now(),
       moveOutDate: json['move_out_date'] != null
           ? DateTime.tryParse(json['move_out_date'] as String)
           : null,
-      monthlyRent: json['monthly_rent'] as int,
-      securityDeposit: json['security_deposit'] as int,
-      status: json['status'] as String,
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-      createdAt: DateTime.parse(json['created_at'] as String),
-      profession: json['profession'] as String,
-      peoples: json['peoples'] as int,
-      propertyId: json['property_id'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      address: json['address'] as String,
-      propertyType: json['property_type'] as String,
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
-      furnishingStatus: json['furnishing_status'] as String,
-      areaSqft: json['area_sqft'] as int,
-      roomNumber: json['room_number'] as String,
-      rentAmount: json['rent_amount'] as int,
+      monthlyRent: (json['monthly_rent'] as num?)?.toInt() ?? 0,
+      securityDeposit: (json['security_deposit'] as num?)?.toInt() ?? 0,
+      status: json['status'] as String? ?? 'pending',
+      updatedAt: json['updated_at'] != null
+          ? (DateTime.tryParse(json['updated_at'] as String) ?? DateTime.now())
+          : DateTime.now(),
+      createdAt: json['created_at'] != null
+          ? (DateTime.tryParse(json['created_at'] as String) ?? DateTime.now())
+          : DateTime.now(),
+      profession: json['profession'] as String? ?? '',
+      peoples: (json['peoples'] as num?)?.toInt() ?? 1,
+      propertyId: json['property_id'] as String? ?? '',
+      title: json['title'] as String? ?? 'Booking',
+      description: json['description'] as String? ?? '',
+      address: json['address'] as String? ?? '',
+      propertyType: json['property_type'] as String? ?? '',
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
+      furnishingStatus: json['furnishing_status'] as String? ?? '',
+      areaSqft: (json['area_sqft'] as num?)?.toInt() ?? 0,
+      roomNumber: json['room_number'] as String? ?? 'N/A',
+      rentAmount: (json['rent_amount'] as num?)?.toInt() ?? 0,
       attributes: List<String>.from(json['attributes'] as List? ?? []),
     );
   }

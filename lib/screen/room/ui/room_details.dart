@@ -67,6 +67,19 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
             ),
           );
         }
+        if (state.room == null) {
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: const Text('Loading...'),
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+
         return SafeArea(
           child: Scaffold(
             body: CustomScrollView(
@@ -83,7 +96,7 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                     },
                   ),
                   title: Text(
-                    state.room?.roomNumber ?? 'Loading...',
+                    state.room!.roomNumber,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -95,13 +108,12 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
                       ImageCarousel(
-                        images:
-                            state.room?.images ?? [], // Your list of image URLs
-                        height: 350, // Optional
-                        borderRadius: 12, // Optional
+                        images: state.room!.images,
+                        height: 350,
+                        borderRadius: 12,
                       ),
                       RoomDetailsContainer(
-                        room: state.room,
+                        room: state.room!,
                       ),
                     ]),
                   ),

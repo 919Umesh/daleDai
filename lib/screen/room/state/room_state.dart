@@ -202,23 +202,32 @@ class RoomState extends ChangeNotifier {
     if (!formKey.currentState!.saveAndValidate()) return;
 
     try {
-      final userId = await SharedPrefService.getValue<String>(
+      var userId = await SharedPrefService.getValue<String>(
         PrefKey.userId,
         defaultValue: "-",
       );
-      final landlordId = await SharedPrefService.getValue<String>(
+      var landlordId = await SharedPrefService.getValue<String>(
         PrefKey.landLordId,
         defaultValue: "-",
       );
-      final propertyId = await SharedPrefService.getValue<String>(
+      var propertyId = await SharedPrefService.getValue<String>(
         PrefKey.propertyID,
         defaultValue: "-",
       );
 
-      final formValues = formKey.currentState!.value;
+      // Fallback to active property values if not present in shared preferences
+      if (propertyId == "-" && _currentPropertyId != null) {
+        propertyId = _currentPropertyId;
+      }
+      if (landlordId == "-" && _property != null) {
+        landlordId = _property!.landlordId;
+      }
 
-      final formatDate =
-          (DateTime date) => date.toIso8601String().split('T')[0];
+      final formValues = formKey.currentState!.value;
+      final formatDate = (DateTime date) => date.toIso8601String().split('T')[0];
+
+      final int rent = (double.tryParse(formValues['monthly_rent'].toString()) ?? 0).toInt();
+      final int deposit = (double.tryParse(formValues['security_deposit'].toString()) ?? 0).toInt();
 
       final Map<String, dynamic> formData = {
         'booking_date': formatDate(formValues['booking_date'] as DateTime),
@@ -226,12 +235,8 @@ class RoomState extends ChangeNotifier {
         'move_out_date': formValues['move_out_date'] != null
             ? formatDate(formValues['move_out_date'] as DateTime)
             : null,
-        'monthly_rent':
-            (double.tryParse(formValues['monthly_rent'].toString()) ?? 0)
-                .toInt(),
-        'security_deposit':
-            (double.tryParse(formValues['security_deposit'].toString()) ?? 0)
-                .toInt(),
+        'monthly_rent': rent,
+        'security_deposit': deposit,
         'profession': formValues['profession'] as String,
         'peoples': (formValues['peoples'] as double).toInt(),
         'room_id': room.roomId,
@@ -242,7 +247,6 @@ class RoomState extends ChangeNotifier {
         'status': 'pending',
       };
 
-      debugPrint('Form Data to be posted: $formData');
       CustomLog.successLog(value: 'Booking Form Data: $formData');
       await createBooking(formData, room);
     } catch (e) {
@@ -263,87 +267,50 @@ class RoomState extends ChangeNotifier {
     try {
       final Map<String, dynamic> createdBooking =
           await RoomApi.createBooking(formData);
-      debugPrint('Booking created successfully: $createdBooking');
       CustomLog.successLog(value: 'Booking created: $createdBooking');
 
+      final String bookingId = createdBooking['booking_id']?.toString() ?? '0';
+
+      // Send email notification non-blockingly
+      try {
+        await OneSignalService.sendEmail(
+          email: "thakuriumesh919@gmail.com",
+          emailType: "BOOKING_CONFIRMED",
+          bookingData: {
+            "customer_name": "Tenant",
+            "booking_id": bookingId,
+            "room_type": room.roomId,
+            "checkin_date": formData['move_in_date'],
+            "checkout_date": formData['move_out_date'] ?? 'N/A',
+            "number_of_guests": formData['peoples'],
+            "total_amount": "${(formData['monthly_rent'] + formData['security_deposit'])}",
+            "property_name": _property?.title ?? "Property",
+            "property_address": _property?.address ?? "Kathmandu",
+            "property_phone": "+977-9841000000"
+          },
+        );
+      } catch (emailErr) {
+        CustomLog.errorLog(value: 'Non-blocking email notification info: $emailErr');
+      }
+
       if (formData['payment_method'] == 'esewa') {
-        try {
-          await SharedPrefService.setValue<String>(
-              PrefKey.bookingId, createdBooking['booking_id']);
-          debugPrint(
-              'Booking ID stored for eSewa payment: ${createdBooking['booking_id']}');
+        await SharedPrefService.setValue<String>(PrefKey.bookingId, bookingId);
+        final int totalAmount = (formData['monthly_rent'] + formData['security_deposit']);
 
-          final EsewaPaymentModel paymentDetails = EsewaPaymentModel(
-            productId: createdBooking['booking_id'],
-            productName: room.roomId,
-            amount: '100',
-            callbackUrl: "https://your-server.com/callback",
-          );
+        final EsewaPaymentModel paymentDetails = EsewaPaymentModel(
+          productId: bookingId,
+          productName: 'Room Booking ${room.roomNumber}',
+          amount: totalAmount.toString(),
+          callbackUrl: "https://daledai.com.np/callback",
+        );
 
-          final result = await OneSignalService.sendEmail(
-            email: "thakuriumesh919@gmail.com",
-            emailType: "BOOKING_CONFIRMED",
-            bookingData: {
-              "customer_name": "Thakuri Umesh",
-              "booking_id": createdBooking['booking_id'],
-              "room_type": room.roomId,
-              "checkin_date": formData['move_in_date'],
-              "checkout_date": formData['move_out_date'],
-              "number_of_guests": formData['peoples'],
-              "total_amount": "450",
-              "property_name": "Solti Hotel",
-              "property_address": "Kalimati,Kathmandu",
-              "property_phone": "+977-9868732774"
-            },
-          );
-          if (result['success'] == true) {
-            debugPrint('Email sent successfully!');
-            await initiatePayment(paymentDetails);
-          } else {
-            debugPrint('Failed to send email: ${result['error']}');
-
-            throw Exception(
-                'Failed to send confirmation email: ${result['error']}');
-          }
-        } catch (e) {
-          debugPrint('Error in eSewa payment flow: $e');
-        }
+        await initiatePayment(paymentDetails);
       } else {
-        try {
-          final result = await OneSignalService.sendEmail(
-            email: "thakuriumesh919@gmail.com",
-            emailType: "BOOKING_CONFIRMED",
-            bookingData: {
-              "customer_name": "Thakuri Umesh",
-              "booking_id": createdBooking['booking_id'],
-              "room_type": room.roomId,
-              "checkin_date": formData['move_in_date'],
-              "checkout_date": formData['move_out_date'],
-              "number_of_guests": formData['peoples'],
-              "total_amount": "450",
-              "property_name": "Solti Hotel",
-              "property_address": "Kalimati,Kathmandu",
-              "property_phone": "+977-9868732774"
-            },
-          );
-          if (result['success'] == true) {
-            debugPrint('Email sent successfully!');
-
-            Fluttertoast.showToast(
-              msg: 'Booking created successfully!',
-              toastLength: Toast.LENGTH_LONG,
-            );
-            debugPrint(
-                'Booking completed for ${formData['payment_method']} payment');
-          } else {
-            debugPrint('Failed to send email: ${result['error']}');
-
-            throw Exception(
-                'Failed to send confirmation email: ${result['error']}');
-          }
-        } catch (e) {
-          debugPrint('Error in eSewa payment flow: $e');
-        }
+        Fluttertoast.showToast(
+          msg: 'Booking created successfully!',
+          toastLength: Toast.LENGTH_LONG,
+          backgroundColor: Colors.green,
+        );
       }
     } catch (e) {
       _errorMessage = 'Failed to create booking: ${e.toString()}';
@@ -368,7 +335,7 @@ class RoomState extends ChangeNotifier {
       );
     } catch (e) {
       Fluttertoast.showToast(
-        msg: 'Error initiating payment: ${e.toString()}',
+        msg: 'Error initiating eSewa payment: ${e.toString()}',
         toastLength: Toast.LENGTH_LONG,
         backgroundColor: Colors.red,
       );
@@ -379,16 +346,30 @@ class RoomState extends ChangeNotifier {
   }
 
   void _handlePaymentSuccess(EsewaPaymentSuccessResult data) {
-    debugPrint(":::SUCCESS::: => $data");
+    debugPrint(":::eSewa Payment Success::: => $data");
+    Fluttertoast.showToast(
+      msg: 'Payment successful! Confirming booking...',
+      toastLength: Toast.LENGTH_SHORT,
+      backgroundColor: Colors.green,
+    );
     _verifyTransactionOnServer(data.refId);
   }
 
   void _handlePaymentFailure(dynamic data) {
-    debugPrint(":::FAILURE::: => $data");
+    debugPrint(":::eSewa Payment Failure::: => $data");
+    Fluttertoast.showToast(
+      msg: 'eSewa Payment failed or was declined.',
+      toastLength: Toast.LENGTH_LONG,
+      backgroundColor: Colors.red,
+    );
   }
 
   void _handlePaymentCancellation(dynamic data) {
-    debugPrint(":::CANCELLATION::: => $data");
+    debugPrint(":::eSewa Payment Cancelled::: => $data");
+    Fluttertoast.showToast(
+      msg: 'eSewa Payment was cancelled.',
+      toastLength: Toast.LENGTH_SHORT,
+    );
   }
 
   Future<void> _verifyTransactionOnServer(String refId) async {

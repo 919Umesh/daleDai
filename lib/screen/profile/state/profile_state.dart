@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/profile/api/profile_api.dart';
 import 'package:omspos/screen/profile/model/user_model.dart';
@@ -110,5 +111,44 @@ class ProfileState extends ChangeNotifier {
 
   Future<void> refreshProfile() async {
     await loadUserProfile(isRefresh: true);
+  }
+
+  Future<bool> updateProfile({
+    required String name,
+    required String phone,
+  }) async {
+    if (_user == null) return false;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final updatedUser = await UserAPI.updateUser(
+        _user!.userId,
+        {
+          'name': name,
+          'phone': phone,
+        },
+      );
+
+      _user = updatedUser;
+      _errorMessage = null;
+      Fluttertoast.showToast(
+        msg: 'Profile updated successfully!',
+        toastLength: Toast.LENGTH_SHORT,
+      );
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to update profile: $e';
+      Fluttertoast.showToast(
+        msg: _errorMessage!,
+        toastLength: Toast.LENGTH_LONG,
+        backgroundColor: Colors.red,
+      );
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

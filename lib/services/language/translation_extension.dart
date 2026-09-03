@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 
 extension TranslationExtension on BuildContext {
   String translate(String key) {
-    final localizationState = Provider.of<LocalizationState>(this, listen: true);
+    final localizationState =
+        Provider.of<LocalizationState>(this, listen: false);
     return localizationState.translate(key);
   }
 }

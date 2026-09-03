@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -128,28 +129,33 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 ),
               ],
             ),
-            floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-            floatingActionButton: Column(
-              children: [
-                FloatingActionButton(
-                  heroTag: 'refreshBtn',
-                  onPressed: () async {
-                    await state.refresh();
-                  },
-                  mini: true,
-                  tooltip: 'Refresh Map Data',
-                  child: const Icon(Icons.refresh),
-                ),
-                FloatingActionButton(
-                  heroTag: 'recenterBtn',
-                  onPressed: () {
-                    state.moveToCurrentLocation();
-                  },
-                  mini: true,
-                  tooltip: 'Recenter to Current Location',
-                  child: const Icon(Icons.my_location),
-                ),
-              ],
+            // Place two small FABs at bottom-right to avoid covering map content
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            floatingActionButton: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewPadding.bottom + 88,
+                right: 12,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FloatingActionButton.small(
+                    heroTag: 'map_refresh',
+                    onPressed: () => state.refresh(),
+                    tooltip: 'Refresh',
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: const Icon(Icons.refresh_rounded, size: 18),
+                  ),
+                  const SizedBox(height: 10),
+                  FloatingActionButton.small(
+                    heroTag: 'map_recenter',
+                    onPressed: () => state.moveToCurrentLocation(),
+                    tooltip: 'Recenter',
+                    backgroundColor: Colors.blueAccent,
+                    child: const Icon(Icons.my_location_rounded, size: 18),
+                  ),
+                ],
+              ),
             ),
           );
         },

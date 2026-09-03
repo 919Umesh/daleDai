@@ -25,10 +25,10 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      userId: json['user_id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      phone: json['phone'] as String,
+      userId: json['user_id'] as String? ?? '',
+      name: json['name'] as String? ?? 'User',
+      email: json['email'] as String? ?? '',
+      phone: json['phone'] as String? ?? 'N/A',
       profileImage: json['profile_image'] as String?,
       isVerified: json['is_verified'] as bool? ?? false,
       documentUrl: json['document_url'] as String?,
@@ -38,7 +38,7 @@ class UserModel {
       updatedAt: json['updated_at'] != null 
           ? DateTime.parse(json['updated_at'] as String) 
           : null,
-      userType: json['user_type'] as String,
+      userType: json['user_type'] as String? ?? 'tenant',
     );
   }
 

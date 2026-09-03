@@ -8,32 +8,66 @@ class RoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).cardColor),
+        borderRadius: BorderRadius.circular(20),
+        color: theme.cardColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: room.images[0],
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            child: Stack(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: room.images.isNotEmpty ? room.images[0] : '',
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorWidget: (_, __, ___) => Container(
+                    height: 160,
+                    color: theme.cardColor,
+                    child: const Icon(Icons.meeting_room_outlined, size: 40),
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: room.isOccupied
+                          ? Colors.redAccent.withOpacity(0.9)
+                          : Colors.green.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      room.isOccupied ? 'OCCUPIED' : 'AVAILABLE',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.all(14),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -42,24 +76,22 @@ class RoomCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        room.roomType,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                        'Room ${room.roomNumber} • ${room.roomType.toUpperCase()}',
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.location_on,
-                              size: 14, color: Colors.white70),
-                          SizedBox(width: 4),
+                          Icon(Icons.payments_outlined,
+                              size: 16, color: theme.primaryColor),
+                          const SizedBox(width: 4),
                           Text(
-                            room.rentAmount.toString(),
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
+                            'NPR ${room.rentAmount} / mo',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: theme.primaryColor,
                             ),
                           ),
                         ],
@@ -68,19 +100,16 @@ class RoomCard extends StatelessWidget {
                   ),
                 ),
                 Container(
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: room.isOccupied
-                        ? Colors.red
-                        : Colors.green, // highlight color
+                    color: theme.primaryColor.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: theme.primaryColor,
+                    size: 20,
                   ),
                 ),
               ],

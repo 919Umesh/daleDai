@@ -70,66 +70,75 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
         );
       }
       return Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              floating: false,
-              snap: false,
-              automaticallyImplyLeading: true,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              title: Text(
-                'Properties',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+        body: RefreshIndicator(
+          onRefresh: () async {
+            if (state.currentAreaId != null && state.currentAreaId!.isNotEmpty) {
+              await state.loadPropertiesByArea(state.currentAreaId!, refresh: true);
+            } else {
+              await state.loadAllProperties(refresh: true);
+            }
+          },
+          child: CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                floating: false,
+                snap: false,
+                automaticallyImplyLeading: true,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                title: Text(
+                  'Properties',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.only(left: 8, right: 8),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // so it scrolls with parent CustomScrollView
-                    itemCount: state.properties.length,
-                    itemBuilder: (context, index) {
-                      final property = state.properties[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 5),
-                        child: InkWell(
-                          onTap: () async {
-                            try {
-                              await SharedPrefService.setValue<String>(
-                                  PrefKey.landLordId, property.landlordId);
-                              await SharedPrefService.setValue<String>(
-                                  PrefKey.propertyID, property.propertyId);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => RoomScreen(
-                                      propertyId:
-                                          property.propertyId.toString())));
-                            } catch (e) {
-                              debugPrint('Failed to save landlordId: $e');
-                            }
-                          },
-                          child: PropertiesCard(
-                            property: property,
+              SliverPadding(
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics:
+                          const NeverScrollableScrollPhysics(), // so it scrolls with parent CustomScrollView
+                      itemCount: state.properties.length,
+                      itemBuilder: (context, index) {
+                        final property = state.properties[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: InkWell(
+                            onTap: () async {
+                              try {
+                                await SharedPrefService.setValue<String>(
+                                    PrefKey.landLordId, property.landlordId);
+                                await SharedPrefService.setValue<String>(
+                                    PrefKey.propertyID, property.propertyId);
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => RoomScreen(
+                                        propertyId:
+                                            property.propertyId.toString())));
+                              } catch (e) {
+                                debugPrint('Failed to save landlordId: $e');
+                              }
+                            },
+                            child: PropertiesCard(
+                              property: property,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ]),
+                        );
+                      },
+                    ),
+                  ]),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     });

@@ -105,7 +105,9 @@ class BookingWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white.withOpacity(0.06)
+                    : Colors.grey.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -120,21 +122,21 @@ class BookingWidget extends StatelessWidget {
                   Container(
                     width: 1,
                     height: 30,
-                    color: Colors.grey[300],
+                    color: Theme.of(context).dividerColor,
                   ),
                   _buildBookingDetail(
                     title: context.translate('monthly_rent'),
-                    value: '₹${booking.monthlyRent}',
+                    value: 'NPR ${booking.monthlyRent}',
                     context: context,
                   ),
                   Container(
                     width: 1,
                     height: 30,
-                    color: Colors.grey[300],
+                    color: Theme.of(context).dividerColor,
                   ),
                   _buildBookingDetail(
                     title: context.translate('deposit'),
-                    value: '₹${booking.securityDeposit}',
+                    value: 'NPR ${booking.securityDeposit}',
                     context: context,
                   ),
                 ],
@@ -197,6 +199,7 @@ class BookingWidget extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),
@@ -220,10 +223,7 @@ class BookingWidget extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey[700],
-              ),
+              style: Theme.of(context).textTheme.bodySmall,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -315,4 +315,5 @@ class BookingWidget extends StatelessWidget {
         return Icons.home;
     }
   }
+
 }

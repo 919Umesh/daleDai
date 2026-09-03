@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/login/state/login_state.dart';
-import 'package:omspos/services/api/supabase_helper.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,6 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<LoginState>(context);
+    final isSignUp = state.isSignUpMode;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -31,25 +32,46 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
               Text(
-                'Welcome Back',
+                isSignUp ? 'Create Account' : 'Welcome Back',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Please sign in to continue',
+                isSignUp
+                    ? 'Please fill in details to create an account'
+                    : 'Please sign in to continue',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.grey.shade600,
                     ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 30),
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
+                    if (isSignUp) ...[
+                      TextFormField(
+                        controller: state.nameController,
+                        decoration: InputDecoration(
+                          labelText: 'Full Name',
+                          prefixIcon: const Icon(Icons.person_outline),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (isSignUp && (value == null || value.trim().isEmpty)) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                     TextFormField(
                       controller: state.emailController,
                       decoration: InputDecoration(
@@ -101,16 +123,16 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Forgot Password?',
+                    if (!isSignUp) ...[
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {},
+                          child: const Text('Forgot Password?'),
                         ),
                       ),
-                    ),
+                    ],
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
@@ -125,23 +147,75 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? null
                             : () async {
                                 if (_formKey.currentState!.validate()) {
-                                  await state.signIn(
-                                    state.emailController.text.trim(),
-                                    state.passwordController.text.trim(),
-                                  );
+                                  if (isSignUp) {
+                                    await state.signUp(
+                                      state.emailController.text.trim(),
+                                      state.passwordController.text.trim(),
+                                      state.nameController.text.trim(),
+                                    );
+                                  } else {
+                                    await state.signIn(
+                                      state.emailController.text.trim(),
+                                      state.passwordController.text.trim(),
+                                    );
+                                  }
                                 }
                               },
                         child: state.isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : const Text(
-                                'Sign In',
-                                style: TextStyle(
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                isSignUp ? 'Sign Up' : 'Sign In',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: Colors.grey.shade400)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            'OR',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: Divider(color: Colors.grey.shade400)),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        icon: Image.network(
+                          'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/960px-Google_%22G%22_logo.svg.png',
+                          width: 20,
+                          height: 20,
+                        ),
+                        label: const Text(
+                          'Continue with Google',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onPressed: () async {
+                          await Provider.of<LoginState>(context, listen: false)
+                              .signInWithGoogle();
+                        },
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -149,15 +223,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Don't have an account?",
+                          isSignUp
+                              ? 'Already have an account?'
+                              : "Don't have an account?",
                           style: TextStyle(color: Colors.grey.shade600),
                         ),
                         TextButton(
                           onPressed: () {
-                            SupabaseProvider.signWithGoogle();
+                            state.toggleAuthMode();
                           },
                           child: Text(
-                            'Sign Up',
+                            isSignUp ? 'Sign In' : 'Sign Up',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],

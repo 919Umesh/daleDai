@@ -39,6 +39,12 @@ class BookingState extends ChangeNotifier {
   List<BookingModel> _bookings = [];
   List<BookingModel> get bookings => _bookings;
 
+  // Cache bookings per status to avoid refetching when switching tabs
+  final Map<String, List<BookingModel>> _bookingsCache = {};
+
+  List<BookingModel> getCachedBookings(String status) =>
+      _bookingsCache[status] ?? [];
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
@@ -77,6 +83,7 @@ class BookingState extends ChangeNotifier {
     _isCalling = false;
     _errorMessage = null;
     _bookings = [];
+    _bookingsCache.clear();
     notifyListeners();
   }
 
@@ -84,6 +91,17 @@ class BookingState extends ChangeNotifier {
     if (_isLoading) return;
     _isLoading = true;
     _errorMessage = null;
+    final statusKey = (status ?? 'confirmed').toLowerCase();
+
+    // If we have cached data for this status and not forcing refresh,
+    // return it immediately to avoid UI delay.
+    if (!(isRefresh ?? false) && _bookingsCache.containsKey(statusKey)) {
+      _bookings = _bookingsCache[statusKey]!;
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
     _bookings = [];
     notifyListeners();
 
@@ -100,6 +118,8 @@ class BookingState extends ChangeNotifier {
         status: status ?? "confirmed",
         isRefresh: isRefresh ?? false,
       );
+      // store in cache for quick subsequent access
+      _bookingsCache[statusKey] = _bookings;
       _errorMessage = null;
       CustomLog.successLog(value: 'Loaded ${_bookings.length} bookings');
     } catch (e) {
@@ -157,4 +177,29 @@ class BookingState extends ChangeNotifier {
   }
 
   Future<void> refreshBookings() async => loadBookings(isRefresh: true);
+
+  Future<void> addComment(String bookingId, String propertyId, String comment) async {
+    if (_context == null) throw Exception('No context set for BookingState');
+    try {
+      final tenantId = await SharedPrefService.getValue<String>(
+        PrefKey.userId,
+        defaultValue: '-',
+      );
+      if (tenantId == '-' || tenantId == null) {
+        throw Exception('User not authenticated');
+      }
+
+      setLoading(true);
+      await BookingAPI.addComment(
+        bookingId: bookingId,
+        propertyId: propertyId,
+        tenantId: tenantId,
+        comment: comment,
+      );
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      rethrow;
+    }
+  }
 }

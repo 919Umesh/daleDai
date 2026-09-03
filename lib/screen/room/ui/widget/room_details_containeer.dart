@@ -1,12 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
+// removed unused cached_network_image import
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/room/model/room_model_images.dart';
 import 'package:omspos/screen/room/ui/booking_bottom_sheet.dart';
+// kept minimal for room details container
 import 'package:omspos/services/language/translation_extension.dart';
 import 'package:omspos/themes/fonts_style.dart';
 
 class RoomDetailsContainer extends StatefulWidget {
-  final RoomModelImage? room;
+  final RoomModelImage room;
   const RoomDetailsContainer({super.key, required this.room});
 
   @override
@@ -32,7 +33,7 @@ class _RoomDetailsContainerState extends State<RoomDetailsContainer> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  room?.roomNumber ?? "No Title",
+                  room.roomNumber,
                   style: titleListTextStyle.copyWith(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -42,14 +43,12 @@ class _RoomDetailsContainerState extends State<RoomDetailsContainer> {
                   height: 40,
                   width: 100,
                   decoration: BoxDecoration(
-                    color: room!.isOccupied
-                        ? Colors.red
-                        : Theme.of(context).primaryColor,
+                    color: room.isOccupied ? Colors.red : Theme.of(context).primaryColor,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: Center(
                       child: Text(
-                    room!.isOccupied ? 'Occupied' : 'Available',
+                        room.isOccupied ? 'Occupied' : 'Available',
                     style: priceTitleTextStyle,
                   )),
                 )
@@ -59,7 +58,7 @@ class _RoomDetailsContainerState extends State<RoomDetailsContainer> {
 
             // Description with See More
             Text(
-              room?.description ?? "No description available",
+              room.description.isNotEmpty ? room.description : "No description available",
               style: subTitleTextStyle.copyWith(height: 1.4),
               maxLines: _isExpanded ? null : 3,
               overflow:
@@ -80,15 +79,28 @@ class _RoomDetailsContainerState extends State<RoomDetailsContainer> {
             Text(context.translate('what_we_offer'), style: titleListTextStyle),
             const SizedBox(height: 8),
             Wrap(
-              spacing: 5,
-              runSpacing: 5,
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                for (var value in room?.attributes ?? [])
-                  Chip(
-                    label: Text(value,
-                        style: const TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w500)),
-                    backgroundColor: Theme.of(context).primaryColor,
+                for (var value in room.attributes)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -100,14 +112,15 @@ class _RoomDetailsContainerState extends State<RoomDetailsContainer> {
             // Details
             Text(context.translate('details'), style: titleListTextStyle),
             const SizedBox(height: 5),
-            _buildDetailRow(context, "Room Type", room?.roomType),
-            _buildDetailRow(context, "Rent Amount", "Rs. ${room?.rentAmount}"),
+            _buildDetailRow(context, "Room Type", room.roomType),
+            _buildDetailRow(context, "Rent Amount", "Rs. ${room.rentAmount}"),
             _buildDetailRow(
-                context, "Security Deposit", "Rs. ${room?.securityDeposit}"),
+              context, "Security Deposit", "Rs. ${room.securityDeposit}"),
 
             SizedBox(
               height: 12,
             ),
+            Text(context.translate('comments'), style: titleListTextStyle),
             // Book Now Button
             SizedBox(
               width: double.infinity,

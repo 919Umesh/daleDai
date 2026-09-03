@@ -20,4 +20,25 @@ class UserAPI {
    
     return UserModel.fromJson(response['data'][0]);
   }
+
+  static Future<UserModel> updateUser(
+      String userId, Map<String, dynamic> updateData) async {
+    final response = await SupabaseProvider.updateData(
+      tableName: 'users',
+      columnName: 'user_id',
+      columnValue: userId,
+      data: updateData,
+    );
+
+    if (response['error'] == true) {
+      throw Exception(response['message'] ?? 'Failed to update user profile');
+    }
+
+    final list = response['data'] as List;
+    if (list.isEmpty) {
+      throw Exception('No user record updated');
+    }
+
+    return UserModel.fromJson(list[0]);
+  }
 }

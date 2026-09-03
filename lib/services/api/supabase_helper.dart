@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:omspos/services/google/google_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:omspos/utils/custom_log.dart';
@@ -44,6 +46,7 @@ class SupabaseProvider {
     int? limit,
     List<String>? columns,
     bool cacheFirst = true,
+    Duration? cacheTTL,
   }) async {
     final cacheKey = _generateCacheKey(
       tableName: tableName,
@@ -56,12 +59,35 @@ class SupabaseProvider {
     CustomLog.warningLog(value: "Supabase GET => $tableName");
 
     final isOnline = await NetworkUtil.hasInternetConnection();
+    final ttl = cacheTTL ?? const Duration(hours: 1);
+
     if (!isOnline || cacheFirst) {
       try {
         final cachedData = await _getFromCache(cacheKey);
         if (cachedData != null) {
-          CustomLog.warningLog(value: "Loaded from cache: $tableName");
-          return cachedData;
+          // check TTL
+          try {
+            final cachedAtStr = cachedData['cachedAt'] as String? ?? cachedData['data']?['cachedAt'] as String?;
+            if (cachedAtStr != null) {
+              final cachedAt = DateTime.parse(cachedAtStr);
+              final age = DateTime.now().difference(cachedAt);
+              if (age <= ttl) {
+                CustomLog.warningLog(value: "Loaded from cache (fresh): $tableName");
+                return cachedData;
+              } else {
+                CustomLog.warningLog(value: "Cache stale by ${age.inSeconds}s for $tableName");
+                // if offline, return stale cache as fallback
+                if (!isOnline) return cachedData;
+                // else continue to fetch fresh data
+              }
+            } else {
+              CustomLog.warningLog(value: "Loaded from cache (no timestamp): $tableName");
+              return cachedData;
+            }
+          } catch (e) {
+            CustomLog.errorLog(value: "Cache timestamp parse error: $e");
+            return cachedData;
+          }
         }
       } catch (e) {
         CustomLog.errorLog(value: "Cache read error: $e");
@@ -192,10 +218,33 @@ class SupabaseProvider {
         password: password,
       );
       if (response.user == null) throw Exception('No user returned');
+
+      final user = response.user!;
+      try {
+        final existingUser = await _client
+            .from('users')
+            .select()
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+        if (existingUser == null) {
+          final userName = email.split('@').first;
+          await _client.from('users').insert({
+            'user_id': user.id,
+            'email': user.email ?? email,
+            'name': userName,
+            'user_type': 'tenant',
+            'is_verified': true,
+          });
+        }
+      } catch (e) {
+        CustomLog.errorLog(value: "User sync error: $e");
+      }
+
       return {
         'error': false,
-        'userId': response.user!.id,
-        'email': response.user!.email ?? email,
+        'userId': user.id,
+        'email': user.email ?? email,
         'message': 'Login successful',
       };
     } on AuthException catch (e) {
@@ -212,14 +261,59 @@ class SupabaseProvider {
     }
   }
 
+  static Future<Map<String, dynamic>> signUpWithPassword({
+    required String email,
+    required String password,
+    String? name,
+  }) async {
+    try {
+      final response = await _client.auth.signUp(
+        email: email,
+        password: password,
+      );
+      if (response.user == null) throw Exception('No user returned');
+
+      final user = response.user!;
+      final userName = name ?? (email.split('@').first);
+
+      try {
+        await _client.from('users').upsert({
+          'user_id': user.id,
+          'email': user.email ?? email,
+          'name': userName,
+          'user_type': 'tenant',
+          'is_verified': true,
+        });
+      } catch (e) {
+        CustomLog.errorLog(value: "Sign up user table sync error: $e");
+      }
+
+      return {
+        'error': false,
+        'userId': user.id,
+        'email': user.email ?? email,
+        'message': 'Sign up successful! Please sign in.',
+      };
+    } on AuthException catch (e) {
+      return {
+        'error': true,
+        'message': 'Sign up error: ${e.message}',
+        'code': e.statusCode?.toString(),
+      };
+    } catch (e) {
+      return {
+        'error': true,
+        'message': 'Failed to sign up: $e',
+      };
+    }
+  }
+
+
   /// ========== GOOGLE SIGN IN HELPERS ==========
   static Future<Map<String, dynamic>> signWithGoogle() async {
     try {
-      await Supabase.instance.client.auth.signInWithOAuth(
-        OAuthProvider.google,
-      );
-
-      final user = Supabase.instance.client.auth.currentUser;
+      final response = await SignInService().googleSignIn();
+      final user = response.user;
 
       if (user == null) {
         return {
@@ -235,9 +329,10 @@ class SupabaseProvider {
         'message': 'Google login successful',
       };
     } catch (e) {
+      CustomLog.errorLog(value: "Google Sign-In Error: $e");
       return {
         'error': true,
-        'message': e.toString(),
+        'message': 'Google sign-in error: $e',
       };
     }
   }
