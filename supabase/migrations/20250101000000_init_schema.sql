@@ -401,34 +401,37 @@ SET
   file_size_limit = EXCLUDED.file_size_limit,
   allowed_mime_types = EXCLUDED.allowed_mime_types;
 
--- Storage RLS & Policies
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
-
+-- Storage RLS & Policies (Public bucket flag handles public read access automatically; safe fallback for policies)
 DO $$
 BEGIN
-  -- Select Policy
-  DROP POLICY IF EXISTS "Allow Public Storage Select" ON storage.objects;
-  CREATE POLICY "Allow Public Storage Select" 
-    ON storage.objects FOR SELECT 
-    USING (true);
+  -- Storage policies on storage.objects (handled safely if running as postgres role)
+  BEGIN
+    DROP POLICY IF EXISTS "Allow Public Storage Select" ON storage.objects;
+    CREATE POLICY "Allow Public Storage Select" ON storage.objects FOR SELECT USING (true);
+  EXCEPTION WHEN insufficient_privilege THEN
+    RAISE NOTICE 'Notice: storage.objects select policy skipped (public bucket flag handles public reads).';
+  END;
 
-  -- Insert Policy
-  DROP POLICY IF EXISTS "Allow Public Storage Insert" ON storage.objects;
-  CREATE POLICY "Allow Public Storage Insert" 
-    ON storage.objects FOR INSERT 
-    WITH CHECK (true);
+  BEGIN
+    DROP POLICY IF EXISTS "Allow Public Storage Insert" ON storage.objects;
+    CREATE POLICY "Allow Public Storage Insert" ON storage.objects FOR INSERT WITH CHECK (true);
+  EXCEPTION WHEN insufficient_privilege THEN
+    RAISE NOTICE 'Notice: storage.objects insert policy skipped due to role permissions.';
+  END;
 
-  -- Update Policy
-  DROP POLICY IF EXISTS "Allow Public Storage Update" ON storage.objects;
-  CREATE POLICY "Allow Public Storage Update" 
-    ON storage.objects FOR UPDATE 
-    USING (true);
+  BEGIN
+    DROP POLICY IF EXISTS "Allow Public Storage Update" ON storage.objects;
+    CREATE POLICY "Allow Public Storage Update" ON storage.objects FOR UPDATE USING (true);
+  EXCEPTION WHEN insufficient_privilege THEN
+    NULL;
+  END;
 
-  -- Delete Policy
-  DROP POLICY IF EXISTS "Allow Public Storage Delete" ON storage.objects;
-  CREATE POLICY "Allow Public Storage Delete" 
-    ON storage.objects FOR DELETE 
-    USING (true);
+  BEGIN
+    DROP POLICY IF EXISTS "Allow Public Storage Delete" ON storage.objects;
+    CREATE POLICY "Allow Public Storage Delete" ON storage.objects FOR DELETE USING (true);
+  EXCEPTION WHEN insufficient_privilege THEN
+    NULL;
+  END;
 END $$;
 
 -- --------------------------------------------------------------------
