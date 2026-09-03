@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:omspos/config/env_config.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/services/language/translation_extension.dart';
 import 'package:omspos/themes/fonts_style.dart';
@@ -90,10 +91,10 @@ class _RoomContainerState extends State<RoomContainer> {
           // Host info row
           Row(
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 28,
                 backgroundImage: CachedNetworkImageProvider(
-                  'https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/profile/Seller.png',
+                  '${EnvConfig.supabaseUrl}/storage/v1/object/public/profile/Seller.png',
                 ),
               ),
               const SizedBox(width: 12),

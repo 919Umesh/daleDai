@@ -32,6 +32,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Create .env file from GitHub Secrets
+        run: |
+          cat << EOF > .env
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          WEB_CLIENT_ID=${{ secrets.WEB_CLIENT_ID }}
+          ONESIGNAL_APP_ID=${{ secrets.ONESIGNAL_APP_ID }}
+          ONESIGNAL_API_KEY=${{ secrets.ONESIGNAL_API_KEY }}
+          EOF
+
+
       - name: Set up Java
         uses: actions/setup-java@v3
         with:

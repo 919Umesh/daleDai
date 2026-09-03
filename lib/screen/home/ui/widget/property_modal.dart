@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:omspos/config/env_config.dart';
 import 'package:omspos/screen/home/model/home_model.dart';
 
 class PropertyModalWidget extends StatelessWidget {
@@ -9,14 +10,14 @@ class PropertyModalWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 180,
-      height: 220,
+      width: 140,
+      margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 12,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
             offset: const Offset(0, 6),
           ),
         ],
@@ -29,7 +30,7 @@ class PropertyModalWidget extends StatelessWidget {
             CachedNetworkImage(
               imageUrl: (area.areaImage?.isNotEmpty ?? false)
                   ? area.areaImage!
-                  : 'https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/profile/Seller.png',
+                  : '${EnvConfig.supabaseUrl}/storage/v1/object/public/profile/Seller.png',
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:omspos/config/env_config.dart';
 import 'package:omspos/constants/assets_list.dart';
 import 'package:omspos/screen/room/state/room_state.dart';
 import 'package:omspos/screen/room/ui/room_details.dart';
@@ -100,7 +101,7 @@ class _RoomScreenState extends State<RoomScreen> {
                     ),
                     background: CachedNetworkImage(
                       imageUrl: state.property?.images[0] ??
-                          'https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/profile/Seller.png',
+                          '${EnvConfig.supabaseUrl}/storage/v1/object/public/profile/Seller.png',
                       fit: BoxFit.cover,
                     ),
                     collapseMode: CollapseMode.parallax,

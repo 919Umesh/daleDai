@@ -5,6 +5,7 @@ import 'config/config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EnvConfig.load();
   await Supabase.initialize(
     url: EnvConfig.supabaseUrl,
     anonKey: EnvConfig.supabaseAnonKey,

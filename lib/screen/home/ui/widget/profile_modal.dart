@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:omspos/config/env_config.dart';
 import 'package:omspos/screen/profile/model/user_model.dart';
 import 'package:omspos/services/language/translation_extension.dart';
 import 'package:omspos/utils/greetings_helper.dart';
@@ -28,7 +29,7 @@ class ProfileModalWidget extends StatelessWidget {
                   backgroundImage: CachedNetworkImageProvider(
                     (userModel?.profileImage?.isNotEmpty ?? false)
                         ? userModel!.profileImage!
-                        : 'https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/profile/Seller.png',
+                        : '${EnvConfig.supabaseUrl}/storage/v1/object/public/profile/Seller.png',
                   ),
                   radius: 30,
                 ),

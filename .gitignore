@@ -44,5 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 *.env
+.env
+.env.*
+!.env.example
 /android/key.properties
 /android/app/release-key.jks
