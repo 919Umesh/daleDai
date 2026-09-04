@@ -27,6 +27,9 @@ jobs:
     permissions:
       contents: write
 
+    outputs:
+      app_version: ${{ steps.version.outputs.APP_VERSION }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -114,6 +117,9 @@ jobs:
     permissions:
       contents: write
 
+    env:
+      APP_VERSION: ${{ needs.build.outputs.app_version }}
+
     steps:
       - name: Download APK artifact
         uses: actions/download-artifact@v4
@@ -123,12 +129,6 @@ jobs:
 
       - name: List downloaded files
         run: ls -la
-
-      - name: Extract version for release job
-        id: ver
-        run: |
-          # Download artifact to get the APK name; version was passed via artifact filename
-          ls *.apk | head -1
 
       - name: Create or Update GitHub Release
         uses: ncipollo/release-action@v1
