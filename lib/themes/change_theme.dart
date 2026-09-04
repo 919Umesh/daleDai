@@ -15,8 +15,18 @@ class ThemeToggle extends StatelessWidget {
       onChanged: (value) {
         themeState.toggleTheme();
       },
-      activeThumbColor: ThemeState.highLightColor,
-      activeTrackColor: ThemeState.highLightColor.withValues(alpha: 0.5),
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return ThemeState.highLightColor;
+        }
+        return null;
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return ThemeState.highLightColor.withValues(alpha: 0.5);
+        }
+        return null;
+      }),
     );
   }
 }
