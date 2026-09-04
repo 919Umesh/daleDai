@@ -74,16 +74,32 @@ ON CONFLICT DO NOTHING;
 -- 5. ROOMS
 INSERT INTO public.rooms (
   room_id, property_id, room_number, room_type, rent_amount,
-  security_deposit, description, is_occupied, attributes
+  security_deposit, description, is_occupied, attributes, max_occupants,
+  floor_number, area_sqft, furnishing_status, bathroom_type,
+  has_attached_bathroom, minimum_stay_months, utilities_included, house_rules,
+  preferred_tenant
 ) VALUES
-  (gen_random_uuid(),'bbbbbbbb-0001-0001-0001-bbbbbbbbbbbb','101','single',12000,24000,'Bright single room with city view',false,ARRAY['WiFi','Hot Water','Wardrobe']),
-  (gen_random_uuid(),'bbbbbbbb-0001-0001-0001-bbbbbbbbbbbb','201','double',18000,36000,'Spacious double room with attached bath',false,ARRAY['WiFi','Hot Water','Wardrobe','AC']),
-  (gen_random_uuid(),'bbbbbbbb-0001-0001-0001-bbbbbbbbbbbb','301','deluxe',28000,56000,'Top-floor suite with rooftop access',true,ARRAY['WiFi','Hot Water','Wardrobe','AC','Mini Kitchen']),
-  (gen_random_uuid(),'bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb','A1','single',10000,20000,'Traditional single room, wooden decor',false,ARRAY['Hot Water','Courtyard View']),
-  (gen_random_uuid(),'bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb','A2','double',16000,32000,'Heritage double with courtyard view',true,ARRAY['Hot Water','Courtyard View','WiFi']),
-  (gen_random_uuid(),'bbbbbbbb-0003-0003-0003-bbbbbbbbbbbb','S01','single',22000,44000,'Self-contained studio, fully furnished',false,ARRAY['WiFi','Kitchen','AC','Hot Water']),
-  (gen_random_uuid(),'bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb','201','double',20000,40000,'Durbar-view double room',false,ARRAY['WiFi','Hot Water','Heritage View','AC']),
-  (gen_random_uuid(),'bbbbbbbb-0013-0013-0013-bbbbbbbbbbbb','S01','single',12000,24000,'Stupa-view single with meditation corner',false,ARRAY['WiFi','Stupa View','Hot Water','Meditation Room'])
+  ('cccccccc-0001-0001-0001-cccccccccccc','bbbbbbbb-0001-0001-0001-bbbbbbbbbbbb','101','single',12000,24000,'Bright single room with city view',false,ARRAY['WiFi','Hot Water','Wardrobe'],1,1,180,'furnished','shared',false,3,ARRAY['Water','WiFi'],ARRAY['No smoking','Quiet hours after 10 PM'],'Student or professional'),
+  ('cccccccc-0002-0002-0002-cccccccccccc','bbbbbbbb-0001-0001-0001-bbbbbbbbbbbb','201','double',18000,36000,'Spacious double room with attached bath',false,ARRAY['WiFi','Hot Water','Wardrobe','AC'],2,2,280,'fully furnished','western',true,3,ARRAY['Water','WiFi'],ARRAY['No smoking','No pets'],'Working professionals'),
+  ('cccccccc-0003-0003-0003-cccccccccccc','bbbbbbbb-0001-0001-0001-bbbbbbbbbbbb','301','deluxe',28000,56000,'Top-floor suite with rooftop access',true,ARRAY['WiFi','Hot Water','Wardrobe','AC','Mini Kitchen'],2,3,420,'fully furnished','western',true,6,ARRAY['Water','WiFi','Electricity'],ARRAY['No smoking'],'Professionals or couples'),
+  ('cccccccc-0004-0004-0004-cccccccccccc','bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb','A1','single',10000,20000,'Traditional single room, wooden decor',false,ARRAY['Hot Water','Courtyard View'],1,1,160,'semi-furnished','shared',false,3,ARRAY['Water'],ARRAY['Respect heritage property'],'Student'),
+  ('cccccccc-0005-0005-0005-cccccccccccc','bbbbbbbb-0002-0002-0002-bbbbbbbbbbbb','A2','double',16000,32000,'Heritage double with courtyard view',true,ARRAY['Hot Water','Courtyard View','WiFi'],2,2,260,'furnished','shared',false,3,ARRAY['Water','WiFi'],ARRAY['No loud music'],'Professionals'),
+  ('cccccccc-0006-0006-0006-cccccccccccc','bbbbbbbb-0003-0003-0003-bbbbbbbbbbbb','S01','single',22000,44000,'Self-contained studio, fully furnished',false,ARRAY['WiFi','Kitchen','AC','Hot Water'],2,4,380,'fully furnished','western',true,6,ARRAY['Water','WiFi'],ARRAY['No smoking','No parties'],'Working professionals'),
+  ('cccccccc-0007-0007-0007-cccccccccccc','bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb','201','double',20000,40000,'Durbar-view double room',false,ARRAY['WiFi','Hot Water','Heritage View','AC'],2,2,300,'furnished','western',true,3,ARRAY['Water','WiFi'],ARRAY['Quiet hours after 10 PM'],'Professionals or couples'),
+  ('cccccccc-0008-0008-0008-cccccccccccc','bbbbbbbb-0013-0013-0013-bbbbbbbbbbbb','S01','single',12000,24000,'Stupa-view single with meditation corner',false,ARRAY['WiFi','Stupa View','Hot Water','Meditation Room'],1,3,190,'furnished','shared',false,3,ARRAY['Water','WiFi'],ARRAY['No smoking','Maintain quiet atmosphere'],'Student or professional')
+ON CONFLICT DO NOTHING;
+
+-- Every room can have any number of images. Additional rows are also allowed;
+-- room_with_images flattens all arrays into one ordered gallery.
+INSERT INTO public.room_images (room_image_id, room_id, image_url) VALUES
+  ('dddddddd-0001-0001-0001-dddddddddddd','cccccccc-0001-0001-0001-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267d?w=1200','https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200','https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200']),
+  ('dddddddd-0002-0002-0002-dddddddddddd','cccccccc-0002-0002-0002-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1200','https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200']),
+  ('dddddddd-0003-0003-0003-dddddddddddd','cccccccc-0003-0003-0003-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200','https://images.unsplash.com/photo-1560185008-b033106af5c3?w=1200']),
+  ('dddddddd-0004-0004-0004-dddddddddddd','cccccccc-0004-0004-0004-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200','https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200']),
+  ('dddddddd-0005-0005-0005-dddddddddddd','cccccccc-0005-0005-0005-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=1200','https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200']),
+  ('dddddddd-0006-0006-0006-dddddddddddd','cccccccc-0006-0006-0006-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=1200','https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200']),
+  ('dddddddd-0007-0007-0007-dddddddddddd','cccccccc-0007-0007-0007-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=1200','https://images.unsplash.com/photo-1560448075-bb485b067938?w=1200']),
+  ('dddddddd-0008-0008-0008-dddddddddddd','cccccccc-0008-0008-0008-cccccccccccc',ARRAY['https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200','https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200'])
 ON CONFLICT DO NOTHING;
 
 -- 6. REVIEWS

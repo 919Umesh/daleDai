@@ -113,7 +113,7 @@ class RoomState extends ChangeNotifier {
       _property =
           await RoomApi.getPropertyDetails(propertyId, isRefresh: refresh);
       _errorMessage = null;
-      CustomLog.successLog(value: 'Loaded ${_property!.title} property');
+      CustomLog.successLog(value: 'Loaded room ${_room!.roomNumber}');
     } catch (e) {
       _errorMessage = e.toString();
       CustomLog.errorLog(value: 'Property load error: $_errorMessage');
@@ -223,10 +223,13 @@ class RoomState extends ChangeNotifier {
       }
 
       final formValues = formKey.currentState!.value;
-      final formatDate = (DateTime date) => date.toIso8601String().split('T')[0];
+      String formatDate(DateTime date) => date.toIso8601String().split('T')[0];
 
-      final int rent = (double.tryParse(formValues['monthly_rent'].toString()) ?? 0).toInt();
-      final int deposit = (double.tryParse(formValues['security_deposit'].toString()) ?? 0).toInt();
+      final int rent =
+          (double.tryParse(formValues['monthly_rent'].toString()) ?? 0).toInt();
+      final int deposit =
+          (double.tryParse(formValues['security_deposit'].toString()) ?? 0)
+              .toInt();
 
       final Map<String, dynamic> formData = {
         'booking_date': formatDate(formValues['booking_date'] as DateTime),
@@ -282,19 +285,22 @@ class RoomState extends ChangeNotifier {
             "checkin_date": formData['move_in_date'],
             "checkout_date": formData['move_out_date'] ?? 'N/A',
             "number_of_guests": formData['peoples'],
-            "total_amount": "${(formData['monthly_rent'] + formData['security_deposit'])}",
+            "total_amount":
+                "${(formData['monthly_rent'] + formData['security_deposit'])}",
             "property_name": _property?.title ?? "Property",
             "property_address": _property?.address ?? "Kathmandu",
             "property_phone": "+977-9841000000"
           },
         );
       } catch (emailErr) {
-        CustomLog.errorLog(value: 'Non-blocking email notification info: $emailErr');
+        CustomLog.errorLog(
+            value: 'Non-blocking email notification info: $emailErr');
       }
 
       if (formData['payment_method'] == 'esewa') {
         await SharedPrefService.setValue<String>(PrefKey.bookingId, bookingId);
-        final int totalAmount = (formData['monthly_rent'] + formData['security_deposit']);
+        final int totalAmount =
+            (formData['monthly_rent'] + formData['security_deposit']);
 
         final EsewaPaymentModel paymentDetails = EsewaPaymentModel(
           productId: bookingId,

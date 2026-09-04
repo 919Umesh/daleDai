@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-Color primaryColor = Colors.green.shade400;
+const Color primaryColor = Color(0xFF29950B);
 MaterialColor primarySwatch = Colors.green;
 
-Color textFormFieldColor = primaryColor.withOpacity(0.1);
+Color textFormFieldColor = primaryColor.withValues(alpha: 0.1);
 
 Color hintColor = Colors.black45;
 Color borderColor = Colors.grey.shade200;

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:omspos/screen/profile/api/profile_api.dart';
 import 'package:omspos/screen/profile/model/user_model.dart';
 import 'package:omspos/services/router/router_name.dart';
+import 'package:omspos/services/google/google_service.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import 'package:omspos/utils/connection_status.dart';
@@ -95,7 +96,20 @@ class ProfileState extends ChangeNotifier {
 
   Future<void> logout() async {
     try {
-      await SharedPrefService.clearAll();
+      try {
+        await SignInService().signOut();
+      } catch (e) {
+        // Local app data must still be cleared if a provider sign-out fails.
+        CustomLog.errorLog(value: 'Provider logout error: $e');
+      }
+      await Future.wait([
+        SharedPrefService.remove(PrefKey.isLogin),
+        SharedPrefService.remove(PrefKey.userId),
+        SharedPrefService.remove(PrefKey.landLordId),
+        SharedPrefService.remove(PrefKey.propertyID),
+        SharedPrefService.remove(PrefKey.bookingId),
+        SharedPrefService.remove(PrefKey.accountRole),
+      ]);
 
       if (_context != null && _context!.mounted) {
         GoRouter.of(_context!).go(loginPath);

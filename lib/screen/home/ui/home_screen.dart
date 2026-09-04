@@ -105,27 +105,34 @@ class _HomeScreenState extends State<HomeScreen> {
                         _SectionHeader(
                           title: context.translate('best_destination'),
                           onViewAll: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => PropertiesScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => PropertiesScreen()),
                           ),
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
                           height: 210,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: state.areas.length,
-                            itemBuilder: (context, index) {
-                              final area = state.areas[index];
-                              return GestureDetector(
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => PropertiesScreen(areaId: area.areaId),
-                                  ),
+                          child: state.areas.isEmpty
+                              ? const _EmptySection(
+                                  icon: Icons.location_off_outlined,
+                                  message: 'No destinations available',
+                                )
+                              : ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: state.areas.length,
+                                  itemBuilder: (context, index) {
+                                    final area = state.areas[index];
+                                    return GestureDetector(
+                                      onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => PropertiesScreen(
+                                              areaId: area.areaId),
+                                        ),
+                                      ),
+                                      child: PropertyModalWidget(area: area),
+                                    );
+                                  },
                                 ),
-                                child: PropertyModalWidget(area: area),
-                              );
-                            },
-                          ),
                         ),
                         const SizedBox(height: 20),
 
@@ -133,39 +140,50 @@ class _HomeScreenState extends State<HomeScreen> {
                         _SectionHeader(
                           title: context.translate('recommended_destination'),
                           onViewAll: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => PropertiesScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => PropertiesScreen()),
                           ),
                         ),
                         const SizedBox(height: 12),
 
                         // Property cards
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: state.properties.length,
-                          itemBuilder: (context, index) {
-                            final property = state.properties[index];
-                            return GestureDetector(
-                              onTap: () async {
-                                try {
-                                  await SharedPrefService.setValue<String>(
-                                      PrefKey.landLordId, property.landlordId);
-                                  await SharedPrefService.setValue<String>(
-                                      PrefKey.propertyID, property.propertyId);
-                                  if (!context.mounted) return;
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (_) => RoomScreen(
-                                      propertyId: property.propertyId.toString(),
-                                    ),
-                                  ));
-                                } catch (e) {
-                                  debugPrint('Navigation error: $e');
-                                }
-                              },
-                              child: ResortCard(property: property),
-                            );
-                          },
-                        ),
+                        if (state.properties.isEmpty)
+                          const _EmptySection(
+                            icon: Icons.home_work_outlined,
+                            message: 'No recommended properties available',
+                          )
+                        else
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: state.properties.length,
+                            itemBuilder: (context, index) {
+                              final property = state.properties[index];
+                              return GestureDetector(
+                                onTap: () async {
+                                  try {
+                                    await SharedPrefService.setValue<String>(
+                                        PrefKey.landLordId,
+                                        property.landlordId);
+                                    await SharedPrefService.setValue<String>(
+                                        PrefKey.propertyID,
+                                        property.propertyId);
+                                    if (!context.mounted) return;
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (_) => RoomScreen(
+                                        propertyId:
+                                            property.propertyId.toString(),
+                                      ),
+                                    ));
+                                  } catch (e) {
+                                    debugPrint('Navigation error: $e');
+                                  }
+                                },
+                                child: ResortCard(property: property),
+                              );
+                            },
+                          ),
 
                         // Extra bottom padding for floating nav bar
                         const SizedBox(height: 100),
@@ -200,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: ThemeState.primaryGreen.withOpacity(0.1),
+                  color: ThemeState.primaryGreen.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, size: 40, color: ThemeState.primaryGreen),
@@ -208,7 +226,9 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
               Text(title, style: theme.textTheme.titleLarge),
               const SizedBox(height: 8),
-              Text(subtitle, style: theme.textTheme.bodyMedium, textAlign: TextAlign.center),
+              Text(subtitle,
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: TextAlign.center),
               const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: onRetry,
@@ -218,6 +238,27 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _EmptySection extends StatelessWidget {
+  final IconData icon;
+  final String message;
+
+  const _EmptySection({required this.icon, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 36, color: Theme.of(context).colorScheme.outline),
+          const SizedBox(height: 8),
+          Text(message, style: Theme.of(context).textTheme.bodyMedium),
+        ],
       ),
     );
   }

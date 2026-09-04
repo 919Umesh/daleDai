@@ -6,7 +6,7 @@ import '../../constants/api_const.dart';
 import '../../utils/custom_log.dart';
 
 class APIProvider {
-  static getAPI({required String endPoint}) async {
+  static Future<dynamic> getAPI({required String endPoint}) async {
     try {
       String api = "dummyurl";
       CustomLog.warningLog(value: " API =>  $api");
@@ -29,7 +29,10 @@ class APIProvider {
     }
   }
 
-  static postAPI({required String endPoint, required String body}) async {
+  static Future<dynamic> postAPI({
+    required String endPoint,
+    required String body,
+  }) async {
     try {
       String api = "dummyurl";
 

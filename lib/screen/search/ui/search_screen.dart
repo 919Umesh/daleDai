@@ -18,27 +18,41 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   List<PropertyModel> _results = [];
   bool _loading = false;
+  bool _hasSearched = false;
+  String? _errorMessage;
   List<PropertyModel> _allProperties = [];
   Timer? _debounce;
 
   Future<void> _performSearch(String query) async {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) {
-      setState(() => _results = []);
+      if (mounted) {
+        setState(() {
+          _results = [];
+          _hasSearched = false;
+          _errorMessage = null;
+        });
+      }
       return;
     }
 
     // Load all properties once (use cache when available)
     if (_allProperties.isEmpty) {
-      setState(() => _loading = true);
+      setState(() {
+        _loading = true;
+        _errorMessage = null;
+      });
       try {
         _allProperties = await HomeApi.getAllProperties(false);
       } catch (e) {
         _allProperties = [];
+        _errorMessage = 'Could not load properties. Please try again.';
       } finally {
-        setState(() => _loading = false);
+        if (mounted) setState(() => _loading = false);
       }
     }
+
+    if (!mounted || _errorMessage != null) return;
 
     final filtered = _allProperties.where((p) {
       final title = p.title.toLowerCase();
@@ -47,7 +61,10 @@ class _SearchScreenState extends State<SearchScreen> {
       return title.contains(q) || address.contains(q) || city.contains(q);
     }).toList();
 
-    setState(() => _results = filtered);
+    setState(() {
+      _results = filtered;
+      _hasSearched = true;
+    });
   }
 
   @override
@@ -79,55 +96,89 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : _results.isEmpty
-              ? Center(child: Text(context.translate('no_results')))
-              : ListView.separated(
-                  itemCount: _results.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final p = _results[index];
-                    final imageUrl = p.images.isNotEmpty ? p.images[0] : null;
-                    return ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: imageUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: imageUrl,
-                                width: 56,
-                                height: 56,
-                                fit: BoxFit.cover,
-                                placeholder: (_, __) => Container(
-                                  width: 56,
-                                  height: 56,
-                                  color: Colors.grey.shade200,
-                                ),
-                                errorWidget: (_, __, ___) => Container(
-                                  width: 56,
-                                  height: 56,
-                                  color: Colors.grey.shade200,
-                                  child:
-                                      const Icon(Icons.home_outlined, size: 20),
-                                ),
-                              )
-                            : Container(
-                                width: 56,
-                                height: 56,
-                                color: Colors.grey.shade200,
-                                child:
-                                    const Icon(Icons.home_outlined, size: 20),
-                              ),
+          : _errorMessage != null
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.error_outline,
+                            size: 48,
+                            color: Theme.of(context).colorScheme.error),
+                        const SizedBox(height: 12),
+                        Text(_errorMessage!, textAlign: TextAlign.center),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            _allProperties = [];
+                            _performSearch(_controller.text);
+                          },
+                          child: const Text('Try again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : _results.isEmpty
+                  ? Center(
+                      child: Text(
+                        _hasSearched
+                            ? context.translate('no_results')
+                            : 'Search by property, address, or city',
+                        textAlign: TextAlign.center,
                       ),
-                      title: Text(p.title),
-                      subtitle: Text('${p.address}, ${p.city}'),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () async {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (_) => RoomScreen(propertyId: p.propertyId),
-                        ));
+                    )
+                  : ListView.separated(
+                      itemCount: _results.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final p = _results[index];
+                        final imageUrl =
+                            p.images.isNotEmpty ? p.images[0] : null;
+                        return ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: imageUrl != null
+                                ? CachedNetworkImage(
+                                    imageUrl: imageUrl,
+                                    width: 56,
+                                    height: 56,
+                                    fit: BoxFit.cover,
+                                    placeholder: (_, __) => Container(
+                                      width: 56,
+                                      height: 56,
+                                      color: Colors.grey.shade200,
+                                    ),
+                                    errorWidget: (_, __, ___) => Container(
+                                      width: 56,
+                                      height: 56,
+                                      color: Colors.grey.shade200,
+                                      child: const Icon(Icons.home_outlined,
+                                          size: 20),
+                                    ),
+                                  )
+                                : Container(
+                                    width: 56,
+                                    height: 56,
+                                    color: Colors.grey.shade200,
+                                    child: const Icon(Icons.home_outlined,
+                                        size: 20),
+                                  ),
+                          ),
+                          title: Text(p.title),
+                          subtitle: Text('${p.address}, ${p.city}'),
+                          trailing:
+                              const Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () async {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) =>
+                                  RoomScreen(propertyId: p.propertyId),
+                            ));
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    ),
     );
   }
 }

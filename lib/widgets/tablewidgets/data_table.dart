@@ -26,7 +26,7 @@ class TableDataWidget extends StatelessWidget {
           ),
           Container(
             height: 0.5,
-            color: Colors.black,
+            color: Theme.of(context).dividerColor,
           )
         ],
       ),

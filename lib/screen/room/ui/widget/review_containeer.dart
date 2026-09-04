@@ -1,11 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:omspos/screen/room/model/review_user.dart';
-import 'package:omspos/themes/fonts_style.dart';
 
 class ReviewContainer extends StatelessWidget {
   final List<ReviewUser> reviews;
-  ReviewContainer({super.key, required this.reviews});
+  const ReviewContainer({super.key, required this.reviews});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +14,7 @@ class ReviewContainer extends StatelessWidget {
         child: Center(
           child: Text(
             'No comments yet. Be the first to comment!',
-            style: reviewCommentTextStyle.copyWith(color: Colors.grey),
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
         ),
       );
@@ -41,7 +40,7 @@ class ReviewContainer extends StatelessWidget {
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -66,7 +65,15 @@ class ReviewContainer extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(review.name, style: reviewTitleTextStyle),
+                    Text(
+                      review.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
                     const SizedBox(height: 4),
                     // Star Rating
                     Row(
@@ -95,11 +102,12 @@ class ReviewContainer extends StatelessWidget {
                 ),
               ),
               // Date
-              Text(
-                _formatDate(review.createdAt.toString()),
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
+              Flexible(
+                child: Text(
+                  _formatDate(review.createdAt.toString()),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
             ],
@@ -109,7 +117,7 @@ class ReviewContainer extends StatelessWidget {
             // Comment
             Text(
               review.comment,
-              style: reviewCommentTextStyle,
+              style: Theme.of(context).textTheme.bodyMedium,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
@@ -120,7 +128,19 @@ class ReviewContainer extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () {},
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (dialogContext) => AlertDialog(
+                    title: Text(review.name),
+                    content: SingleChildScrollView(child: Text(review.comment)),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                ),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,

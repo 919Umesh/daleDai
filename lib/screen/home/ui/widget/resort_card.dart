@@ -17,7 +17,7 @@ class ResortCard extends StatelessWidget {
         color: theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.12),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -32,7 +32,8 @@ class ResortCard extends StatelessWidget {
             child: Stack(
               children: [
                 CachedNetworkImage(
-                  imageUrl: property.images.isNotEmpty ? property.images[0] : '',
+                  imageUrl:
+                      property.images.isNotEmpty ? property.images[0] : '',
                   height: 170,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -49,7 +50,8 @@ class ResortCard extends StatelessWidget {
                   errorWidget: (_, __, ___) => Container(
                     height: 170,
                     color: theme.cardColor,
-                    child: Icon(Icons.image_not_supported, color: Colors.white30, size: 40),
+                    child: Icon(Icons.image_not_supported,
+                        color: Colors.white30, size: 40),
                   ),
                 ),
                 // Gradient overlay
@@ -61,7 +63,7 @@ class ResortCard extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Colors.black.withOpacity(0.5),
+                          Colors.black.withValues(alpha: 0.5),
                         ],
                       ),
                     ),
@@ -72,7 +74,8 @@ class ResortCard extends StatelessWidget {
                   top: 10,
                   left: 10,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: theme.primaryColor,
                       borderRadius: BorderRadius.circular(20),
@@ -113,7 +116,8 @@ class ResortCard extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.location_on, size: 13, color: theme.primaryColor),
+                          Icon(Icons.location_on,
+                              size: 13, color: theme.primaryColor),
                           const SizedBox(width: 3),
                           Expanded(
                             child: Text(
@@ -132,9 +136,11 @@ class ResortCard extends StatelessWidget {
                           spacing: 6,
                           children: property.attributes.take(3).map((a) {
                             return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: theme.primaryColor.withOpacity(0.12),
+                                color:
+                                    theme.primaryColor.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(

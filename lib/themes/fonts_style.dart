@@ -15,7 +15,7 @@ TextStyle textFormTitleStyle = GoogleFonts.poppins(
 
 TextStyle titleListTextStyle = GoogleFonts.poppins(
   fontSize: 18.0,
-  color: Colors.white,
+  fontWeight: FontWeight.w600,
 );
 
 TextStyle whiteTextStyle = GoogleFonts.poppins(
@@ -37,12 +37,10 @@ TextStyle titleTextStyle = GoogleFonts.poppins(
 
 TextStyle subTitleTextStyle = GoogleFonts.poppins(
   fontSize: 12.0,
-  color: Colors.white,
 );
 
 TextStyle hintTextStyle = GoogleFonts.poppins(
   fontSize: 13.0,
-  color: hintColor,
 );
 
 TextStyle labelTextStyle = GoogleFonts.poppins(
@@ -55,7 +53,6 @@ TextStyle reviewTitleTextStyle = GoogleFonts.poppins(
   fontSize: 16.0,
 );
 TextStyle reviewCommentTextStyle = GoogleFonts.poppins(
-  color: Colors.white,
   fontSize: 14.0,
 );
 
@@ -65,6 +62,6 @@ TextStyle productTitleTextStyle = GoogleFonts.poppins(
 );
 
 TextStyle priceTitleTextStyle = GoogleFonts.poppins(
-  color: Colors.white,
   fontSize: 16.0,
+  fontWeight: FontWeight.w600,
 );

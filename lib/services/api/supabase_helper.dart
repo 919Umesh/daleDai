@@ -66,21 +66,25 @@ class SupabaseProvider {
         if (cachedData != null) {
           // check TTL
           try {
-            final cachedAtStr = cachedData['cachedAt'] as String? ?? cachedData['data']?['cachedAt'] as String?;
+            final cachedAtStr = cachedData['cachedAt'] as String? ??
+                cachedData['data']?['cachedAt'] as String?;
             if (cachedAtStr != null) {
               final cachedAt = DateTime.parse(cachedAtStr);
               final age = DateTime.now().difference(cachedAt);
               if (age <= ttl) {
-                CustomLog.warningLog(value: "Loaded from cache (fresh): $tableName");
+                CustomLog.warningLog(
+                    value: "Loaded from cache (fresh): $tableName");
                 return cachedData;
               } else {
-                CustomLog.warningLog(value: "Cache stale by ${age.inSeconds}s for $tableName");
+                CustomLog.warningLog(
+                    value: "Cache stale by ${age.inSeconds}s for $tableName");
                 // if offline, return stale cache as fallback
                 if (!isOnline) return cachedData;
                 // else continue to fetch fresh data
               }
             } else {
-              CustomLog.warningLog(value: "Loaded from cache (no timestamp): $tableName");
+              CustomLog.warningLog(
+                  value: "Loaded from cache (no timestamp): $tableName");
               return cachedData;
             }
           } catch (e) {
@@ -264,11 +268,13 @@ class SupabaseProvider {
     required String email,
     required String password,
     String? name,
+    String userType = 'tenant',
   }) async {
     try {
       final response = await _client.auth.signUp(
         email: email,
         password: password,
+        data: {'name': name, 'user_type': userType},
       );
       if (response.user == null) throw Exception('No user returned');
 
@@ -280,7 +286,7 @@ class SupabaseProvider {
           'user_id': user.id,
           'email': user.email ?? email,
           'name': userName,
-          'user_type': 'tenant',
+          'user_type': userType,
           'is_verified': true,
         });
       } catch (e) {
@@ -307,7 +313,6 @@ class SupabaseProvider {
     }
   }
 
-
   /// ========== GOOGLE SIGN IN HELPERS ==========
   static Future<Map<String, dynamic>> signWithGoogle() async {
     try {
@@ -321,10 +326,26 @@ class SupabaseProvider {
         };
       }
 
+      final createdAt = DateTime.tryParse(user.createdAt);
+      final lastSignInAt = DateTime.tryParse(user.lastSignInAt ?? '');
+      // Supabase sets both timestamps together for the first OAuth session.
+      // Comparing them avoids treating an existing user who signs in again as
+      // a new profile merely because the account was created recently.
+      final isNewUser = createdAt != null &&
+          lastSignInAt != null &&
+          lastSignInAt.difference(createdAt).abs() < const Duration(seconds: 5);
+      final profile = await _client
+          .from('users')
+          .select('user_type')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
       return {
         'error': false,
         'userId': user.id,
         'email': user.email,
+        'isNewUser': isNewUser,
+        'userType': profile?['user_type']?.toString() ?? 'tenant',
         'message': 'Google login successful',
       };
     } catch (e) {

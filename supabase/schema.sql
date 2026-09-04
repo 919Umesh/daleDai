@@ -163,6 +163,17 @@ CREATE TABLE IF NOT EXISTS public.rooms (
   updated_at timestamp with time zone NULL DEFAULT now(),
   attributes text[] NULL,
   description text NOT NULL DEFAULT 'Description Empty',
+  max_occupants integer NOT NULL DEFAULT 1,
+  floor_number integer NULL,
+  area_sqft integer NULL,
+  furnishing_status text NULL,
+  bathroom_type text NULL,
+  has_attached_bathroom boolean NOT NULL DEFAULT false,
+  available_from date NULL,
+  minimum_stay_months integer NOT NULL DEFAULT 1,
+  utilities_included text[] NOT NULL DEFAULT '{}',
+  house_rules text[] NOT NULL DEFAULT '{}',
+  preferred_tenant text NULL,
   CONSTRAINT rooms_pkey PRIMARY KEY (room_id),
   CONSTRAINT rooms_property_id_fkey FOREIGN KEY (property_id) REFERENCES public.properties(property_id) ON DELETE CASCADE
 );
@@ -171,6 +182,17 @@ ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS attributes text[] NULL;
 ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS description text NOT NULL DEFAULT 'Description Empty';
 ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS is_occupied boolean NOT NULL DEFAULT false;
 ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS updated_at timestamp with time zone NULL DEFAULT now();
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS max_occupants integer NOT NULL DEFAULT 1;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS floor_number integer NULL;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS area_sqft integer NULL;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS furnishing_status text NULL;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS bathroom_type text NULL;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS has_attached_bathroom boolean NOT NULL DEFAULT false;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS available_from date NULL;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS minimum_stay_months integer NOT NULL DEFAULT 1;
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS utilities_included text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS house_rules text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.rooms ADD COLUMN IF NOT EXISTS preferred_tenant text NULL;
 
 
 -- F. Room Images Table
@@ -330,11 +352,19 @@ DROP VIEW IF EXISTS public.room_with_images CASCADE;
 CREATE OR REPLACE VIEW public.room_with_images AS
 SELECT 
     r.*,
-    COALESCE(i.image_url, ARRAY[]::text[]) AS images
-FROM 
-    public.rooms r
-LEFT JOIN 
-    public.room_images i ON r.room_id = i.room_id;
+    COALESCE(
+      (
+        SELECT array_agg(image.url ORDER BY ri.created_at, image.ordinality)
+        FROM public.room_images ri
+        CROSS JOIN LATERAL unnest(ri.image_url)
+          WITH ORDINALITY AS image(url, ordinality)
+        WHERE ri.room_id = r.room_id
+          AND image.url IS NOT NULL
+          AND btrim(image.url) <> ''
+      ),
+      ARRAY[]::text[]
+    ) AS images
+FROM public.rooms r;
 
 -- View 4: reviews_user
 DROP VIEW IF EXISTS public.reviews_user CASCADE;

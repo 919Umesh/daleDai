@@ -15,7 +15,10 @@ class TitleValueWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: ContainerDecoration.decoration(),
+      decoration: ContainerDecoration.decoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        bColor: Theme.of(context).dividerColor,
+      ),
       margin: const EdgeInsets.symmetric(vertical: 3.0),
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(children: [
@@ -48,7 +51,10 @@ class PDCTitleValueWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: ContainerDecoration.decoration(bColor: Colors.white),
+      decoration: ContainerDecoration.decoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
+        bColor: Theme.of(context).dividerColor,
+      ),
       margin: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
       padding: const EdgeInsets.symmetric(vertical: 3.0),
       child: Row(children: [

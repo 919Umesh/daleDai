@@ -76,12 +76,12 @@ class ConfirmationWidget extends StatelessWidget {
           ),
           if (hideButton == false)
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(10.0),
                   bottomRight: Radius.circular(10.0),
                 ),
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10.0),

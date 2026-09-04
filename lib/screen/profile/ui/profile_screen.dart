@@ -45,7 +45,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) return;
 
     final nameController = TextEditingController(text: user.name);
-    final phoneController = TextEditingController(text: user.phone == 'N/A' ? '' : user.phone);
+    final phoneController =
+        TextEditingController(text: user.phone == 'N/A' ? '' : user.phone);
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -200,9 +201,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (state.errorMessage != null) {
           return Scaffold(
             body: Center(
-              child: Text(
-                state.errorMessage!,
-                style: const TextStyle(color: Colors.red, fontSize: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.error_outline,
+                        size: 48, color: Theme.of(context).colorScheme.error),
+                    const SizedBox(height: 12),
+                    Text(state.errorMessage!, textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: state.refreshProfile,
+                      child: const Text('Try again'),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -236,16 +250,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Center(
                         child: Column(
                           children: [
-                            user.profileImage != null && user.profileImage!.isNotEmpty
+                            user.profileImage != null &&
+                                    user.profileImage!.isNotEmpty
                                 ? CircleAvatar(
                                     radius: 50,
-                                    backgroundImage: NetworkImage(user.profileImage!),
+                                    backgroundImage:
+                                        NetworkImage(user.profileImage!),
                                   )
                                 : CircleAvatar(
                                     radius: 50,
-                                    backgroundColor: Theme.of(context).primaryColor,
+                                    backgroundColor:
+                                        Theme.of(context).primaryColor,
                                     child: Text(
-                                      user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
+                                      user.name.isNotEmpty
+                                          ? user.name[0].toUpperCase()
+                                          : 'U',
                                       style: const TextStyle(
                                         fontSize: 36,
                                         fontWeight: FontWeight.bold,
@@ -256,14 +275,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(height: 10),
                             Text(
                               user.name,
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               user.email,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     color: Colors.grey,
                                   ),
                             ),
@@ -273,7 +298,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               icon: const Icon(Icons.edit, size: 16),
                               label: const Text('Edit Profile'),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 6),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(20),
                                 ),
@@ -291,7 +317,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     'Account Information',
@@ -301,7 +328,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: () => _showEditProfileDialog(state),
+                                    onPressed: () =>
+                                        _showEditProfileDialog(state),
                                     child: const Text('Edit'),
                                   ),
                                 ],
@@ -330,70 +358,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 8),
                       Card(
                         margin: const EdgeInsets.only(bottom: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.light_mode,
-                                      color: Theme.of(context).primaryColor),
-                                  const SizedBox(width: 12),
-                                  const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Theme',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      Text(
-                                        'Switch between light and dark mode',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              ThemeToggle(),
-                            ],
-                          ),
+                        child: const ListTile(
+                          leading: Icon(Icons.dark_mode_outlined),
+                          title: Text('Theme'),
+                          subtitle: Text('Switch between light and dark mode'),
+                          trailing: ThemeToggle(),
                         ),
                       ),
                       Card(
                         margin: const EdgeInsets.only(bottom: 8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.language,
-                                      color: Theme.of(context).primaryColor),
-                                  const SizedBox(width: 12),
-                                  const Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Language',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      Text(
-                                        'Change app language',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              ChangeLanguage(),
-                            ],
-                          ),
+                        child: const ListTile(
+                          leading: Icon(Icons.language),
+                          title: Text('Language'),
+                          subtitle: Text('Change app language'),
+                          trailing: ChangeLanguage(),
                         ),
                       ),
                       Card(

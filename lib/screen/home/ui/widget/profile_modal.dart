@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:omspos/config/env_config.dart';
@@ -31,7 +30,7 @@ class ProfileModalWidget extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: ThemeState.primaryGreen.withOpacity(0.08),
+            color: ThemeState.primaryGreen.withValues(alpha: 0.08),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -99,7 +98,7 @@ class ProfileModalWidget extends StatelessWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: ThemeState.primaryGreen.withOpacity(0.12),
+                    color: ThemeState.primaryGreen.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.notifications_outlined,
@@ -119,11 +118,11 @@ class ProfileModalWidget extends StatelessWidget {
                   color: isDark ? ThemeState.surfaceDark2 : Colors.white,
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: ThemeState.primaryGreen.withOpacity(0.2),
+                    color: ThemeState.primaryGreen.withValues(alpha: 0.2),
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 8,
                     ),
                   ],
@@ -143,7 +142,6 @@ class ProfileModalWidget extends StatelessWidget {
                               ?.copyWith(color: Colors.grey.shade600),
                         ),
                       ),
-                     
                     ],
                   ),
                 ),

@@ -32,11 +32,11 @@ class UserModel {
       profileImage: json['profile_image'] as String?,
       isVerified: json['is_verified'] as bool? ?? false,
       documentUrl: json['document_url'] as String?,
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at'] as String) 
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
           : null,
-      updatedAt: json['updated_at'] != null 
-          ? DateTime.parse(json['updated_at'] as String) 
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
           : null,
       userType: json['user_type'] as String? ?? 'tenant',
     );

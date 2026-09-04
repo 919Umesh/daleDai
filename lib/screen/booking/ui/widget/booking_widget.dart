@@ -29,7 +29,8 @@ class BookingWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color:
+                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -73,6 +74,7 @@ class BookingWidget extends StatelessWidget {
                   child: Text(
                     booking.status.toUpperCase(),
                     style: const TextStyle(
+                      color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
@@ -106,8 +108,8 @@ class BookingWidget extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white.withOpacity(0.06)
-                    : Colors.grey.withOpacity(0.1),
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -148,7 +150,7 @@ class BookingWidget extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                if (booking.profession.isNotEmpty)
+                if (booking.peoples > 0)
                   _buildChip(
                     '${booking.peoples} ${booking.peoples == 1 ? context.translate('person') : context.translate('people')}',
                     Icons.people,
@@ -238,26 +240,31 @@ class BookingWidget extends StatelessWidget {
     required String value,
     required BuildContext context,
   }) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 11,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 13,
-            color: Theme.of(context).primaryColor,
-            fontWeight: FontWeight.bold,
+          const SizedBox(height: 4),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -315,5 +322,4 @@ class BookingWidget extends StatelessWidget {
         return Icons.home;
     }
   }
-
 }

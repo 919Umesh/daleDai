@@ -9,6 +9,7 @@ class IndexState extends ChangeNotifier {
     Icons.home,
     Icons.list_alt,
     Icons.favorite,
+    Icons.real_estate_agent,
     Icons.person,
   ];
 
@@ -23,6 +24,13 @@ class IndexState extends ChangeNotifier {
     if (!_isBottomBarVisible) {
       _isBottomBarVisible = true;
     }
+    notifyListeners();
+  }
+
+  void reset() {
+    _currentIndex = 0;
+    _fabIcon = _icons.first;
+    _isBottomBarVisible = true;
     notifyListeners();
   }
 

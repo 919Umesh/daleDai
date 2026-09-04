@@ -49,3 +49,4 @@ app.*.map.json
 !.env.example
 /android/key.properties
 /android/app/release-key.jks
+supabase/.temp/

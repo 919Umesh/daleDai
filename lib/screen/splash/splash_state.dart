@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:omspos/services/location/location_service.dart';
 import 'package:omspos/services/sharedPreference/preference_keys.dart';
 import 'package:omspos/services/sharedPreference/sharedPref_service.dart';
 import '../../services/router/router_name.dart';
@@ -24,7 +23,6 @@ class SplashState with ChangeNotifier {
   Future<void> _startTimer() async {
     _timer = Timer(const Duration(seconds: 2), () async {
       if (_isDisposed) return;
-      await LocationService.initialize();
       await _navigateUser();
     });
   }
@@ -39,12 +37,12 @@ class SplashState with ChangeNotifier {
           ) ??
           false;
 
-      if (!_isDisposed) {
+      if (!_isDisposed && _context.mounted) {
         _context.go(isLoggedIn ? indexScreenPath : loginPath);
       }
     } catch (e) {
       debugPrint('Error during navigation: $e');
-      if (!_isDisposed) {
+      if (!_isDisposed && _context.mounted) {
         _context.go(loginPath);
       }
     }

@@ -23,18 +23,19 @@ class _ImageCarouselState extends State<ImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     if (widget.images.isEmpty) {
       return Container(
         height: widget.height,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(widget.borderRadius),
-          color: Colors.grey[300],
+          color: scheme.surfaceContainerHighest,
         ),
-        child: const Center(
+        child: Center(
           child: Icon(
             Icons.image_not_supported_outlined,
             size: 50,
-            color: Colors.grey,
+            color: scheme.onSurfaceVariant,
           ),
         ),
       );
@@ -61,17 +62,17 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     fit: BoxFit.cover,
                     width: double.infinity,
                     placeholder: (context, url) => Container(
-                      color: Colors.grey[300],
+                      color: scheme.surfaceContainerHighest,
                       child: const Center(
                         child: CircularProgressIndicator(),
                       ),
                     ),
                     errorWidget: (context, url, error) => Container(
-                      color: Colors.grey[300],
-                      child: const Center(
+                      color: scheme.surfaceContainerHighest,
+                      child: Center(
                         child: Icon(
                           Icons.error_outline,
-                          color: Colors.grey,
+                          color: scheme.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -93,8 +94,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: _currentPage == index
-                    ? Colors.green.shade600
-                    : Colors.grey.shade400,
+                    ? scheme.primary
+                    : scheme.outlineVariant,
               ),
             ),
           ),
@@ -102,11 +103,10 @@ class _ImageCarouselState extends State<ImageCarousel> {
         const SizedBox(height: 4),
         Text(
           '${_currentPage + 1}/${widget.images.length}',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-            fontWeight: FontWeight.w500,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
         ),
       ],
     );

@@ -17,15 +17,11 @@ class _BookingListScreenState extends State<BookingListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final List<String> _tabs = ["Confirmed", "Pending", "Completed"];
-  late ScrollController _scrollController;
-  double _lastScrollOffset = 0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
-    _scrollController = ScrollController();
-    _scrollController.addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<BookingState>(context, listen: false).getContext = context;
     });
@@ -37,23 +33,9 @@ class _BookingListScreenState extends State<BookingListScreen>
     });
   }
 
-  void _scrollListener() {
-    final currentScrollOffset = _scrollController.offset;
-    final indexState = Provider.of<IndexState>(context, listen: false);
-    if (currentScrollOffset > _lastScrollOffset && currentScrollOffset > 100) {
-      indexState.hideBottomBar();
-    } else if (currentScrollOffset < _lastScrollOffset) {
-      indexState.showBottomBar();
-    }
-
-    _lastScrollOffset = currentScrollOffset;
-  }
-
   @override
   void dispose() {
     _tabController.dispose();
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -79,8 +61,7 @@ class _BookingListScreenState extends State<BookingListScreen>
           body: TabBarView(
             controller: _tabController,
             children: _tabs.map((tab) {
-              return BookingTab(
-                  status: tab, scrollController: _scrollController);
+              return BookingTab(status: tab);
             }).toList(),
           ),
         );
@@ -91,10 +72,8 @@ class _BookingListScreenState extends State<BookingListScreen>
 
 class BookingTab extends StatefulWidget {
   final String status;
-  final ScrollController scrollController;
 
-  const BookingTab(
-      {super.key, required this.status, required this.scrollController});
+  const BookingTab({super.key, required this.status});
 
   @override
   State<BookingTab> createState() => _BookingTabState();
@@ -102,9 +81,13 @@ class BookingTab extends StatefulWidget {
 
 class _BookingTabState extends State<BookingTab>
     with AutomaticKeepAliveClientMixin {
+  late final ScrollController _scrollController;
+  double _lastScrollOffset = 0;
+
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController()..addListener(_scrollListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = Provider.of<BookingState>(context, listen: false);
       // trigger load if we don't have cached data for this status
@@ -115,6 +98,25 @@ class _BookingTabState extends State<BookingTab>
     });
   }
 
+  void _scrollListener() {
+    final offset = _scrollController.offset;
+    final indexState = context.read<IndexState>();
+    if (offset > _lastScrollOffset && offset > 100) {
+      indexState.hideBottomBar();
+    } else if (offset < _lastScrollOffset) {
+      indexState.showBottomBar();
+    }
+    _lastScrollOffset = offset;
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_scrollListener)
+      ..dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -123,21 +125,19 @@ class _BookingTabState extends State<BookingTab>
     final bookings = state.getCachedBookings(key);
 
     if (!state.hasInternet) {
-      return Scaffold(
-          appBar: AppBar(
-            title: const Text('No Internet'),
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  AssetsList.noInternet,
-                  fit: BoxFit.contain,
-                ),
-              ],
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(AssetsList.noInternet, fit: BoxFit.contain),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => state.loadBookings(status: key),
+              child: const Text('Retry'),
             ),
-          ));
+          ],
+        ),
+      );
     }
 
     if (state.isLoading && bookings.isEmpty) {
@@ -148,15 +148,29 @@ class _BookingTabState extends State<BookingTab>
       return Center(child: Text(state.errorMessage!));
     }
 
-    if (bookings.isEmpty) return const Center(child: Text("No bookings found"));
+    if (bookings.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () => state.loadBookings(status: key, isRefresh: true),
+        child: ListView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [
+            SizedBox(height: 180),
+            Icon(Icons.event_busy_outlined, size: 48),
+            SizedBox(height: 12),
+            Center(child: Text('No bookings found')),
+          ],
+        ),
+      );
+    }
 
     return RefreshIndicator(
       onRefresh: () async {
         await state.loadBookings(status: key, isRefresh: true);
       },
       child: ListView.builder(
-        controller: widget.scrollController,
-        padding: const EdgeInsets.all(12),
+        controller: _scrollController,
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
         itemCount: bookings.length,
         itemBuilder: (context, index) {
           final booking = bookings[index];

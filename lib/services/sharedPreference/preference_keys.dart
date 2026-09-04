@@ -4,4 +4,7 @@ enum PrefKey {
   landLordId,
   propertyID,
   bookingId,
+  accountRole,
+  isDarkTheme,
+  languageCode,
 }

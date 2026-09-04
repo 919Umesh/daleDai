@@ -10,14 +10,15 @@ class GredientContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: reverseGredient == false
-              ? [Colors.white, primaryColor]
-              : [primaryColor, Colors.white],
+              ? [scheme.surface, primaryColor]
+              : [primaryColor, scheme.surface],
         ),
       ),
       child: child,

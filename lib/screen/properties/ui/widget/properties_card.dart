@@ -8,12 +8,13 @@ class PropertiesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final imageUrl = property.images.isNotEmpty ? property.images.first : '';
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).cardColor),
+          borderRadius: BorderRadius.circular(16), color: theme.cardColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -25,10 +26,21 @@ class PropertiesCard extends StatelessWidget {
                 topRight: Radius.circular(16),
               ),
               child: CachedNetworkImage(
-                imageUrl: property.images[0],
+                imageUrl: imageUrl,
                 height: 150,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  height: 150,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (_, __, ___) => Container(
+                  height: 150,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child:
+                      const Icon(Icons.image_not_supported_outlined, size: 40),
+                ),
               ),
             ),
           ),
@@ -43,8 +55,7 @@ class PropertiesCard extends StatelessWidget {
                     children: [
                       Text(
                         property.city,
-                        style: TextStyle(
-                          color: Colors.white,
+                        style: theme.textTheme.titleMedium?.copyWith(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -53,13 +64,14 @@ class PropertiesCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(Icons.location_on,
-                              size: 14, color: Colors.white70),
-                          SizedBox(width: 4),
-                          Text(
-                            property.address,
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13,
+                              size: 14, color: theme.colorScheme.primary),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              property.address,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodyMedium,
                             ),
                           ),
                         ],
@@ -68,8 +80,8 @@ class PropertiesCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF29950B), // highlight color
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
                   child: const Padding(

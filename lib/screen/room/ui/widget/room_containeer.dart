@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:omspos/config/env_config.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/services/language/translation_extension.dart';
-import 'package:omspos/themes/fonts_style.dart';
 
 class RoomContainer extends StatefulWidget {
   final PropertyModel? property;
@@ -18,6 +17,7 @@ class _RoomContainerState extends State<RoomContainer> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
@@ -27,7 +27,7 @@ class _RoomContainerState extends State<RoomContainer> {
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -39,7 +39,7 @@ class _RoomContainerState extends State<RoomContainer> {
           // Title
           Text(
             widget.property?.title ?? "No Title",
-            style: titleListTextStyle,
+            style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
 
@@ -49,7 +49,8 @@ class _RoomContainerState extends State<RoomContainer> {
                 widget.property?.description ?? "No description available";
             return LayoutBuilder(builder: (context, constraints) {
               final painter = TextPainter(
-                text: TextSpan(text: description, style: subTitleTextStyle),
+                text: TextSpan(
+                    text: description, style: theme.textTheme.bodyMedium),
                 maxLines: 4,
                 textDirection: Directionality.of(context),
               )..layout(maxWidth: constraints.maxWidth);
@@ -59,7 +60,7 @@ class _RoomContainerState extends State<RoomContainer> {
                 children: [
                   Text(
                     description,
-                    style: subTitleTextStyle,
+                    style: theme.textTheme.bodyMedium,
                     maxLines: _isExpanded ? null : 4,
                     overflow: _isExpanded
                         ? TextOverflow.visible
@@ -86,8 +87,8 @@ class _RoomContainerState extends State<RoomContainer> {
 
           // What we offer
           Text(
-             context.translate('what_we_offer'),
-            style: titleListTextStyle,
+            context.translate('what_we_offer'),
+            style: theme.textTheme.titleLarge,
           ),
           Wrap(
             spacing: 8,
@@ -95,12 +96,16 @@ class _RoomContainerState extends State<RoomContainer> {
             children: [
               for (var value in widget.property?.attributes ?? [])
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -118,7 +123,7 @@ class _RoomContainerState extends State<RoomContainer> {
           // Hosted By
           Text(
             context.translate('hosted_by'),
-            style: titleListTextStyle,
+            style: theme.textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
 
@@ -135,13 +140,13 @@ class _RoomContainerState extends State<RoomContainer> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text('Property host', style: theme.textTheme.titleMedium),
                   Text(
-                    'Umesh Shahi',
-                    style: titleListTextStyle,
-                  ),
-                  Text(
-                    'Kathmandu, Nepal',
-                    style: subTitleTextStyle,
+                    [widget.property?.city, widget.property?.state]
+                        .whereType<String>()
+                        .where((value) => value.isNotEmpty)
+                        .join(', '),
+                    style: theme.textTheme.bodySmall,
                   ),
                 ],
               ),

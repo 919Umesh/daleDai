@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ? 'Please fill in details to create an account'
                     : 'Please sign in to continue',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
               ),
               const SizedBox(height: 30),
@@ -64,11 +64,30 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         validator: (value) {
-                          if (isSignUp && (value == null || value.trim().isEmpty)) {
+                          if (isSignUp &&
+                              (value == null || value.trim().isEmpty)) {
                             return 'Please enter your name';
                           }
                           return null;
                         },
+                      ),
+                      const SizedBox(height: 16),
+                      SegmentedButton<String>(
+                        segments: const [
+                          ButtonSegment(
+                            value: 'tenant',
+                            icon: Icon(Icons.search),
+                            label: Text('Find a room'),
+                          ),
+                          ButtonSegment(
+                            value: 'landlord',
+                            icon: Icon(Icons.real_estate_agent_outlined),
+                            label: Text('Manage property'),
+                          ),
+                        ],
+                        selected: {state.accountType},
+                        onSelectionChanged: (value) =>
+                            state.setAccountType(value.first),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -128,7 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: state.isLoading
+                              ? null
+                              : () => state.sendPasswordReset(),
                           child: const Text('Forgot Password?'),
                         ),
                       ),
@@ -162,7 +183,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 }
                               },
                         child: state.isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
                             : Text(
                                 isSignUp ? 'Sign Up' : 'Sign In',
                                 style: const TextStyle(
@@ -175,18 +197,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        Expanded(child: Divider(color: Colors.grey.shade400)),
+                        const Expanded(child: Divider()),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             'OR',
                             style: TextStyle(
-                              color: Colors.grey.shade600,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        Expanded(child: Divider(color: Colors.grey.shade400)),
+                        const Expanded(child: Divider()),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -198,12 +222,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          side: BorderSide(color: Colors.grey.shade300),
                         ),
-                        icon: Image.network(
-                          'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/960px-Google_%22G%22_logo.svg.png',
-                          width: 20,
-                          height: 20,
+                        icon: const Text(
+                          'G',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF4285F4),
+                          ),
                         ),
                         label: const Text(
                           'Continue with Google',
@@ -219,14 +245,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           isSignUp
                               ? 'Already have an account?'
                               : "Don't have an account?",
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                         TextButton(
                           onPressed: () {

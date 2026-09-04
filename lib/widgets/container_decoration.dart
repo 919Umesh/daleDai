@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
-
-import '../themes/colors.dart';
-
 class ContainerDecoration {
-  static decoration({
+  static BoxDecoration decoration({
     double? height,
     double? width,
     Color? bColor,
@@ -12,8 +9,8 @@ class ContainerDecoration {
     BorderRadiusGeometry? borderRadius,
   }) {
     return BoxDecoration(
-      color: color ?? Colors.white,
-      border: Border.all(color: bColor ?? borderColor),
+      color: color,
+      border: bColor == null ? null : Border.all(color: bColor),
       borderRadius: borderRadius ?? BorderRadius.circular(5.0),
     );
   }

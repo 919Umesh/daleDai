@@ -17,7 +17,7 @@ class PropertyModalWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.18),
+            color: Colors.black.withValues(alpha: 0.18),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -45,7 +45,8 @@ class PropertyModalWidget extends StatelessWidget {
               ),
               errorWidget: (_, __, ___) => Container(
                 color: ThemeState.surfaceDark,
-                child: const Icon(Icons.landscape, color: Colors.white30, size: 40),
+                child: const Icon(Icons.landscape,
+                    color: Colors.white30, size: 40),
               ),
             ),
 
@@ -57,8 +58,8 @@ class PropertyModalWidget extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withOpacity(0.3),
-                    Colors.black.withOpacity(0.85),
+                    Colors.black.withValues(alpha: 0.3),
+                    Colors.black.withValues(alpha: 0.85),
                   ],
                   stops: const [0.2, 0.6, 1.0],
                 ),
@@ -81,7 +82,10 @@ class PropertyModalWidget extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       shadows: [
-                        Shadow(color: Colors.black54, blurRadius: 6, offset: Offset(1, 1)),
+                        Shadow(
+                            color: Colors.black54,
+                            blurRadius: 6,
+                            offset: Offset(1, 1)),
                       ],
                     ),
                   ),
@@ -95,7 +99,8 @@ class PropertyModalWidget extends StatelessWidget {
                           color: ThemeState.primaryGreen,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 12),
+                        child: const Icon(Icons.arrow_forward_rounded,
+                            color: Colors.white, size: 12),
                       ),
                     ],
                   ),

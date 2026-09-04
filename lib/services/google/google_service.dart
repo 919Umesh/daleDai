@@ -1,28 +1,62 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:omspos/config/env_config.dart';
+import 'package:omspos/utils/custom_log.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignInService {
   final SupabaseClient _client = Supabase.instance.client;
+  static Future<void>? _googleInitialization;
+
+  Future<void> _initializeGoogleSignIn(String webClientId) {
+    if (webClientId.isEmpty) {
+      throw const AuthException('Google WEB_CLIENT_ID is not configured.');
+    }
+
+    return _googleInitialization ??= GoogleSignIn.instance.initialize(
+      serverClientId: webClientId,
+    );
+  }
+
+  Future<GoogleSignInAccount> _authenticate() async {
+    final googleSignIn = GoogleSignIn.instance;
+
+    try {
+      // This method is called from the login button, so start an explicit
+      // authentication flow instead of trying to restore a cached account.
+      return await googleSignIn.authenticate();
+    } on GoogleSignInException catch (error) {
+      final isAccountReauthFailure =
+          error.code == GoogleSignInExceptionCode.canceled &&
+              (error.description ?? '').toLowerCase().contains(
+                    'account reauth failed',
+                  );
+
+      if (!isAccountReauthFailure) rethrow;
+
+      // Credential Manager can retain a stale account selection. Clear the
+      // local Google session (without revoking access) and retry once.
+      await googleSignIn.signOut();
+      return googleSignIn.authenticate();
+    }
+  }
 
   Future<AuthResponse> googleSignIn() async {
     final webClientId = EnvConfig.webClientId;
+    const scopes = ['email', 'profile'];
 
-    final scopes = ['email', 'profile'];
-    final googleSignIn = GoogleSignIn.instance;
-    
-
-    await googleSignIn.initialize(
-      serverClientId: webClientId,
-    );
-    final googleUser = await googleSignIn.attemptLightweightAuthentication()
-        ?? await googleSignIn.authenticate();
-    final authorization = await googleUser.authorizationClient.authorizationForScopes(scopes) ?? await googleUser.authorizationClient.authorizeScopes(scopes);
+    await _initializeGoogleSignIn(webClientId);
+    final googleUser = await _authenticate();
+    final authorization =
+        await googleUser.authorizationClient.authorizationForScopes(scopes) ??
+            await googleUser.authorizationClient.authorizeScopes(scopes);
     final idToken = googleUser.authentication.idToken;
     final accessToken = authorization.accessToken;
 
     if (idToken == null) {
       throw AuthException('Missing Google ID Token.');
+    }
+    if (accessToken.isEmpty) {
+      throw const AuthException('Missing Google Access Token.');
     }
 
     final response = await _client.auth.signInWithIdToken(
@@ -41,7 +75,8 @@ class SignInService {
             .maybeSingle();
 
         if (existingUser == null) {
-          final displayName = googleUser.displayName ?? user.email?.split('@').first ?? 'User';
+          final displayName =
+              googleUser.displayName ?? user.email?.split('@').first ?? 'User';
           await _client.from('users').insert({
             'user_id': user.id,
             'email': user.email ?? googleUser.email,
@@ -53,7 +88,9 @@ class SignInService {
         }
       } catch (e) {
         // Log error inserting user record, but allow auth response to pass
-        print('Error syncing google user to public.users table: $e');
+        CustomLog.errorLog(
+          value: 'Error syncing google user to public.users table: $e',
+        );
       }
     }
 
@@ -62,12 +99,16 @@ class SignInService {
 
   Future<void> signOut() async {
     final googleSignIn = GoogleSignIn.instance;
-    await googleSignIn.disconnect();
-    await _client.auth.signOut();
+    await _initializeGoogleSignIn(EnvConfig.webClientId);
+    // signOut clears the local session. disconnect would also revoke the
+    // user's authorization and force an unnecessary reauthorization later.
+    try {
+      await googleSignIn.signOut();
+    } finally {
+      await _client.auth.signOut();
+    }
   }
 }
-
-
 
 // onPressed: () async {
 //             setState(() => _loading = true);
@@ -83,7 +124,6 @@ class SignInService {
 //               setState(() => _loading = false);
 //             }
 //           },
-
 
 //This is the google auth sign in method
 // import 'package:google_sign_in/google_sign_in.dart';
@@ -162,6 +202,3 @@ class SignInService {
 //     await _client.auth.signOut();
 //   }
 // }
-
-
-

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../themes/colors.dart';
 import '../themes/fonts_style.dart';
 
-
 class TextFormDecoration {
   static decoration({
     required String hintText,
@@ -34,9 +33,6 @@ class TextFormDecoration {
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5.0),
           borderSide: BorderSide(color: primaryColor)),
-      enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5.0),
-          borderSide: const BorderSide(color: Colors.white)),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
     );
   }

@@ -52,28 +52,42 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
             ));
       }
       if (state.isLoading) {
-        return Center(child: Lottie.asset(AssetsList.davsan));
+        return Scaffold(
+          appBar: AppBar(title: const Text('Properties')),
+          body: Center(child: Lottie.asset(AssetsList.davsan)),
+        );
       }
       if (state.errorMessage != null) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error, size: 64),
-              Text('Error: ${state.errorMessage}'),
-              ElevatedButton(
-                onPressed: state.retry,
-                child: Text('Try Again'),
+        return Scaffold(
+          appBar: AppBar(title: const Text('Properties')),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline,
+                      size: 64, color: Theme.of(context).colorScheme.error),
+                  const SizedBox(height: 12),
+                  Text(state.errorMessage!, textAlign: TextAlign.center),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: state.retry,
+                    child: const Text('Try Again'),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       }
       return Scaffold(
         body: RefreshIndicator(
           onRefresh: () async {
-            if (state.currentAreaId != null && state.currentAreaId!.isNotEmpty) {
-              await state.loadPropertiesByArea(state.currentAreaId!, refresh: true);
+            if (state.currentAreaId != null &&
+                state.currentAreaId!.isNotEmpty) {
+              await state.loadPropertiesByArea(state.currentAreaId!,
+                  refresh: true);
             } else {
               await state.loadAllProperties(refresh: true);
             }
@@ -85,60 +99,46 @@ class _PropertiesScreenState extends State<PropertiesScreen> {
                 floating: false,
                 snap: false,
                 automaticallyImplyLeading: true,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  //test commit 
-                ),
-                title: Text(
+                title: const Text(
                   'Properties',
                   style: TextStyle(
-                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SliverPadding(
-                padding: const EdgeInsets.only(left: 8, right: 8),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics:
-                          const NeverScrollableScrollPhysics(), // so it scrolls with parent CustomScrollView
-                      itemCount: state.properties.length,
-                      itemBuilder: (context, index) {
-                        final property = state.properties[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 5),
-                          child: InkWell(
-                            onTap: () async {
-                              try {
-                                await SharedPrefService.setValue<String>(
-                                    PrefKey.landLordId, property.landlordId);
-                                await SharedPrefService.setValue<String>(
-                                    PrefKey.propertyID, property.propertyId);
-                                if (!context.mounted) return;
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => RoomScreen(
-                                        propertyId:
-                                            property.propertyId.toString())));
-                              } catch (e) {
-                                debugPrint('Failed to save landlordId: $e');
-                              }
-                            },
-                            child: PropertiesCard(
-                              property: property,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ]),
+              if (state.properties.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Center(child: Text('No properties found')),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  sliver: SliverList.builder(
+                    itemCount: state.properties.length,
+                    itemBuilder: (context, index) {
+                      final property = state.properties[index];
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () async {
+                          try {
+                            await SharedPrefService.setValue<String>(
+                                PrefKey.landLordId, property.landlordId);
+                            await SharedPrefService.setValue<String>(
+                                PrefKey.propertyID, property.propertyId);
+                            if (!context.mounted) return;
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => RoomScreen(
+                                    propertyId: property.propertyId)));
+                          } catch (e) {
+                            debugPrint('Failed to open property: $e');
+                          }
+                        },
+                        child: PropertiesCard(property: property),
+                      );
+                    },
+                  ),
                 ),
-              ),
             ],
           ),
         ),

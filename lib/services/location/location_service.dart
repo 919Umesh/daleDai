@@ -57,7 +57,9 @@ class LocationService {
       }
 
       _currentPosition = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.best,
+        ),
       );
       CustomLog.actionLog(
           value: "Fetched new location: ${_currentPosition!.toJson()}");

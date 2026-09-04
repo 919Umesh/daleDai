@@ -17,11 +17,13 @@ class AuthAPI {
     required String email,
     required String password,
     String? name,
+    String userType = 'tenant',
   }) async {
     final response = await SupabaseProvider.signUpWithPassword(
       email: email,
       password: password,
       name: name,
+      userType: userType,
     );
     return AuthModel.fromJson(response);
   }

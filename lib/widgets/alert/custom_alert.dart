@@ -70,12 +70,12 @@ class CustomAlertWidget extends StatelessWidget {
             ),
           ),
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(10.0),
                 bottomRight: Radius.circular(10.0),
               ),
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
             ),
             child: child,
           ),

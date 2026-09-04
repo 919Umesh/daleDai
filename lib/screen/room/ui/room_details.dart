@@ -30,50 +30,72 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
       builder: (context, state, child) {
         if (!state.hanInternet) {
           return Scaffold(
-              appBar: AppBar(
-                title: Text('No Internet'),
-              ),
-              body: Center(
+            appBar: AppBar(title: const Text('Room details')),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset(
                       AssetsList.noInternet,
                       fit: BoxFit.contain,
                     ),
+                    const SizedBox(height: 16),
+                    const Text('No internet connection'),
+                    const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: state.retry,
-                      child: Text('Retry'),
+                      onPressed: () =>
+                          state.loadRoomDetails(widget.roomID, refresh: true),
+                      child: const Text('Retry'),
                     ),
                   ],
                 ),
-              ));
+              ),
+            ),
+          );
         }
         if (state.isLoading) {
-          return Center(child: Lottie.asset(AssetsList.davsan));
+          return Scaffold(
+            appBar: AppBar(title: const Text('Room details')),
+            body: Center(child: Lottie.asset(AssetsList.davsan)),
+          );
         }
         if (state.errorMessage != null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error, size: 64),
-                Text('Error: ${state.errorMessage}'),
-                ElevatedButton(
-                  onPressed: state.retry,
-                  child: Text('Try Again'),
-                ),
-              ],
+          return Scaffold(
+            appBar: AppBar(title: const Text('Room details')),
+            body: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      state.errorMessage!,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () =>
+                        state.loadRoomDetails(widget.roomID, refresh: true),
+                    child: const Text('Try again'),
+                  ),
+                ],
+              ),
             ),
           );
         }
         if (state.room == null) {
           return Scaffold(
             appBar: AppBar(
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
               title: const Text('Loading...'),
             ),
             body: const Center(child: CircularProgressIndicator()),
@@ -82,43 +104,39 @@ class _RoomDetailScreenState extends State<RoomDetailScreen> {
 
         return SafeArea(
           child: Scaffold(
-            body: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  floating: false,
-                  snap: false,
-                  automaticallyImplyLeading: true,
-                  leading: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  title: Text(
-                    state.room!.roomNumber,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+            body: RefreshIndicator(
+              onRefresh: () =>
+                  state.loadRoomDetails(widget.roomID, refresh: true),
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    title: Text(
+                      'Room ${state.room!.roomNumber}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
-                ),
-                SliverPadding(
-                  padding: const EdgeInsets.only(left: 8, right: 8),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      ImageCarousel(
-                        images: state.room!.images,
-                        height: 350,
-                        borderRadius: 12,
-                      ),
-                      RoomDetailsContainer(
-                        room: state.room!,
-                      ),
-                    ]),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        Semantics(
+                          label:
+                              '${state.room!.images.length} room photos. Swipe to browse.',
+                          child: ImageCarousel(
+                            images: state.room!.images,
+                            height: 300,
+                            borderRadius: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        RoomDetailsContainer(room: state.room!),
+                      ]),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
