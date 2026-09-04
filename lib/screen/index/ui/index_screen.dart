@@ -7,7 +7,6 @@ import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:omspos/screen/map/screen/map_screen.dart';
 import 'package:omspos/screen/profile/ui/profile_screen.dart';
 import 'package:omspos/services/language/translation_extension.dart';
-import 'package:omspos/themes/theme_state.dart';
 import 'package:provider/provider.dart';
 
 class IndexScreen extends StatelessWidget {

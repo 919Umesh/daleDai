@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:omspos/enum/enumerator.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/screen/room/api/room_api.dart';
 import 'package:omspos/screen/room/model/esewa_payment_model.dart';

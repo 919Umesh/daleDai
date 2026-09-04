@@ -9,6 +9,17 @@ class ReviewContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (reviews.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: Center(
+          child: Text(
+            'No comments yet. Be the first to comment!',
+            style: reviewCommentTextStyle.copyWith(color: Colors.grey),
+          ),
+        ),
+      );
+    }
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -93,15 +104,17 @@ class ReviewContainer extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Comment
-          Text(
-            review.comment,
-            style: reviewCommentTextStyle,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
+          if (review.comment.trim().isNotEmpty) ...[
+            const SizedBox(height: 16),
+            // Comment
+            Text(
+              review.comment,
+              style: reviewCommentTextStyle,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+          ],
           // Read More button (optional)
           if ((review.comment).length > 100)
             Align(

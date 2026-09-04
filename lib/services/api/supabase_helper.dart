@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:omspos/services/google/google_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';

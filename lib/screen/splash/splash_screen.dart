@@ -3,7 +3,6 @@ import 'package:omspos/constants/assets_list.dart';
 import 'package:provider/provider.dart';
 import '../../config/app_detail.dart';
 import '../../constants/text_style.dart';
-import '../../themes/fonts_style.dart';
 import '../../widgets/gerdient_container.dart';
 import '../../widgets/space.dart';
 import 'splash_state.dart';
@@ -45,7 +44,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _controller.dispose();
-    _splashState.dispose();
     super.dispose();
   }
 

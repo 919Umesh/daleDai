@@ -50,9 +50,11 @@ class SplashState with ChangeNotifier {
     }
   }
 
+  @override
   void dispose() {
     _isDisposed = true;
     _timer?.cancel();
     _timer = null;
+    super.dispose();
   }
 }

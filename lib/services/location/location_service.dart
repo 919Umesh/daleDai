@@ -51,7 +51,7 @@ class LocationService {
       if (!hasPermission) return null;
 
       if (_currentPosition != null &&
-          DateTime.now().difference(_currentPosition!.timestamp!) <
+          DateTime.now().difference(_currentPosition!.timestamp) <
               Duration(minutes: 5)) {
         return _currentPosition;
       }

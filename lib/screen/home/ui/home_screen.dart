@@ -152,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       PrefKey.landLordId, property.landlordId);
                                   await SharedPrefService.setValue<String>(
                                       PrefKey.propertyID, property.propertyId);
+                                  if (!context.mounted) return;
                                   Navigator.of(context).push(MaterialPageRoute(
                                     builder: (_) => RoomScreen(
                                       propertyId: property.propertyId.toString(),

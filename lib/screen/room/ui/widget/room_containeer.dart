@@ -43,24 +43,45 @@ class _RoomContainerState extends State<RoomContainer> {
           ),
           const SizedBox(height: 8),
 
-          // Paragraph with See More
-          Text(
-            widget.property?.description ?? "No description available",
-            style: subTitleTextStyle,
-            maxLines: _isExpanded ? null : 4,
-            overflow:
-                _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-          ),
-          InkWell(
-            onTap: () => setState(() => _isExpanded = !_isExpanded),
-            child: Text(
-              _isExpanded ?  context.translate('see_less') :  context.translate('see_more'),
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+          // Paragraph with See More (only shown when text actually overflows)
+          Builder(builder: (context) {
+            final description =
+                widget.property?.description ?? "No description available";
+            return LayoutBuilder(builder: (context, constraints) {
+              final painter = TextPainter(
+                text: TextSpan(text: description, style: subTitleTextStyle),
+                maxLines: 4,
+                textDirection: Directionality.of(context),
+              )..layout(maxWidth: constraints.maxWidth);
+              final isOverflowing = painter.didExceedMaxLines;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    description,
+                    style: subTitleTextStyle,
+                    maxLines: _isExpanded ? null : 4,
+                    overflow: _isExpanded
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
+                  ),
+                  if (isOverflowing)
+                    InkWell(
+                      onTap: () => setState(() => _isExpanded = !_isExpanded),
+                      child: Text(
+                        _isExpanded
+                            ? context.translate('see_less')
+                            : context.translate('see_more'),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            });
+          }),
           const SizedBox(height: 20),
 
           // What we offer

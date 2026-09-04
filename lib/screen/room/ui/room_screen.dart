@@ -114,6 +114,7 @@ class _RoomScreenState extends State<RoomScreen> {
                           'comment': comment,
                         };
                         await RoomApi.createReview(formData);
+                        if (!context.mounted) return;
                         Navigator.of(ctx2).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Comment added')),
@@ -123,6 +124,7 @@ class _RoomScreenState extends State<RoomScreen> {
                           Provider.of<RoomState>(context, listen: false).loadReviews(propertyId);
                         } catch (_) {}
                       } catch (e) {
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Failed to add comment: ${e.toString()}')),
                         );

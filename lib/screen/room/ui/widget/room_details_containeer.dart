@@ -56,23 +56,45 @@ class _RoomDetailsContainerState extends State<RoomDetailsContainer> {
             ),
             const SizedBox(height: 12),
 
-            // Description with See More
-            Text(
-              room.description.isNotEmpty ? room.description : "No description available",
-              style: subTitleTextStyle.copyWith(height: 1.4),
-              maxLines: _isExpanded ? null : 3,
-              overflow:
-                  _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => setState(() => _isExpanded = !_isExpanded),
-                child: Text(_isExpanded
-                    ? context.translate('see_less')
-                    : context.translate('see_more')),
-              ),
-            ),
+            // Description with See More (only shown when text actually overflows)
+            Builder(builder: (context) {
+              final description = room.description.isNotEmpty
+                  ? room.description
+                  : "No description available";
+              final descriptionStyle = subTitleTextStyle.copyWith(height: 1.4);
+              return LayoutBuilder(builder: (context, constraints) {
+                final painter = TextPainter(
+                  text: TextSpan(text: description, style: descriptionStyle),
+                  maxLines: 3,
+                  textDirection: Directionality.of(context),
+                )..layout(maxWidth: constraints.maxWidth);
+                final isOverflowing = painter.didExceedMaxLines;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      description,
+                      style: descriptionStyle,
+                      maxLines: _isExpanded ? null : 3,
+                      overflow: _isExpanded
+                          ? TextOverflow.visible
+                          : TextOverflow.ellipsis,
+                    ),
+                    if (isOverflowing)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () =>
+                              setState(() => _isExpanded = !_isExpanded),
+                          child: Text(_isExpanded
+                              ? context.translate('see_less')
+                              : context.translate('see_more')),
+                        ),
+                      ),
+                  ],
+                );
+              });
+            }),
             SizedBox(
               height: 2,
             ),
@@ -120,7 +142,7 @@ class _RoomDetailsContainerState extends State<RoomDetailsContainer> {
             SizedBox(
               height: 12,
             ),
-            Text(context.translate('comments'), style: titleListTextStyle),
+           
             // Book Now Button
             SizedBox(
               width: double.infinity,

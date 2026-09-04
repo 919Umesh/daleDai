@@ -166,7 +166,6 @@ class BookingInvoice {
   }
 
   Widget _buildBookingSummary(Context context) {
-    final dateFormat = DateFormat('yyyy-MM-dd');
     final statusText = bookingData.status.toUpperCase();
 
     return Container(

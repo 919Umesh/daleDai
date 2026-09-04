@@ -72,7 +72,6 @@ class LoginState extends ChangeNotifier {
       } else {
         // Assume successful login returns userId and email
         final userId = response['userId'];
-        final email = response['email'];
         await SharedPrefService.setValue<String>(PrefKey.userId, userId);
         await SharedPrefService.setValue<bool>(PrefKey.isLogin, true);
         Fluttertoast.showToast(
