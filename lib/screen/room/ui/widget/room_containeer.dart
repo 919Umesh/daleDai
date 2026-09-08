@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:omspos/config/env_config.dart';
 import 'package:omspos/screen/home/model/property_model.dart';
 import 'package:omspos/services/language/translation_extension.dart';
 
@@ -120,6 +119,7 @@ class _RoomContainerState extends State<RoomContainer> {
                 ),
             ],
           ),
+          const SizedBox(height: 20),
           // Hosted By
           Text(
             context.translate('hosted_by'),
@@ -132,15 +132,24 @@ class _RoomContainerState extends State<RoomContainer> {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundImage: CachedNetworkImageProvider(
-                  '${EnvConfig.supabaseUrl}/storage/v1/object/public/profile/Seller.png',
-                ),
+                backgroundColor: theme.colorScheme.primaryContainer,
+                backgroundImage:
+                    (widget.property?.hostProfileImage ?? '').isNotEmpty
+                        ? CachedNetworkImageProvider(
+                            widget.property!.hostProfileImage!,
+                          )
+                        : null,
+                child: (widget.property?.hostProfileImage ?? '').isEmpty
+                    ? Icon(Icons.person,
+                        color: theme.colorScheme.onPrimaryContainer)
+                    : null,
               ),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Property host', style: theme.textTheme.titleMedium),
+                  Text(widget.property?.hostName ?? 'Property owner',
+                      style: theme.textTheme.titleMedium),
                   Text(
                     [widget.property?.city, widget.property?.state]
                         .whereType<String>()

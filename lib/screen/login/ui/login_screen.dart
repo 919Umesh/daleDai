@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:omspos/constants/assets_list.dart';
 import 'package:omspos/screen/login/state/login_state.dart';
 import 'package:provider/provider.dart';
 
@@ -147,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: state.isLoading
+                          onPressed: state.isLoading || state.isGoogleLoading
                               ? null
                               : () => state.sendPasswordReset(),
                           child: const Text('Forgot Password?'),
@@ -164,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: state.isLoading
+                        onPressed: state.isLoading || state.isGoogleLoading
                             ? null
                             : () async {
                                 if (_formKey.currentState!.validate()) {
@@ -214,43 +215,35 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                    Center(
+                      child: Semantics(
+                        button: true,
+                        label: 'Continue with Google',
+                        child: Tooltip(
+                          message: 'Continue with Google',
+                          child: InkResponse(
+                            onTap: state.isLoading || state.isGoogleLoading
+                                ? null
+                                : () => state.signInWithGoogle(),
+                            radius: 30,
+                            child: state.isGoogleLoading
+                                ? const SizedBox(
+                                    width: 48,
+                                    height: 48,
+                                    child: Padding(
+                                      padding: EdgeInsets.all(12),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                      ),
+                                    ),
+                                  )
+                                : Image.asset(
+                                    AssetsList.googleSignInIcon,
+                                    width: 48,
+                                    height: 48,
+                                  ),
                           ),
                         ),
-                        icon: state.isLoading
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Text(
-                                'G',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF4285F4),
-                                ),
-                              ),
-                        label: Text(
-                          state.isLoading
-                              ? 'Signing in…'
-                              : 'Continue with Google',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        onPressed: state.isLoading
-                            ? null
-                            : () => state.signInWithGoogle(),
                       ),
                     ),
                     const SizedBox(height: 24),

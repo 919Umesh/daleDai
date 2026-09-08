@@ -29,13 +29,13 @@ BEGIN
 
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'property_type') THEN
     CREATE TYPE public.property_type AS ENUM (
-      'apartment', 'house', 'room', 'flat', 'hostel', 'commercial', 'villa', 'single', 'double', 'rent'
+      'apartment', 'house', 'room', 'pg'
     );
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'furnishing_status') THEN
     CREATE TYPE public.furnishing_status AS ENUM (
-      'unfurnished', 'semi-furnished', 'fully-furnished', 'furnished'
+      'unfurnished', 'semi_furnished', 'furnished'
     );
   END IF;
 
@@ -111,7 +111,6 @@ CREATE TABLE IF NOT EXISTS public.properties (
   address text NOT NULL,
   city text NOT NULL,
   state text NOT NULL,
-  pincode text NOT NULL,
   latitude double precision NOT NULL,
   longitude double precision NOT NULL,
   property_type public.property_type NOT NULL,

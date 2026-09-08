@@ -78,6 +78,11 @@ class ManagementApi {
     List<String> images = const [],
   }) async {
     final payload = {...values, 'landlord_id': currentUserId};
+    payload['furnishing_status'] = switch (payload['furnishing_status']) {
+      'semi-furnished' => 'semi_furnished',
+      'fully-furnished' => 'furnished',
+      final value => value,
+    };
     late String id;
     if (propertyId == null) {
       final row =
@@ -152,17 +157,45 @@ class ManagementApi {
         .toList();
   }
 
+  static Future<List<Map<String, dynamic>>> getApplications(
+      String propertyId) async {
+    final result = await _client.rpc(
+      'get_property_applications',
+      params: {'p_property_id': propertyId},
+    );
+    return List<Map<String, dynamic>>.from(result as List);
+  }
+
+  static Future<void> approveApplication(String bookingId) async {
+    await _client.rpc(
+      'approve_rental_application',
+      params: {'p_booking_id': bookingId},
+    );
+    _notifyChanged();
+  }
+
   static Future<String> saveUnit({
     String? roomId,
     required Map<String, dynamic> values,
     List<String> images = const [],
   }) async {
+    final payload = {...values};
+    for (final field in ['rent_amount', 'security_deposit']) {
+      final value = payload[field];
+      final number = value is num
+          ? value
+          : num.tryParse(value?.toString().trim() ?? '');
+      if (number == null || number % 1 != 0) {
+        throw ArgumentError('$field must be a whole number.');
+      }
+      payload[field] = number.toInt();
+    }
     late String id;
     if (roomId == null) {
-      final row = await _client.from('rooms').insert(values).select().single();
+      final row = await _client.from('rooms').insert(payload).select().single();
       id = row['room_id'].toString();
     } else {
-      await _client.from('rooms').update(values).eq('room_id', roomId);
+      await _client.from('rooms').update(payload).eq('room_id', roomId);
       id = roomId;
     }
     if (images.isNotEmpty) {
@@ -173,28 +206,6 @@ class ManagementApi {
     }
     _notifyChanged();
     return id;
-  }
-
-  static Future<void> assignTenant({
-    required String propertyId,
-    required String roomId,
-    required Map<String, dynamic> values,
-  }) async {
-    await _client.rpc('assign_tenant', params: {
-      'p_property_id': propertyId,
-      'p_room_id': roomId,
-      'p_tenant_name': values['tenant_name'],
-      'p_tenant_phone': values['tenant_phone'],
-      'p_tenant_email': values['tenant_email'],
-      'p_emergency_contact': values['emergency_contact'],
-      'p_lease_start': values['lease_start'],
-      'p_lease_end': values['lease_end'],
-      'p_monthly_rent': values['monthly_rent'],
-      'p_security_deposit': values['security_deposit'],
-      'p_rent_due_day': values['rent_due_day'],
-      'p_notes': values['notes'],
-    });
-    _notifyChanged();
   }
 
   static Future<void> vacateTenant(String tenancyId) async {
@@ -263,6 +274,17 @@ class ManagementApi {
     _notifyChanged();
   }
 
+  static Future<List<Map<String, dynamic>>> getExpenses(
+      String propertyId) async {
+    final result = await _client
+        .from('property_expenses')
+        .select('*,rooms(room_number)')
+        .eq('property_id', propertyId)
+        .order('expense_date', ascending: false)
+        .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(result);
+  }
+
   static Future<List<Map<String, dynamic>>> getMaintenance(
       String propertyId) async {
     final result = await _client
@@ -274,21 +296,39 @@ class ManagementApi {
   }
 
   static Future<void> addMaintenance({
-    required String propertyId,
-    String? roomId,
+    required Map<String, dynamic> tenancy,
     required String title,
     required String description,
     required String priority,
   }) async {
     await _client.from('maintenance_requests').insert({
-      'owner_id': currentUserId,
-      'property_id': propertyId,
-      'room_id': roomId,
+      'owner_id': tenancy['owner_id'],
+      'property_id': tenancy['property_id'],
+      'room_id': tenancy['room_id'],
+      'tenancy_id': tenancy['tenancy_id'],
       'title': title,
       'description': description,
       'priority': priority,
     });
     _notifyChanged();
+  }
+
+  static Future<List<Map<String, dynamic>>> getTenantTenancies() async {
+    final result = await _client
+        .from('tenancies')
+        .select('*,properties(title),rooms(room_number)')
+        .eq('tenant_user_id', currentUserId)
+        .inFilter('status', ['active', 'notice'])
+        .order('lease_start', ascending: false);
+    return List<Map<String, dynamic>>.from(result);
+  }
+
+  static Future<List<Map<String, dynamic>>> getTenantMaintenance() async {
+    final result = await _client
+        .from('maintenance_requests')
+        .select('*,properties(title),rooms(room_number)')
+        .order('reported_at', ascending: false);
+    return List<Map<String, dynamic>>.from(result);
   }
 
   static Future<void> resolveMaintenance(String id) async {

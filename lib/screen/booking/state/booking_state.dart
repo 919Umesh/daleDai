@@ -91,7 +91,7 @@ class BookingState extends ChangeNotifier {
     if (_isLoading) return;
     _isLoading = true;
     _errorMessage = null;
-    final statusKey = (status ?? 'confirmed').toLowerCase();
+    final statusKey = (status ?? 'pending').toLowerCase();
 
     // If we have cached data for this status and not forcing refresh,
     // return it immediately to avoid UI delay.
@@ -115,7 +115,7 @@ class BookingState extends ChangeNotifier {
 
       _bookings = await BookingAPI.getBookingsByUser(
         userId.toString(),
-        status: status ?? "confirmed",
+        status: status ?? "pending",
         isRefresh: isRefresh ?? false,
       );
       // store in cache for quick subsequent access

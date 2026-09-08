@@ -16,7 +16,7 @@ class BookingListScreen extends StatefulWidget {
 class _BookingListScreenState extends State<BookingListScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final List<String> _tabs = ["Confirmed", "Pending", "Completed"];
+  final List<String> _tabs = ["Pending", "Completed"];
 
   @override
   void initState() {

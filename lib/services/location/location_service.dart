@@ -45,12 +45,14 @@ class LocationService {
     return true;
   }
 
-  static Future<Position?> getCurrentLocation() async {
+  static Future<Position?> getCurrentLocation(
+      {bool forceRefresh = false}) async {
     try {
       bool hasPermission = await _handleLocationPermission();
       if (!hasPermission) return null;
 
-      if (_currentPosition != null &&
+      if (!forceRefresh &&
+          _currentPosition != null &&
           DateTime.now().difference(_currentPosition!.timestamp) <
               Duration(minutes: 5)) {
         return _currentPosition;
@@ -59,6 +61,7 @@ class LocationService {
       _currentPosition = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.best,
+          timeLimit: Duration(seconds: 20),
         ),
       );
       CustomLog.actionLog(
@@ -93,7 +96,6 @@ class LocationService {
   }
 }
 
-
 // // To get current location anywhere in your app:
 // Position? position = await LocationService.getCurrentLocation();
 // if (position != null) {
@@ -106,7 +108,6 @@ class LocationService {
 // // Or use the convenience methods:
 // String? lat = await LocationService.getLatitude();
 // String? lng = await LocationService.getLongitude();
-
 
 // bool hasPermission = await LocationService._handleLocationPermission();
 // if (!hasPermission) {

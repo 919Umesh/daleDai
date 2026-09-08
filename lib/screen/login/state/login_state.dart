@@ -14,6 +14,7 @@ class LoginState extends ChangeNotifier {
 
   late BuildContext _context;
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
   String? _errorMessage;
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
@@ -21,6 +22,7 @@ class LoginState extends ChangeNotifier {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool get isLoading => _isLoading;
+  bool get isGoogleLoading => _isGoogleLoading;
   String? get errorMessage => _errorMessage;
   bool get obscurePassword => _obscurePassword;
   TextEditingController get emailController => _emailController;
@@ -65,7 +67,9 @@ class LoginState extends ChangeNotifier {
 
   /// Sign in using Google OAuth and navigate on success
   Future<void> signInWithGoogle() async {
-    _isLoading = true;
+    if (_isGoogleLoading || _isLoading) return;
+
+    _isGoogleLoading = true;
     _errorMessage = null;
     notifyListeners();
     try {
@@ -113,7 +117,7 @@ class LoginState extends ChangeNotifier {
       );
       CustomLog.errorLog(value: 'Google login exception: $e');
     } finally {
-      _isLoading = false;
+      _isGoogleLoading = false;
       notifyListeners();
     }
   }

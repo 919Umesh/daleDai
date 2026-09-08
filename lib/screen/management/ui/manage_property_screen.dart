@@ -22,6 +22,8 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
   String _title = 'Property';
   List<ManagedUnit> _units = const [];
   List<Map<String, dynamic>> _maintenance = const [];
+  List<Map<String, dynamic>> _expenses = const [];
+  List<Map<String, dynamic>> _applications = const [];
 
   @override
   void initState() {
@@ -39,6 +41,8 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
         ManagementApi.getProperty(widget.propertyId),
         ManagementApi.getUnits(widget.propertyId),
         ManagementApi.getMaintenance(widget.propertyId),
+        ManagementApi.getExpenses(widget.propertyId),
+        ManagementApi.getApplications(widget.propertyId),
       ]);
       if (!mounted) return;
       setState(() {
@@ -46,6 +50,8 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
             'Property';
         _units = result[1] as List<ManagedUnit>;
         _maintenance = result[2] as List<Map<String, dynamic>>;
+        _expenses = result[3] as List<Map<String, dynamic>>;
+        _applications = result[4] as List<Map<String, dynamic>>;
         _loading = false;
       });
     } catch (e) {
@@ -86,19 +92,42 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
                       children: [
                         _propertySummary(),
                         const SizedBox(height: 18),
-                        Row(children: [
-                          Expanded(
-                              child: OutlinedButton.icon(
-                                  onPressed: _addExpense,
-                                  icon: const Icon(Icons.receipt_long_outlined),
-                                  label: const Text('Add expense'))),
-                          const SizedBox(width: 10),
-                          Expanded(
-                              child: OutlinedButton.icon(
-                                  onPressed: _addMaintenance,
-                                  icon: const Icon(Icons.build_outlined),
-                                  label: const Text('Maintenance'))),
-                        ]),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _addExpense,
+                            icon: const Icon(Icons.add_card_outlined),
+                            label: const Text('Record an expense'),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Rental applications',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold)),
+                            Text('${_applications.length} pending'),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (_applications.isEmpty)
+                          const Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Row(children: [
+                                Icon(Icons.assignment_turned_in_outlined),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text('No pending rental applications.'),
+                                ),
+                              ]),
+                            ),
+                          )
+                        else
+                          ..._applications.map(_applicationCard),
                         const SizedBox(height: 24),
                         Text('Rooms and flats',
                             style: Theme.of(context)
@@ -117,6 +146,35 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
                                         'No units yet. Add a room, flat, shop, or office.')
                                   ]))),
                         ..._units.map(_unitCard),
+                        const SizedBox(height: 24),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Expenses',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold)),
+                            Text(_money.format(_expenses.fold<num>(
+                                0,
+                                (sum, expense) =>
+                                    sum +
+                                    ((expense['amount'] as num?) ?? 0)))),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (_expenses.isEmpty)
+                          const Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Row(children: [
+                                Icon(Icons.receipt_long_outlined),
+                                SizedBox(width: 12),
+                                Expanded(child: Text('No expenses recorded yet.')),
+                              ]),
+                            ),
+                          ),
+                        ..._expenses.take(20).map(_expenseCard),
                         const SizedBox(height: 24),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,29 +199,68 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
   Widget _propertySummary() {
     final occupied = _units.where((u) => u.isOccupied).length;
     final potential = _units.fold<double>(0, (sum, unit) => sum + unit.rent);
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(children: [
-          Expanded(child: _stat('Units', '${_units.length}')),
-          Expanded(child: _stat('Occupied', '$occupied')),
-          Expanded(child: _stat('Vacant', '${_units.length - occupied}')),
-          Expanded(child: _stat('Rent/month', _money.format(potential))),
-        ]),
-      ),
+    final cards = [
+      ('Units', '${_units.length}', Icons.home_work_outlined, Colors.indigo),
+      ('Occupied', '$occupied', Icons.people_alt_outlined, Colors.orange),
+      ('Vacant', '${_units.length - occupied}', Icons.meeting_room_outlined,
+        Colors.green),
+      ('Rent / month', _money.format(potential), Icons.payments_outlined,
+        Colors.teal),
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final gap = 10.0;
+        final width = (constraints.maxWidth - gap) / 2;
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: cards
+              .map((card) => SizedBox(
+                    width: width,
+                    child: _statCard(
+                        card.$1, card.$2, card.$3, card.$4),
+                  ))
+              .toList(),
+        );
+      },
     );
   }
 
-  Widget _stat(String label, String value) => Column(children: [
-        FittedBox(
-            child: Text(value,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w800, fontSize: 16))),
-        const SizedBox(height: 3),
-        Text(label,
-            style: Theme.of(context).textTheme.bodySmall,
-            textAlign: TextAlign.center),
-      ]);
+  Widget _statCard(String label, String value, IconData icon, Color color) =>
+      Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: .1),
+          border: Border.all(color: color.withValues(alpha: .22)),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(children: [
+          Container(
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: .16),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(value,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 17)),
+                ),
+                Text(label, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
+          ),
+        ]),
+      );
 
   Widget _unitCard(ManagedUnit unit) {
     final statusColor = unit.isOccupied ? Colors.orange : Colors.green;
@@ -194,14 +291,14 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
             PopupMenuButton<String>(
               onSelected: (value) {
                 if (value == 'edit') _openUnitEditor(unit);
-                if (value == 'tenant') _assignTenant(unit);
+                if (value == 'details') _showTenantDetails(unit);
                 if (value == 'vacate') _vacate(unit);
               },
               itemBuilder: (_) => [
                 const PopupMenuItem(value: 'edit', child: Text('Edit unit')),
-                if (!unit.isOccupied)
+                if (unit.isOccupied && unit.tenancyId != null)
                   const PopupMenuItem(
-                      value: 'tenant', child: Text('Assign tenant')),
+                      value: 'details', child: Text('View resident details')),
                 if (unit.isOccupied && unit.tenancyId != null)
                   const PopupMenuItem(
                       value: 'vacate', child: Text('Mark vacant')),
@@ -257,25 +354,133 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
             Text(unit.description, maxLines: 2, overflow: TextOverflow.ellipsis)
           ],
           const SizedBox(height: 10),
+          if (unit.isOccupied && unit.tenancyId != null)
+            Row(children: [
+              Expanded(
+                child: FilledButton.tonalIcon(
+                  onPressed: () => _showTenantDetails(unit),
+                  icon: const Icon(Icons.badge_outlined, size: 18),
+                  label: const Text('Resident details'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _vacate(unit),
+                  icon: const Icon(Icons.logout, size: 18),
+                  label: const Text('Move out'),
+                ),
+              ),
+            ])
+          else
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _openUnitEditor(unit),
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                label: const Text('Edit unit'),
+              ),
+            ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _applicationCard(Map<String, dynamic> application) {
+    final moveIn =
+        DateTime.tryParse(application['move_in_date']?.toString() ?? '');
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            CircleAvatar(
+              backgroundColor:
+                  Theme.of(context).colorScheme.primaryContainer,
+              child: const Icon(Icons.person_outline),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(application['tenant_name']?.toString() ?? 'Applicant',
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                  Text('Unit ${application['room_number'] ?? ''}'),
+                ],
+              ),
+            ),
+            Chip(
+              label: const Text('Pending'),
+              side: BorderSide.none,
+              backgroundColor: Colors.orange.withValues(alpha: .14),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          Wrap(spacing: 14, runSpacing: 6, children: [
+            if (application['tenant_phone']?.toString().isNotEmpty == true)
+              Text('📞 ${application['tenant_phone']}'),
+            if (application['tenant_email']?.toString().isNotEmpty == true)
+              Text('✉ ${application['tenant_email']}'),
+            if (moveIn != null)
+              Text('Move-in ${DateFormat.yMMMd().format(moveIn)}'),
+            Text('${application['peoples'] ?? 1} occupant(s)'),
+          ]),
+          const SizedBox(height: 12),
           Row(children: [
             Expanded(
-                child: OutlinedButton.icon(
-                    onPressed: () => _openUnitEditor(unit),
-                    icon: const Icon(Icons.edit_outlined, size: 18),
-                    label: const Text('Edit'))),
-            const SizedBox(width: 8),
-            Expanded(
-                child: FilledButton.icon(
-              onPressed: unit.isOccupied
-                  ? (unit.tenancyId == null ? null : () => _vacate(unit))
-                  : () => _assignTenant(unit),
-              icon: Icon(unit.isOccupied ? Icons.logout : Icons.person_add_alt),
-              label: Text(unit.isOccupied ? 'Vacate' : 'Add tenant'),
-            )),
+              child: Text(
+                '${_money.format((application['monthly_rent'] as num?) ?? 0)}/month',
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            FilledButton.icon(
+              onPressed: () => _approveApplication(application),
+              icon: const Icon(Icons.check_circle_outline),
+              label: const Text('Approve'),
+            ),
           ]),
         ]),
       ),
     );
+  }
+
+  Future<void> _approveApplication(Map<String, dynamic> application) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Approve rental application?'),
+        content: Text(
+          '${application['tenant_name'] ?? 'This tenant'} will be assigned to unit ${application['room_number'] ?? ''}.',
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Approve')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await ManagementApi.approveApplication(
+          application['booking_id'].toString());
+      await _load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tenant assigned successfully.')),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not approve application: $error')),
+        );
+      }
+    }
   }
 
   Widget _maintenanceCard(Map<String, dynamic> item) {
@@ -300,6 +505,33 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
     ));
   }
 
+  Widget _expenseCard(Map<String, dynamic> expense) {
+    final room = expense['rooms'] as Map<String, dynamic>?;
+    final date = DateTime.tryParse(expense['expense_date']?.toString() ?? '');
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: ListTile(
+        leading: CircleAvatar(
+          child: Icon(
+            expense['category'] == 'maintenance'
+                ? Icons.build_outlined
+                : Icons.receipt_long_outlined,
+          ),
+        ),
+        title: Text(expense['description']?.toString() ?? 'Expense'),
+        subtitle: Text([
+          _label(expense['category']?.toString() ?? 'other'),
+          if (room != null) 'Unit ${room['room_number']}',
+          if (date != null) DateFormat.yMMMd().format(date),
+        ].join(' • ')),
+        trailing: Text(
+          _money.format((expense['amount'] as num?) ?? 0),
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+      ),
+    );
+  }
+
   String _label(String value) => value
       .replaceAll('_', ' ')
       .split(' ')
@@ -312,17 +544,6 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
         MaterialPageRoute(
             builder: (_) =>
                 UnitEditorScreen(propertyId: widget.propertyId, unit: unit)));
-    if (changed == true) _load();
-  }
-
-  Future<void> _assignTenant(ManagedUnit unit) async {
-    final changed = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (_) =>
-          TenantEditorSheet(propertyId: widget.propertyId, unit: unit),
-    );
     if (changed == true) _load();
   }
 
@@ -476,21 +697,63 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
   }
 
   Future<void> _addExpense() async {
+    final formKey = GlobalKey<FormState>();
     final description = TextEditingController();
     final amount = TextEditingController();
     String category = 'maintenance';
     String? roomId;
-    final saved = await showDialog<bool>(
+    final saved = await showModalBottomSheet<bool>(
         context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
         builder: (ctx) => StatefulBuilder(
-            builder: (ctx, setLocal) => AlertDialog(
-                  title: const Text('Add expense'),
-                  content: SingleChildScrollView(
-                      child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    DropdownButtonFormField(
-                        value: category,
-                        decoration:
-                            const InputDecoration(labelText: 'Category'),
+            builder: (ctx, setLocal) => Padding(
+                  padding: EdgeInsets.fromLTRB(
+                      20, 12, 20, MediaQuery.viewInsetsOf(ctx).bottom + 20),
+                  child: Form(
+                    key: formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Container(
+                              width: 42,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: Theme.of(ctx).dividerColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(children: [
+                            CircleAvatar(
+                              backgroundColor: Theme.of(ctx)
+                                  .colorScheme
+                                  .primaryContainer,
+                              child: const Icon(Icons.add_card_outlined),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Record expense',
+                                    style: Theme.of(ctx)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(fontWeight: FontWeight.bold)),
+                                const Text('Track a property operating cost'),
+                              ],
+                            ),
+                          ]),
+                          const SizedBox(height: 20),
+                          DropdownButtonFormField<String>(
+                        initialValue: category,
+                        decoration: const InputDecoration(
+                            labelText: 'Category',
+                            prefixIcon: Icon(Icons.category_outlined)),
                         items: const [
                           'maintenance',
                           'utilities',
@@ -503,11 +766,13 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
                                 value: e, child: Text(_label(e))))
                             .toList(),
                         onChanged: (v) => setLocal(() => category = v!)),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     DropdownButtonFormField<String?>(
-                        value: roomId,
-                        decoration:
-                            const InputDecoration(labelText: 'Unit (optional)'),
+                        initialValue: roomId,
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                            labelText: 'Unit',
+                            prefixIcon: Icon(Icons.meeting_room_outlined)),
                         items: [
                           const DropdownMenuItem<String?>(
                               value: null, child: Text('Whole property')),
@@ -515,30 +780,50 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
                               value: u.id, child: Text(u.number)))
                         ],
                         onChanged: (v) => setLocal(() => roomId = v)),
-                    const SizedBox(height: 10),
-                    TextField(
+                    const SizedBox(height: 12),
+                    TextFormField(
                         controller: description,
-                        decoration:
-                            const InputDecoration(labelText: 'Description')),
-                    const SizedBox(height: 10),
-                    TextField(
-                        controller: amount,
-                        keyboardType: TextInputType.number,
+                        textCapitalization: TextCapitalization.sentences,
                         decoration: const InputDecoration(
-                            labelText: 'Amount', prefixText: 'NPR ')),
-                  ])),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('Cancel')),
-                    FilledButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('Save'))
-                  ],
+                            labelText: 'Description',
+                            hintText: 'What was this expense for?',
+                            prefixIcon: Icon(Icons.notes_outlined)),
+                        validator: (value) => value == null || value.trim().isEmpty
+                            ? 'Enter a description'
+                            : null),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                        controller: amount,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        decoration: const InputDecoration(
+                            labelText: 'Amount',
+                            prefixText: 'NPR ',
+                            prefixIcon: Icon(Icons.payments_outlined)),
+                        validator: (value) =>
+                            (double.tryParse(value?.trim() ?? '') ?? 0) <= 0
+                                ? 'Enter a valid amount'
+                                : null),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            Navigator.pop(ctx, true);
+                          }
+                        },
+                        icon: const Icon(Icons.save_outlined),
+                        label: const Text('Save expense'),
+                      ),
+                    ),
+                        ],
+                      ),
+                    ),
+                  ),
                 )));
-    if (saved == true &&
-        description.text.trim().isNotEmpty &&
-        (double.tryParse(amount.text) ?? 0) > 0) {
+    if (saved == true) {
       await ManagementApi.addExpense(
           propertyId: widget.propertyId,
           roomId: roomId,
@@ -546,89 +831,16 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
           description: description.text.trim(),
           amount: double.parse(amount.text),
           expenseDate: DateTime.now());
-      if (mounted)
+      await _load();
+      if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('Expense recorded')));
+      }
     }
     description.dispose();
     amount.dispose();
   }
-
-  Future<void> _addMaintenance() async {
-    final title = TextEditingController();
-    final description = TextEditingController();
-    String priority = 'normal';
-    String? roomId;
-    final saved = await showModalBottomSheet<bool>(
-        context: context,
-        isScrollControlled: true,
-        builder: (ctx) => StatefulBuilder(
-            builder: (ctx, setLocal) => Padding(
-                  padding: EdgeInsets.fromLTRB(
-                      20, 20, 20, MediaQuery.viewInsetsOf(ctx).bottom + 20),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Text('New maintenance request',
-                        style: Theme.of(ctx).textTheme.titleLarge),
-                    const SizedBox(height: 16),
-                    TextField(
-                        controller: title,
-                        decoration:
-                            const InputDecoration(labelText: 'Issue title')),
-                    const SizedBox(height: 10),
-                    TextField(
-                        controller: description,
-                        minLines: 2,
-                        maxLines: 4,
-                        decoration:
-                            const InputDecoration(labelText: 'Description')),
-                    const SizedBox(height: 10),
-                    Row(children: [
-                      Expanded(
-                          child: DropdownButtonFormField<String?>(
-                              value: roomId,
-                              decoration:
-                                  const InputDecoration(labelText: 'Unit'),
-                              items: [
-                                const DropdownMenuItem<String?>(
-                                    value: null, child: Text('Property')),
-                                ..._units.map((u) => DropdownMenuItem<String?>(
-                                    value: u.id, child: Text(u.number)))
-                              ],
-                              onChanged: (v) => setLocal(() => roomId = v))),
-                      const SizedBox(width: 10),
-                      Expanded(
-                          child: DropdownButtonFormField(
-                              value: priority,
-                              decoration:
-                                  const InputDecoration(labelText: 'Priority'),
-                              items: const ['low', 'normal', 'high', 'urgent']
-                                  .map((e) => DropdownMenuItem(
-                                      value: e, child: Text(_label(e))))
-                                  .toList(),
-                              onChanged: (v) => setLocal(() => priority = v!)))
-                    ]),
-                    const SizedBox(height: 18),
-                    SizedBox(
-                        width: double.infinity,
-                        child: FilledButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: const Text('Create request'))),
-                  ]),
-                )));
-    if (saved == true && title.text.trim().isNotEmpty) {
-      await ManagementApi.addMaintenance(
-          propertyId: widget.propertyId,
-          roomId: roomId,
-          title: title.text.trim(),
-          description: description.text.trim(),
-          priority: priority);
-      await _load();
-    }
-    title.dispose();
-    description.dispose();
-  }
 }
-
 class UnitEditorScreen extends StatefulWidget {
   const UnitEditorScreen({super.key, required this.propertyId, this.unit});
   final String propertyId;
@@ -687,112 +899,252 @@ class _UnitEditorScreenState extends State<UnitEditorScreen> {
   String? _required(String? v) =>
       v == null || v.trim().isEmpty ? 'Required' : null;
 
+  String? _moneyValidator(String? value) {
+    final amount = int.tryParse(value?.trim() ?? '');
+    if (amount == null) return 'Enter a whole amount';
+    if (amount <= 0) return 'Must be greater than zero';
+    return null;
+  }
+
+  String? _depositValidator(String? value) {
+    final amount = int.tryParse(value?.trim() ?? '');
+    if (amount == null) return 'Enter a whole amount';
+    if (amount < 0) return 'Cannot be negative';
+    return null;
+  }
+
+  String _label(String value) => value
+      .split('_')
+      .map((part) =>
+          part.isEmpty ? part : '${part[0].toUpperCase()}${part.substring(1)}')
+      .join(' ');
+
+  Widget _sectionCard({required String title, required List<Widget> children}) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 14),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _responsivePair(Widget first, Widget second) => LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < 440) {
+            return Column(children: [
+              first,
+              const SizedBox(height: 12),
+              second,
+            ]);
+          }
+          return Row(children: [
+            Expanded(child: first),
+            const SizedBox(width: 12),
+            Expanded(child: second),
+          ]);
+        },
+      );
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
             title:
                 Text(widget.unit == null ? 'Add room or flat' : 'Edit unit')),
         body: Form(
-            key: _form,
-            child: ListView(padding: const EdgeInsets.all(16), children: [
-              Row(children: [
-                Expanded(
-                    child: DropdownButtonFormField(
-                        value: _kind,
-                        decoration:
-                            const InputDecoration(labelText: 'Unit kind'),
-                        items: const [
-                          'room',
-                          'flat',
-                          'apartment',
-                          'shop',
-                          'office',
-                          'other'
-                        ]
-                            .map((e) =>
-                                DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (v) => setState(() => _kind = v!))),
-                const SizedBox(width: 10),
-                Expanded(
-                    child: TextFormField(
-                        controller: _number,
-                        decoration: const InputDecoration(
-                            labelText: 'Unit number/name'),
-                        validator: _required))
-              ]),
-              const SizedBox(height: 12),
-              DropdownButtonFormField(
-                  value: _type,
-                  decoration: const InputDecoration(labelText: 'Room layout'),
-                  items: const [
-                    'single',
-                    'double',
-                    'shared',
-                    'master',
-                    'deluxe'
-                  ]
-                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+          key: _form,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+            children: [
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withValues(alpha: .55),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(children: [
+                  CircleAvatar(
+                    radius: 24,
+                    child: Icon(widget.unit == null
+                        ? Icons.add_home_work_outlined
+                        : Icons.edit_outlined),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.unit == null
+                              ? 'Create a rentable unit'
+                              : 'Update unit details',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(height: 3),
+                        const Text('Add pricing, layout and clear photos.'),
+                      ],
+                    ),
+                  ),
+                ]),
+              ),
+              const SizedBox(height: 16),
+              _sectionCard(title: 'Unit details', children: [
+                _responsivePair(
+                  DropdownButtonFormField<String>(
+                    initialValue: _kind,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Unit kind',
+                      prefixIcon: Icon(Icons.home_work_outlined),
+                    ),
+                    items: const [
+                      'room',
+                      'flat',
+                      'apartment',
+                      'shop',
+                      'office',
+                      'other'
+                    ]
+                        .map((e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(_label(e),
+                                  overflow: TextOverflow.ellipsis),
+                            ))
+                        .toList(),
+                    onChanged: (v) => setState(() => _kind = v!),
+                  ),
+                  TextFormField(
+                    controller: _number,
+                    decoration: const InputDecoration(
+                      labelText: 'Unit number or name',
+                      prefixIcon: Icon(Icons.tag_outlined),
+                    ),
+                    validator: _required,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  initialValue: _type,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Room layout',
+                    prefixIcon: Icon(Icons.bed_outlined),
+                  ),
+                  items: const ['single', 'double', 'shared']
+                      .map((e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(_label(e)),
+                          ))
                       .toList(),
-                  onChanged: (v) => setState(() => _type = v!)),
-              const SizedBox(height: 12),
-              Row(children: [
-                Expanded(
-                    child: TextFormField(
-                        controller: _rent,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                            labelText: 'Monthly rent', prefixText: 'NPR '),
-                        validator: _required)),
-                const SizedBox(width: 10),
-                Expanded(
-                    child: TextFormField(
-                        controller: _deposit,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                            labelText: 'Deposit', prefixText: 'NPR '),
-                        validator: _required))
-              ]),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<int>(
-                  value: _dueDay,
-                  decoration:
-                      const InputDecoration(labelText: 'Rent due each month'),
-                  items: List.generate(
-                      28,
-                      (i) => DropdownMenuItem(
-                          value: i + 1, child: Text('Day ${i + 1}'))),
-                  onChanged: (v) => setState(() => _dueDay = v!)),
-              const SizedBox(height: 12),
-              TextFormField(
+                  onChanged: (v) => setState(() => _type = v!),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
                   controller: _description,
                   minLines: 3,
                   maxLines: 5,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  validator: _required),
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    hintText: 'Describe the space and its best features',
+                    prefixIcon: Icon(Icons.notes_outlined),
+                    alignLabelWithHint: true,
+                  ),
+                  validator: _required,
+                ),
+              ]),
               const SizedBox(height: 12),
-              DeviceImagePicker(
-                selectedFiles: _selectedImages,
-                existingUrls: _existingImages,
-                onFilesChanged: (files) =>
-                    setState(() => _selectedImages = files),
-                onExistingRemoved: (url) => setState(() {
-                  _existingImages = [..._existingImages]..remove(url);
-                  _removedImages.add(url);
-                }),
-              ),
-              const SizedBox(height: 22),
-              FilledButton.icon(
+              _sectionCard(title: 'Rent and billing', children: [
+                _responsivePair(
+                  TextFormField(
+                    controller: _rent,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Monthly rent',
+                      prefixText: 'NPR ',
+                      prefixIcon: Icon(Icons.payments_outlined),
+                    ),
+                    validator: _moneyValidator,
+                  ),
+                  TextFormField(
+                    controller: _deposit,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Security deposit',
+                      prefixText: 'NPR ',
+                      prefixIcon: Icon(Icons.savings_outlined),
+                    ),
+                    validator: _depositValidator,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<int>(
+                  initialValue: _dueDay,
+                  decoration: const InputDecoration(
+                    labelText: 'Rent due each month',
+                    prefixIcon: Icon(Icons.event_repeat_outlined),
+                  ),
+                  items: List.generate(
+                    28,
+                    (i) => DropdownMenuItem(
+                      value: i + 1,
+                      child: Text('Day ${i + 1}'),
+                    ),
+                  ),
+                  onChanged: (v) => setState(() => _dueDay = v!),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              _sectionCard(title: 'Unit photos', children: [
+                DeviceImagePicker(
+                  selectedFiles: _selectedImages,
+                  existingUrls: _existingImages,
+                  onFilesChanged: (files) =>
+                      setState(() => _selectedImages = files),
+                  onExistingRemoved: (url) => setState(() {
+                    _existingImages = [..._existingImages]..remove(url);
+                    _removedImages.add(url);
+                  }),
+                ),
+              ]),
+              const SizedBox(height: 18),
+              SizedBox(
+                height: 52,
+                child: FilledButton.icon(
                   onPressed: _saving ? null : _save,
-                  icon: const Icon(Icons.save_outlined),
-                  label: Text(_saving ? 'Saving…' : 'Save unit')),
-            ])),
+                  icon: _saving
+                      ? const SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save_outlined),
+                  label: Text(_saving ? 'Saving unit…' : 'Save unit'),
+                ),
+              ),
+            ],
+          ),
+        ),
       );
 
   Future<void> _save() async {
     if (!_form.currentState!.validate()) return;
-    final rent = double.tryParse(_rent.text);
-    final deposit = double.tryParse(_deposit.text);
+    final rent = int.tryParse(_rent.text.trim());
+    final deposit = int.tryParse(_deposit.text.trim());
     if (rent == null || deposit == null) return;
     if (_existingImages.isEmpty && _selectedImages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -832,222 +1184,6 @@ class _UnitEditorScreenState extends State<UnitEditorScreen> {
       if (mounted)
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Could not save unit: $e')));
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
-  }
-}
-
-class TenantEditorSheet extends StatefulWidget {
-  const TenantEditorSheet(
-      {super.key, required this.propertyId, required this.unit});
-  final String propertyId;
-  final ManagedUnit unit;
-
-  @override
-  State<TenantEditorSheet> createState() => _TenantEditorSheetState();
-}
-
-class _TenantEditorSheetState extends State<TenantEditorSheet> {
-  final _form = GlobalKey<FormState>();
-  final _name = TextEditingController();
-  final _phone = TextEditingController();
-  final _email = TextEditingController();
-  final _emergency = TextEditingController();
-  final _notes = TextEditingController();
-  late final TextEditingController _rent;
-  late final TextEditingController _deposit;
-  DateTime _start = DateTime.now();
-  DateTime? _end;
-  late int _dueDay;
-  bool _saving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _rent = TextEditingController(text: widget.unit.rent.toStringAsFixed(0));
-    _deposit =
-        TextEditingController(text: widget.unit.deposit.toStringAsFixed(0));
-    _dueDay = widget.unit.rentDueDay;
-  }
-
-  @override
-  void dispose() {
-    for (final c in [
-      _name,
-      _phone,
-      _email,
-      _emergency,
-      _notes,
-      _rent,
-      _deposit
-    ]) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  String? _required(String? v) =>
-      v == null || v.trim().isEmpty ? 'Required' : null;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.fromLTRB(
-            18, 12, 18, MediaQuery.viewInsetsOf(context).bottom + 18),
-        child: Form(
-            key: _form,
-            child: SingleChildScrollView(
-                child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                  Center(
-                      child: Container(
-                          width: 42,
-                          height: 4,
-                          decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(4)))),
-                  const SizedBox(height: 16),
-                  Text('Assign tenant to ${widget.unit.number}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                      controller: _name,
-                      decoration:
-                          const InputDecoration(labelText: 'Tenant full name'),
-                      validator: _required),
-                  const SizedBox(height: 10),
-                  Row(children: [
-                    Expanded(
-                        child: TextFormField(
-                            controller: _phone,
-                            keyboardType: TextInputType.phone,
-                            decoration:
-                                const InputDecoration(labelText: 'Phone'),
-                            validator: _required)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                        child: TextFormField(
-                            controller: _email,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                                labelText: 'Email (optional)')))
-                  ]),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      controller: _emergency,
-                      decoration: const InputDecoration(
-                          labelText: 'Emergency contact')),
-                  const SizedBox(height: 10),
-                  Row(children: [
-                    Expanded(
-                        child: TextFormField(
-                            controller: _rent,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                                labelText: 'Monthly rent', prefixText: 'NPR '),
-                            validator: _required)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                        child: TextFormField(
-                            controller: _deposit,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                                labelText: 'Deposit', prefixText: 'NPR '),
-                            validator: _required))
-                  ]),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<int>(
-                      value: _dueDay,
-                      decoration:
-                          const InputDecoration(labelText: 'Monthly due date'),
-                      items: List.generate(
-                          28,
-                          (i) => DropdownMenuItem(
-                              value: i + 1, child: Text('Day ${i + 1}'))),
-                      onChanged: (v) => setState(() => _dueDay = v!)),
-                  const SizedBox(height: 10),
-                  Row(children: [
-                    Expanded(
-                        child: OutlinedButton.icon(
-                            onPressed: () => _pickDate(true),
-                            icon: const Icon(Icons.event),
-                            label: Text(
-                                'Starts ${DateFormat.yMMMd().format(_start)}'))),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: OutlinedButton.icon(
-                            onPressed: () => _pickDate(false),
-                            icon: const Icon(Icons.event_available),
-                            label: Text(_end == null
-                                ? 'No end date'
-                                : 'Ends ${DateFormat.yMMMd().format(_end!)}')))
-                  ]),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                      controller: _notes,
-                      minLines: 2,
-                      maxLines: 3,
-                      decoration:
-                          const InputDecoration(labelText: 'Agreement notes')),
-                  const SizedBox(height: 18),
-                  SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                          onPressed: _saving ? null : _save,
-                          icon: const Icon(Icons.person_add_alt),
-                          label: Text(_saving
-                              ? 'Assigning…'
-                              : 'Assign tenant & create rent schedule'))),
-                ]))),
-      );
-
-  Future<void> _pickDate(bool start) async {
-    final date = await showDatePicker(
-        context: context,
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2040),
-        initialDate:
-            start ? _start : (_end ?? _start.add(const Duration(days: 365))));
-    if (date != null)
-      setState(() {
-        if (start) {
-          _start = date;
-        } else {
-          _end = date;
-        }
-      });
-  }
-
-  Future<void> _save() async {
-    if (!_form.currentState!.validate()) return;
-    setState(() => _saving = true);
-    try {
-      await ManagementApi.assignTenant(
-          propertyId: widget.propertyId,
-          roomId: widget.unit.id,
-          values: {
-            'tenant_name': _name.text.trim(),
-            'tenant_phone': _phone.text.trim(),
-            'tenant_email':
-                _email.text.trim().isEmpty ? null : _email.text.trim(),
-            'emergency_contact': _emergency.text.trim(),
-            'lease_start': _start.toIso8601String().split('T').first,
-            'lease_end': _end?.toIso8601String().split('T').first,
-            'monthly_rent': double.parse(_rent.text),
-            'security_deposit': double.parse(_deposit.text),
-            'rent_due_day': _dueDay,
-            'notes': _notes.text.trim(),
-          });
-      if (mounted) Navigator.pop(context, true);
-    } catch (e) {
-      if (mounted)
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not assign tenant: $e')));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

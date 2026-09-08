@@ -113,7 +113,7 @@ class RoomState extends ChangeNotifier {
       _property =
           await RoomApi.getPropertyDetails(propertyId, isRefresh: refresh);
       _errorMessage = null;
-      CustomLog.successLog(value: 'Loaded room ${_room!.roomNumber}');
+      CustomLog.successLog(value: 'Loaded property ${_property?.title ?? propertyId}');
     } catch (e) {
       _errorMessage = e.toString();
       CustomLog.errorLog(value: 'Property load error: $_errorMessage');
@@ -149,7 +149,7 @@ class RoomState extends ChangeNotifier {
     try {
       _room = await RoomApi.getRoomsDetails(roomId, isRefresh: refresh);
       _errorMessage = null;
-      CustomLog.successLog(value: 'Loaded ${_property!.title} property');
+      CustomLog.successLog(value: 'Loaded room ${_room?.roomNumber ?? roomId}');
     } catch (e) {
       _errorMessage = e.toString();
       CustomLog.errorLog(value: 'Property load error: $_errorMessage');
@@ -353,7 +353,7 @@ class RoomState extends ChangeNotifier {
   void _handlePaymentSuccess(EsewaPaymentSuccessResult data) {
     debugPrint(":::eSewa Payment Success::: => $data");
     Fluttertoast.showToast(
-      msg: 'Payment successful! Confirming booking...',
+      msg: 'Payment successful! Application sent for owner approval.',
       toastLength: Toast.LENGTH_SHORT,
       backgroundColor: Colors.green,
     );
@@ -416,7 +416,7 @@ class RoomState extends ChangeNotifier {
     try {
       final Map<String, dynamic> updateData = {
         'payment_method': 'esewa',
-        'status': 'confirmed',
+        'status': 'pending',
       };
 
       await RoomApi.updateBooking(bookingId, updateData);

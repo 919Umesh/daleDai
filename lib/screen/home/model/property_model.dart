@@ -6,7 +6,6 @@ class PropertyModel {
   final String address;
   final String city;
   final String state;
-  final String pincode;
   final double latitude;
   final double longitude;
   final String propertyType;
@@ -19,6 +18,8 @@ class PropertyModel {
   final String areaId;
   final List<String> attributes;
   final List<String> images;
+  final String? hostName;
+  final String? hostProfileImage;
 
 
   PropertyModel({
@@ -29,7 +30,6 @@ class PropertyModel {
     required this.address,
     required this.city,
     required this.state,
-    required this.pincode,
     required this.latitude,
     required this.longitude,
     required this.propertyType,
@@ -42,6 +42,8 @@ class PropertyModel {
     required this.areaId,
     required this.attributes,
     required this.images,
+    this.hostName,
+    this.hostProfileImage,
   });
 
   factory PropertyModel.fromJson(Map<String, dynamic> json) {
@@ -53,7 +55,6 @@ class PropertyModel {
       address: json['address'] as String,
       city: json['city'] as String,
       state: json['state'] as String,
-      pincode: json['pincode'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       propertyType: json['property_type'] as String,
@@ -68,6 +69,8 @@ class PropertyModel {
       areaId: json['area_id'] as String,
       attributes: List<String>.from(json['attributes'] as List? ?? []),
       images: List<String>.from(json['images'] as List? ?? []),
+      hostName: json['host_name']?.toString(),
+      hostProfileImage: json['host_profile_image']?.toString(),
     );
   }
 
@@ -80,7 +83,6 @@ class PropertyModel {
       'address': address,
       'city': city,
       'state': state,
-      'pincode': pincode,
       'latitude': latitude,
       'longitude': longitude,
       'property_type': propertyType,
@@ -93,6 +95,8 @@ class PropertyModel {
       'area_id': areaId,
       'attributes': attributes,
       'images': images,
+      'host_name': hostName,
+      'host_profile_image': hostProfileImage,
     };
   }
 }

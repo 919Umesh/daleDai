@@ -6,7 +6,6 @@ class PropertiesModel {
   final String address;
   final String city;
   final String state;
-  final String pincode;
   final double latitude;
   final double longitude;
   final String propertyType;
@@ -29,7 +28,6 @@ class PropertiesModel {
     required this.address,
     required this.city,
     required this.state,
-    required this.pincode,
     required this.latitude,
     required this.longitude,
     required this.propertyType,
@@ -53,7 +51,6 @@ class PropertiesModel {
       address: json['address'] as String,
       city: json['city'] as String,
       state: json['state'] as String,
-      pincode: json['pincode'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       propertyType: json['property_type'] as String,
@@ -80,7 +77,6 @@ class PropertiesModel {
       'address': address,
       'city': city,
       'state': state,
-      'pincode': pincode,
       'latitude': latitude,
       'longitude': longitude,
       'property_type': propertyType,

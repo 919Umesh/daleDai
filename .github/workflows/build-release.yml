@@ -14,9 +14,14 @@ env:
   APK_NAME: "basti"
   BUILD_NUMBER: ${{ github.run_number }}
   CHANGES: |
-    - Secure environment handling via dotenv
-    - Fixed Supabase schema permission errors
-    - Supabase migrations, views and storage buckets
+    - Fixed Google sign-in and refreshed app branding
+    - Redesigned property and unit forms with automatic device location
+    - Added Nepal province selection, property amenities, and owner profiles
+    - Added owner dashboards, expense history, resident details, and rent tracking
+    - Added owner-approved rental applications with automatic tenant assignment
+    - Added tenant maintenance requests with secure owner resolution workflow
+    - Removed postal codes and aligned property, furnishing, and room data types
+    - Added Supabase migrations and row-level security for the new workflows
     - Automated build #${{ github.run_number }}
 
 jobs:

@@ -6,6 +6,7 @@ import 'package:omspos/screen/booking/ui/bookig_screen.dart';
 import 'package:omspos/screen/home/ui/home_screen.dart';
 import 'package:omspos/screen/index/state/index_state.dart';
 import 'package:omspos/screen/map/screen/map_screen.dart';
+import 'package:omspos/screen/maintenance/ui/tenant_maintenance_screen.dart';
 import 'package:omspos/screen/management/ui/owner_dashboard_screen.dart';
 import 'package:omspos/screen/profile/ui/profile_screen.dart';
 import 'package:omspos/services/language/translation_extension.dart';
@@ -26,6 +27,7 @@ class _IndexScreenState extends State<IndexScreen> {
     HomeScreen(),
     MapScreen(),
     BookingListScreen(),
+    TenantMaintenanceScreen(),
     ProfileScreen(),
   ];
 
@@ -46,6 +48,7 @@ class _IndexScreenState extends State<IndexScreen> {
     _NavItem(EvaIcons.homeOutline, EvaIcons.home, 'home'),
     _NavItem(EvaIcons.searchOutline, EvaIcons.search, 'explore'),
     _NavItem(EvaIcons.calendarOutline, EvaIcons.calendar, 'bookings'),
+    _NavItem(Icons.build_outlined, Icons.build, 'maintenance'),
     _NavItem(EvaIcons.personOutline, EvaIcons.person, 'profile'),
   ];
 

@@ -5,6 +5,7 @@ import 'package:omspos/screen/room/model/review_user.dart';
 import 'package:omspos/screen/room/model/room_model.dart';
 import 'package:omspos/screen/room/model/room_model_images.dart';
 import 'package:omspos/services/api/supabase_helper.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class RoomApi {
   static Future<List<RoomModelImage>> getRoomsByProperty(String propertyId,
@@ -66,7 +67,20 @@ class RoomApi {
       throw Exception('Property not found');
     }
 
-    return PropertyModel.fromJson(response['data'][0]);
+    final property = Map<String, dynamic>.from(response['data'][0] as Map);
+    if (Supabase.instance.client.auth.currentUser != null) {
+      final hostResult = await Supabase.instance.client.rpc(
+        'get_property_host_profile',
+        params: {'p_property_id': propertyId},
+      );
+      if (hostResult is List && hostResult.isNotEmpty) {
+        final host = Map<String, dynamic>.from(hostResult.first as Map);
+        property
+          ..['host_name'] = host['host_name']
+          ..['host_profile_image'] = host['host_profile_image'];
+      }
+    }
+    return PropertyModel.fromJson(property);
   }
 
   static Future<Map<String, dynamic>> createBooking(
