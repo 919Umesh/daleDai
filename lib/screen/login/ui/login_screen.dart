@@ -223,25 +223,34 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        icon: const Text(
-                          'G',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF4285F4),
-                          ),
-                        ),
-                        label: const Text(
-                          'Continue with Google',
-                          style: TextStyle(
+                        icon: state.isLoading
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text(
+                                'G',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF4285F4),
+                                ),
+                              ),
+                        label: Text(
+                          state.isLoading
+                              ? 'Signing in…'
+                              : 'Continue with Google',
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        onPressed: () async {
-                          await Provider.of<LoginState>(context, listen: false)
-                              .signInWithGoogle();
-                        },
+                        onPressed: state.isLoading
+                            ? null
+                            : () => state.signInWithGoogle(),
                       ),
                     ),
                     const SizedBox(height: 24),

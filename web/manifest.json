@@ -1,11 +1,11 @@
 {
-    "name": "omspos",
-    "short_name": "omspos",
+    "name": "Basti",
+    "short_name": "Basti",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#29950B",
+    "theme_color": "#29950B",
+    "description": "Find and manage rental homes with Basti.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

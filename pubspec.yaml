@@ -81,12 +81,24 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
-flutter_icons:
+flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icons/basti.png" 
+  image_path: "assets/icons/basti_app_icon.png"
+  remove_alpha_ios: true
   min_sdk_android: 23
-  adaptive_icon_background: "#FFFFFF"
+  web:
+    generate: true
+    image_path: "assets/icons/basti_app_icon.png"
+    background_color: "#29950B"
+    theme_color: "#29950B"
+  windows:
+    generate: true
+    image_path: "assets/icons/basti_app_icon.png"
+    icon_size: 256
+  macos:
+    generate: true
+    image_path: "assets/icons/basti_app_icon.png"
 
 flutter:
   uses-material-design: true

@@ -63,12 +63,25 @@ class _SplashScreenState extends State<SplashScreen>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // App Icon
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: Image.asset(
-                        AssetsList.appIcon,
-                        height: 120,
-                        fit: BoxFit.contain,
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(28),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 24,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(28),
+                        child: Image.asset(
+                          AssetsList.appIcon,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     verticalSpace(20),
