@@ -907,7 +907,7 @@ class _PropertyEditorScreenState extends State<PropertyEditorScreen> {
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        initialValue: _type,
+                        value: _type,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'Property type',
@@ -931,7 +931,7 @@ class _PropertyEditorScreenState extends State<PropertyEditorScreen> {
                       ),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        initialValue: _furnishing,
+                        value: _furnishing,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           labelText: 'Furnishing',
@@ -989,7 +989,7 @@ class _PropertyEditorScreenState extends State<PropertyEditorScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            initialValue: _provinces.contains(_state.text)
+                            value: _provinces.contains(_state.text)
                                 ? _state.text
                                 : null,
                             isExpanded: true,
@@ -1017,7 +1017,7 @@ class _PropertyEditorScreenState extends State<PropertyEditorScreen> {
                       ]),
                       const SizedBox(height: 12),
                       DropdownButtonFormField<String>(
-                        initialValue: _areas
+                        value: _areas
                                 .any((a) => a['area_id'].toString() == _areaId)
                             ? _areaId
                             : null,

@@ -221,7 +221,7 @@ class _TenantMaintenanceScreenState extends State<TenantMaintenanceScreen> {
                         ?.copyWith(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 18),
                 DropdownButtonFormField<Map<String, dynamic>>(
-                  initialValue: tenancy,
+                  value: tenancy,
                   isExpanded: true,
                   decoration: const InputDecoration(
                     labelText: 'Rental unit',
@@ -264,7 +264,7 @@ class _TenantMaintenanceScreenState extends State<TenantMaintenanceScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: priority,
+                  value: priority,
                   decoration: const InputDecoration(
                     labelText: 'Priority',
                     prefixIcon: Icon(Icons.priority_high),

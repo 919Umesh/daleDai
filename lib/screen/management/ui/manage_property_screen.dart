@@ -750,7 +750,7 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
                           ]),
                           const SizedBox(height: 20),
                           DropdownButtonFormField<String>(
-                        initialValue: category,
+                        value: category,
                         decoration: const InputDecoration(
                             labelText: 'Category',
                             prefixIcon: Icon(Icons.category_outlined)),
@@ -768,7 +768,7 @@ class _ManagePropertyScreenState extends State<ManagePropertyScreen> {
                         onChanged: (v) => setLocal(() => category = v!)),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String?>(
-                        initialValue: roomId,
+                        value: roomId,
                         isExpanded: true,
                         decoration: const InputDecoration(
                             labelText: 'Unit',
@@ -1007,7 +1007,7 @@ class _UnitEditorScreenState extends State<UnitEditorScreen> {
               _sectionCard(title: 'Unit details', children: [
                 _responsivePair(
                   DropdownButtonFormField<String>(
-                    initialValue: _kind,
+                    value: _kind,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'Unit kind',
@@ -1040,7 +1040,7 @@ class _UnitEditorScreenState extends State<UnitEditorScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  initialValue: _type,
+                  value: _type,
                   isExpanded: true,
                   decoration: const InputDecoration(
                     labelText: 'Room layout',
@@ -1094,7 +1094,7 @@ class _UnitEditorScreenState extends State<UnitEditorScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<int>(
-                  initialValue: _dueDay,
+                  value: _dueDay,
                   decoration: const InputDecoration(
                     labelText: 'Rent due each month',
                     prefixIcon: Icon(Icons.event_repeat_outlined),
